@@ -125,9 +125,9 @@
 <meta property="og:locale" content="zh-Hans">
 <meta property="og:image" content="http://picture.jobshen.com/blog/hexo_github/snipaste_20170917_185841.png">
 <meta property="og:image" content="http://picture.jobshen.com/blog/hexo_github/snipaste_20170917_191236.png">
-<meta property="og:image" content="http://picture.jobshen.comblog/hexo_github/snipaste_20170917_191445.png">
+<meta property="og:image" content="http://picture.jobshen.com/blog/hexo_github/snipaste_20170917_191445.png">
 <meta property="og:image" content="http://picture.jobshen.com/blog/hexo_github/validation-default-scheme-mac.png">
-<meta property="og:updated_time" content="2017-09-17T11:38:56.974Z">
+<meta property="og:updated_time" content="2017-09-17T11:45:02.375Z">
 <meta name="twitter:card" content="summary">
 <meta name="twitter:title" content="利用Hexo和Github Page搭建个人Blog">
 <meta name="twitter:description" content="之前使用wordpress在AWS上搭建的博客，但国内访问速度堪忧，而且费用也不少，于是觉得切到Github上，最终觉得通过Hexo和Github Page重新搭建博客，这篇文章只是为了记录搭建的过程，以防以后忘记（记性不好啊。。。）">
@@ -455,7 +455,7 @@
 <p>然后在该仓库下找到一个文件 <strong>CNAME</strong>， 打开后将里面的值修改为你博客的域名，例如我的 <strong>blog.jobshen.com</strong></p>
 <p><img src="http://picture.jobshen.com/blog/hexo_github/snipaste_20170917_191236.png" alt="img"></p>
 <p>注册完域名后添加一条CNAME记录，然后解析到github Page的地址，我的域名是在Godaddy上注册，添加一个CNAME指向github.io，像这样：</p>
-<p><img src="http://picture.jobshen.comblog/hexo_github/snipaste_20170917_191445.png" alt="img"></p>
+<p><img src="http://picture.jobshen.com/blog/hexo_github/snipaste_20170917_191445.png" alt="img"></p>
 <p>这样你就可以通过自己的域名访问GitHub Page了。</p>
 <h2 id="安装Hexo"><a href="#安装Hexo" class="headerlink" title="安装Hexo"></a>安装Hexo</h2><p>之所以选择Hexo是因为Hexo看上去非常简洁而且支持Markdown，符合我的期望，安装也很方便。</p>
 <h3 id="准备工作"><a href="#准备工作" class="headerlink" title="准备工作"></a>准备工作</h3><p>Hexo 需要NodeJ.js和git</p>
@@ -467,20 +467,20 @@
 </ul>
 <h4 id="Node-js"><a href="#Node-js" class="headerlink" title="Node.js"></a>Node.js</h4><p>安装 Node.js 的最佳方式是使用 <a href="https://github.com/creationix/nvm" target="_blank" rel="external">nvm</a>。</p>
 <p>cURL:</p>
-<figure class="highlight shell"><table><tr><td class="gutter"><pre><div class="line">1</div></pre></td><td class="code"><pre><div class="line"><span class="meta">$</span><span class="bash"> curl https://raw.github.com/creationix/nvm/master/install.sh | sh</span></div></pre></td></tr></table></figure>
+<figure class="highlight shell"><table><tr><td class="gutter"><pre><div class="line">1</div></pre></td><td class="code"><pre><div class="line"><span class="meta">$</span> curl https://raw.github.com/creationix/nvm/master/install.sh | sh</div></pre></td></tr></table></figure>
 <p>Wget:</p>
-<figure class="highlight shell"><table><tr><td class="gutter"><pre><div class="line">1</div></pre></td><td class="code"><pre><div class="line"><span class="meta">$</span><span class="bash"> wget -qO- https://raw.github.com/creationix/nvm/master/install.sh | sh</span></div></pre></td></tr></table></figure>
+<figure class="highlight shell"><table><tr><td class="gutter"><pre><div class="line">1</div></pre></td><td class="code"><pre><div class="line"><span class="meta">$</span> wget -qO- https://raw.github.com/creationix/nvm/master/install.sh | sh</div></pre></td></tr></table></figure>
 <p>安装完成后，重启终端并执行下列命令即可安装 Node.js。</p>
-<figure class="highlight shell"><table><tr><td class="gutter"><pre><div class="line">1</div></pre></td><td class="code"><pre><div class="line"><span class="meta">$</span><span class="bash"> nvm install stable</span></div></pre></td></tr></table></figure>
+<figure class="highlight shell"><table><tr><td class="gutter"><pre><div class="line">1</div></pre></td><td class="code"><pre><div class="line"><span class="meta">$</span> nvm install stable</div></pre></td></tr></table></figure>
 <p>或者您也可以下载 <a href="http://nodejs.org/" target="_blank" rel="external">安装程序</a> 来安装。</p>
 <blockquote>
 <p>Windows 用户</p>
 <p>对于windows用户来说，建议使用安装程序进行安装。安装时，请勾选<strong>Add to PATH</strong>选项。<br>另外，您也可以使用<strong>Git Bash</strong>，这是git for windows自带的一组程序，提供了Linux风格的shell，在该环境下，您可以直接用上面提到的命令来安装Node.js。打开它的方法很简单，在任意位置单击右键，选择“Git Bash Here”即可。由于Hexo的很多操作都涉及到命令行，您可以考虑始终使用<strong>Git Bash</strong>来进行操作。</p>
 </blockquote>
 <h4 id="安装Hexo-1"><a href="#安装Hexo-1" class="headerlink" title="安装Hexo"></a>安装Hexo</h4><p>所有必备的应用程序安装完成后，即可使用 npm 安装 Hexo。</p>
-<figure class="highlight shell"><table><tr><td class="gutter"><pre><div class="line">1</div></pre></td><td class="code"><pre><div class="line"><span class="meta">$</span><span class="bash"> npm install -g hexo-cli</span></div></pre></td></tr></table></figure>
+<figure class="highlight shell"><table><tr><td class="gutter"><pre><div class="line">1</div></pre></td><td class="code"><pre><div class="line"><span class="meta">$</span> npm install -g hexo-cli</div></pre></td></tr></table></figure>
 <h2 id="建站"><a href="#建站" class="headerlink" title="建站"></a>建站</h2><p>安装 Hexo 完成后，请执行下列命令，Hexo 将会在指定文件夹中新建所需要的文件。</p>
-<figure class="highlight shell"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div></pre></td><td class="code"><pre><div class="line"><span class="meta">$</span><span class="bash"> hexo init &lt;folder&gt;</span></div><div class="line"><span class="meta">$</span><span class="bash"> <span class="built_in">cd</span> &lt;folder&gt;</span></div><div class="line"><span class="meta">$</span><span class="bash"> npm install</span></div></pre></td></tr></table></figure>
+<figure class="highlight shell"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div></pre></td><td class="code"><pre><div class="line"><span class="meta">$</span> hexo init &lt;folder&gt;</div><div class="line"><span class="meta">$</span> cd &lt;folder&gt;</div><div class="line"><span class="meta">$</span> npm install</div></pre></td></tr></table></figure>
 <p>新建完成后，指定文件夹的目录如下：</p>
 <figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div></pre></td><td class="code"><pre><div class="line">.</div><div class="line">├── _config.yml</div><div class="line">├── package.json</div><div class="line">├── scaffolds</div><div class="line">├── source</div><div class="line">|   ├── _drafts</div><div class="line">|   └── _posts</div><div class="line">└── themes</div></pre></td></tr></table></figure>
 <h3 id="config-yml"><a href="#config-yml" class="headerlink" title="_config.yml"></a>_config.yml</h3><p>网站的 <a href="https://hexo.io/zh-cn/docs/configuration.html" target="_blank" rel="external">配置</a> 信息，您可以在此配置大部分的参数。</p>
