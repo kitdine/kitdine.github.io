@@ -117,7 +117,7 @@
 
 <meta property="og:type" content="website">
 <meta property="og:title" content="一杯咖啡的时间">
-<meta property="og:url" content="http://blog.jobshen.com/index.html">
+<meta property="og:url" content="http://blog.jobshen.com/tags/Redis/index.html">
 <meta property="og:site_name" content="一杯咖啡的时间">
 <meta property="og:locale" content="zh-Hans">
 <meta name="twitter:card" content="summary">
@@ -150,13 +150,13 @@
 
 
 
-  <link rel="canonical" href="http://blog.jobshen.com/"/>
+  <link rel="canonical" href="http://blog.jobshen.com/tags/Redis/"/>
 
 
 
 
 
-  <title>一杯咖啡的时间</title>
+  <title>标签: Redis | 一杯咖啡的时间</title>
   
 <script>
   window.fbAsyncInit = function() {
@@ -208,9 +208,7 @@
     
   
 
-  <div class="container sidebar-position-left 
-   page-home 
- ">
+  <div class="container sidebar-position-left  ">
     <div class="headband"></div>
 
     <header id="header" class="header" itemscope itemtype="http://schema.org/WPHeader">
@@ -347,471 +345,53 @@
         <div class="content-wrap">
           <div id="content" class="content">
             
-  <section id="posts" class="posts-expand">
-    
-      
-
-  
 
   
   
   
+  <div class="post-block tag">
 
-  <article class="post post-type-normal" itemscope itemtype="http://schema.org/Article">
-  
-  
-  
-  <div class="post-block">
-    <link itemprop="mainEntityOfPage" href="http://blog.jobshen.com/posts/1728650486/">
-
-    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
-      <meta itemprop="name" content="Job Shen">
-      <meta itemprop="description" content="">
-      <meta itemprop="image" content="/uploads/Avatar.png">
-    </span>
-
-    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
-      <meta itemprop="name" content="一杯咖啡的时间">
-    </span>
-
-    
-      <header class="post-header">
-
-        
-        
-          <h1 class="post-title" itemprop="name headline">
-                
-                <a class="post-title-link" href="/posts/1728650486/" itemprop="url">记一次线上Redis故障恢复和分析（一）</a></h1>
-        
-
-        <div class="post-meta">
-          <span class="post-time">
-            
-              <span class="post-meta-item-icon">
-                <i class="fa fa-calendar-o"></i>
-              </span>
-              
-                <span class="post-meta-item-text">发表于</span>
-              
-              <time title="创建于" itemprop="dateCreated datePublished" datetime="2017-09-20T22:37:20+08:00">
-                2017-09-20
-              </time>
-            
-
-            
-              <span class="post-meta-divider">|</span>
-            
-
-            
-              <span class="post-meta-item-icon">
-                <i class="fa fa-calendar-check-o"></i>
-              </span>
-              
-                <span class="post-meta-item-text">更新于</span>
-              
-              <time title="更新于" itemprop="dateModified" datetime="2017-09-21T20:03:52+08:00">
-                2017-09-21
-              </time>
-            
-          </span>
-
-          
-
-          
-            
-          
-
-          
-          
-             <span id="/posts/1728650486/" class="leancloud_visitors" data-flag-title="记一次线上Redis故障恢复和分析（一）">
-               <span class="post-meta-divider">|</span>
-               <span class="post-meta-item-icon">
-                 <i class="fa fa-eye"></i>
-               </span>
-               
-                 <span class="post-meta-item-text">阅读次数 </span>
-               
-                 <span class="leancloud-visitors-count"></span>
-             </span>
-          
-
-          
-
-          
-
-          
-
-        </div>
-      </header>
-    
-
-    
-    
-    
-    <div class="post-body" itemprop="articleBody">
-
-      
-      
-
-      
-        
-          
-            <h2 id="起因"><a href="#起因" class="headerlink" title="起因"></a>起因</h2><p>那天早上一到公司就有客服过来反应我们的App登录不了了，我赶紧试了一下登陆App，发现是可以登录的，就以为是个别现象没有在意。过了一会儿客服来反应更频繁了，这才意识到可能没有那么简单。</p>
-<h2 id="分析"><a href="#分析" class="headerlink" title="分析"></a>分析</h2><p>一开始认为是服务器问题，检查了所有相关的应用服务器，应用是否正在运行，发现一切正常，cpu、内存、IO 都是正常的，没有异常；</p>
-<p>然后考虑是否是代码层面问题（数据库问题被排除，因为一旦数据库出问题不可能只有一部分人受影响），于是去检查日志，发现有以下错误信息：</p>
-<p><img src="https://picture.jobshen.com/blog/redis/redis-01.png" alt="错误信息"></p>
-<p>然后登陆redis控制台，一台一台测试，终于发现了有问题的那台机器：</p>
-<p><img src="https://picture.jobshen.com/blog/redis/redis-02.png" alt="发现问题"></p>
-<p>接下来要做的就很简单了，redis是集群部署，并且每个节点都有master-slave，因此直接kill该节点，问题修复，一切正常。</p>
-<h2 id="寻找根本原因"><a href="#寻找根本原因" class="headerlink" title="寻找根本原因"></a>寻找根本原因</h2><p>但是这样做并不能解决根本问题，由于之前部署redis集群时考虑不够周全，没有配置redis日志，因此决定直接修改配置文件，逐个重启redis节点。这也就导致了再次故障，因为那个故障节点又被启动加入集群并且由于所有节点都经历了重启该节点又被设为master了。</p>
-<p>这时去观察该节点redis的日志，终于发现了问题，满屏都是异常信息：</p>
-<p> <strong>Can’t save in background: fork: Cannot allocate memory</strong>  </p>
-<p>通过Google得知是由于机器内存不足导致的，遂检查机器内存，发现内存已被占用超过90%，于是赶紧增大机器内存，毕竟redis 数据都是存储在内存中，才能做到这么快的读写。</p>
-<p>基于此，对整个redis集群的内存占用情况进行了一次排查，增大了机器内存，并且增加了对机器内存使用情况的监控防止再出现此类情况。</p>
-<h2 id="又一个问题"><a href="#又一个问题" class="headerlink" title="又一个问题"></a>又一个问题</h2><p>好景不长，一个问题解决又来一个问题，对于redis操作出现了非预期结果，类似 incrBy +1 结果+2，执行expire 结果返回失败。</p>
-<p>该问题的跟踪解决将在下一篇文章中介绍。</p>
-
-          
-        
-      
-    </div>
-    
-    
-    
-
-    
-
-    
-
-    
-
-    <footer class="post-footer">
-      
-
-      <div>
-        
+    <div id="posts" class="posts-collapse">
+      <div class="collection-title">
+        <h1>Redis<small>标签</small>
+        </h1>
       </div>
 
       
-
-      
-
-      
-      
-        <div class="post-eof"></div>
-      
-    </footer>
-  </div>
-  
-  
-  
-  </article>
-
-
-    
-      
-
-  
-
-  
-  
-  
+        
 
   <article class="post post-type-normal" itemscope itemtype="http://schema.org/Article">
-  
-  
-  
-  <div class="post-block">
-    <link itemprop="mainEntityOfPage" href="http://blog.jobshen.com/posts/3873148614/">
+    <header class="post-header">
 
-    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
-      <meta itemprop="name" content="Job Shen">
-      <meta itemprop="description" content="">
-      <meta itemprop="image" content="/uploads/Avatar.png">
-    </span>
-
-    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
-      <meta itemprop="name" content="一杯咖啡的时间">
-    </span>
-
-    
-      <header class="post-header">
-
+      <h2 class="post-title">
         
-        
-          <h1 class="post-title" itemprop="name headline">
-                
-                <a class="post-title-link" href="/posts/3873148614/" itemprop="url">利用Hexo和Github Page搭建个人Blog</a></h1>
-        
-
-        <div class="post-meta">
-          <span class="post-time">
-            
-              <span class="post-meta-item-icon">
-                <i class="fa fa-calendar-o"></i>
-              </span>
+            <a class="post-title-link" href="/posts/1728650486/" itemprop="url">
               
-                <span class="post-meta-item-text">发表于</span>
+                <span itemprop="name">记一次线上Redis故障恢复和分析（一）</span>
               
-              <time title="创建于" itemprop="dateCreated datePublished" datetime="2017-09-17T18:44:56+08:00">
-                2017-09-17
-              </time>
-            
-
-            
-              <span class="post-meta-divider">|</span>
-            
-
-            
-              <span class="post-meta-item-icon">
-                <i class="fa fa-calendar-check-o"></i>
-              </span>
-              
-                <span class="post-meta-item-text">更新于</span>
-              
-              <time title="更新于" itemprop="dateModified" datetime="2017-09-17T23:07:28+08:00">
-                2017-09-17
-              </time>
-            
-          </span>
-
-          
-
-          
-            
-          
-
-          
-          
-             <span id="/posts/3873148614/" class="leancloud_visitors" data-flag-title="利用Hexo和Github Page搭建个人Blog">
-               <span class="post-meta-divider">|</span>
-               <span class="post-meta-item-icon">
-                 <i class="fa fa-eye"></i>
-               </span>
-               
-                 <span class="post-meta-item-text">阅读次数 </span>
-               
-                 <span class="leancloud-visitors-count"></span>
-             </span>
-          
-
-          
-
-          
-
-          
-
-        </div>
-      </header>
-    
-
-    
-    
-    
-    <div class="post-body" itemprop="articleBody">
-
-      
-      
-
-      
-        
-          <p>之前使用wordpress在AWS上搭建的博客，但国内访问速度堪忧，而且费用也不少，于是觉得切到Github上，最终觉得通过Hexo和Github Page重新搭建博客，这篇文章只是为了记录搭建的过程，以防以后忘记（记性不好啊。。。）</p>
-          <!--noindex-->
-          <div class="post-button text-center">
-            <a class="btn" href="/posts/3873148614/#more" rel="contents">
-              阅读全文 &raquo;
             </a>
-          </div>
-          <!--/noindex-->
         
-      
-    </div>
-    
-    
-    
+      </h2>
 
-    
-
-    
-
-    
-
-    <footer class="post-footer">
-      
-
-      <div>
-        
+      <div class="post-meta">
+        <time class="post-time" itemprop="dateCreated"
+              datetime="2017-09-20T22:37:20+08:00"
+              content="2017-09-20" >
+          09-20
+        </time>
       </div>
 
-      
+    </header>
+  </article>
+
 
       
+    </div>
 
-      
-      
-        <div class="post-eof"></div>
-      
-    </footer>
   </div>
   
   
   
-  </article>
-
-
-    
-      
-
-  
-
-  
-  
-  
-
-  <article class="post post-type-normal" itemscope itemtype="http://schema.org/Article">
-  
-  
-  
-  <div class="post-block">
-    <link itemprop="mainEntityOfPage" href="http://blog.jobshen.com/posts/1243066710/">
-
-    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
-      <meta itemprop="name" content="Job Shen">
-      <meta itemprop="description" content="">
-      <meta itemprop="image" content="/uploads/Avatar.png">
-    </span>
-
-    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
-      <meta itemprop="name" content="一杯咖啡的时间">
-    </span>
-
-    
-      <header class="post-header">
-
-        
-        
-          <h1 class="post-title" itemprop="name headline">
-                
-                <a class="post-title-link" href="/posts/1243066710/" itemprop="url">Hello World</a></h1>
-        
-
-        <div class="post-meta">
-          <span class="post-time">
-            
-              <span class="post-meta-item-icon">
-                <i class="fa fa-calendar-o"></i>
-              </span>
-              
-                <span class="post-meta-item-text">发表于</span>
-              
-              <time title="创建于" itemprop="dateCreated datePublished" datetime="2017-08-26T18:12:31+08:00">
-                2017-08-26
-              </time>
-            
-
-            
-              <span class="post-meta-divider">|</span>
-            
-
-            
-              <span class="post-meta-item-icon">
-                <i class="fa fa-calendar-check-o"></i>
-              </span>
-              
-                <span class="post-meta-item-text">更新于</span>
-              
-              <time title="更新于" itemprop="dateModified" datetime="2017-09-20T23:40:44+08:00">
-                2017-09-20
-              </time>
-            
-          </span>
-
-          
-
-          
-            
-          
-
-          
-          
-             <span id="/posts/1243066710/" class="leancloud_visitors" data-flag-title="Hello World">
-               <span class="post-meta-divider">|</span>
-               <span class="post-meta-item-icon">
-                 <i class="fa fa-eye"></i>
-               </span>
-               
-                 <span class="post-meta-item-text">阅读次数 </span>
-               
-                 <span class="leancloud-visitors-count"></span>
-             </span>
-          
-
-          
-
-          
-
-          
-
-        </div>
-      </header>
-    
-
-    
-    
-    
-    <div class="post-body" itemprop="articleBody">
-
-      
-      
-
-      
-        
-          <p>Welcome to <a href="https://hexo.io/" target="_blank" rel="external">Hexo</a>! This is your very first post. Check <a href="https://hexo.io/docs/" target="_blank" rel="external">documentation</a> for more info. If you get any problems when using Hexo, you can find the answer in <a href="https://hexo.io/docs/troubleshooting.html" target="_blank" rel="external">troubleshooting</a> or you can ask me on <a href="https://github.com/hexojs/hexo/issues" target="_blank" rel="external">GitHub</a>.</p>
-          <!--noindex-->
-          <div class="post-button text-center">
-            <a class="btn" href="/posts/1243066710/#more" rel="contents">
-              阅读全文 &raquo;
-            </a>
-          </div>
-          <!--/noindex-->
-        
-      
-    </div>
-    
-    
-    
-
-    
-
-    
-
-    
-
-    <footer class="post-footer">
-      
-
-      <div>
-        
-      </div>
-
-      
-
-      
-
-      
-      
-        <div class="post-eof"></div>
-      
-    </footer>
-  </div>
-  
-  
-  
-  </article>
-
-
-    
-  </section>
 
   
 
