@@ -115,20 +115,20 @@
 
 
 
-<meta name="description" content="起因那天早上一到公司就有客服过来反应我们的App登录不了了，我赶紧试了一下登陆App，发现是可以登录的，就以为是个别现象没有在意。过了一会儿客服来反应更频繁了，这才意识到可能没有那么简单。 分析一开始认为是服务器问题，检查了所有相关的应用服务器，应用是否正在运行，发现一切正常，cpu、内存、IO 都是正常的，没有异常； 然后考虑是否是代码层面问题（数据库问题被排除，因为一旦数据库出问题不可能只有一">
+<meta name="description" content="起因那天早上一到公司就有客服过来反应我们的App登录不了了，我赶紧试了一下登陆App，发现是可以登录的，就以为是个别现象没有在意。过了一会儿客服来反应更频繁了，这才意识到可能没有那么简单。">
 <meta name="keywords" content="Redis">
 <meta property="og:type" content="article">
 <meta property="og:title" content="记一次线上Redis故障恢复和分析（一）">
 <meta property="og:url" content="http://blog.jobshen.com/posts/1728650486/index.html">
 <meta property="og:site_name" content="一杯咖啡的时间">
-<meta property="og:description" content="起因那天早上一到公司就有客服过来反应我们的App登录不了了，我赶紧试了一下登陆App，发现是可以登录的，就以为是个别现象没有在意。过了一会儿客服来反应更频繁了，这才意识到可能没有那么简单。 分析一开始认为是服务器问题，检查了所有相关的应用服务器，应用是否正在运行，发现一切正常，cpu、内存、IO 都是正常的，没有异常； 然后考虑是否是代码层面问题（数据库问题被排除，因为一旦数据库出问题不可能只有一">
+<meta property="og:description" content="起因那天早上一到公司就有客服过来反应我们的App登录不了了，我赶紧试了一下登陆App，发现是可以登录的，就以为是个别现象没有在意。过了一会儿客服来反应更频繁了，这才意识到可能没有那么简单。">
 <meta property="og:locale" content="zh-Hans">
 <meta property="og:image" content="https://picture.jobshen.com/blog/redis/redis-01.png">
 <meta property="og:image" content="https://picture.jobshen.com/blog/redis/redis-02.png">
-<meta property="og:updated_time" content="2017-09-21T12:03:52.570Z">
+<meta property="og:updated_time" content="2017-09-21T12:08:02.649Z">
 <meta name="twitter:card" content="summary">
 <meta name="twitter:title" content="记一次线上Redis故障恢复和分析（一）">
-<meta name="twitter:description" content="起因那天早上一到公司就有客服过来反应我们的App登录不了了，我赶紧试了一下登陆App，发现是可以登录的，就以为是个别现象没有在意。过了一会儿客服来反应更频繁了，这才意识到可能没有那么简单。 分析一开始认为是服务器问题，检查了所有相关的应用服务器，应用是否正在运行，发现一切正常，cpu、内存、IO 都是正常的，没有异常； 然后考虑是否是代码层面问题（数据库问题被排除，因为一旦数据库出问题不可能只有一">
+<meta name="twitter:description" content="起因那天早上一到公司就有客服过来反应我们的App登录不了了，我赶紧试了一下登陆App，发现是可以登录的，就以为是个别现象没有在意。过了一会儿客服来反应更频繁了，这才意识到可能没有那么简单。">
 <meta name="twitter:image" content="https://picture.jobshen.com/blog/redis/redis-01.png">
 
 
@@ -413,7 +413,7 @@
               
                 <span class="post-meta-item-text">更新于</span>
               
-              <time title="更新于" itemprop="dateModified" datetime="2017-09-21T20:03:52+08:00">
+              <time title="更新于" itemprop="dateModified" datetime="2017-09-21T20:08:02+08:00">
                 2017-09-21
               </time>
             
@@ -459,6 +459,7 @@
 
       
         <h2 id="起因"><a href="#起因" class="headerlink" title="起因"></a>起因</h2><p>那天早上一到公司就有客服过来反应我们的App登录不了了，我赶紧试了一下登陆App，发现是可以登录的，就以为是个别现象没有在意。过了一会儿客服来反应更频繁了，这才意识到可能没有那么简单。</p>
+<a id="more"></a>
 <h2 id="分析"><a href="#分析" class="headerlink" title="分析"></a>分析</h2><p>一开始认为是服务器问题，检查了所有相关的应用服务器，应用是否正在运行，发现一切正常，cpu、内存、IO 都是正常的，没有异常；</p>
 <p>然后考虑是否是代码层面问题（数据库问题被排除，因为一旦数据库出问题不可能只有一部分人受影响），于是去检查日志，发现有以下错误信息：</p>
 <p><img src="https://picture.jobshen.com/blog/redis/redis-01.png" alt="错误信息"></p>
