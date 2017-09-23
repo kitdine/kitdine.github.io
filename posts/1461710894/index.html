@@ -115,23 +115,23 @@
 
 
 
-<meta name="description" content="异常场景最近一段时间时不时就有开发人员向我反应：redis的key有点问题，帮我删个key值、怎么key没有过期，我明明设了过期时间的。一开始没有放心上，以为只是程序逻辑处理不当或者redis偶尔抽风，不用在意。可是渐渐反应的人多了，觉得可能不是这么简单了，于是就和相关的开发人员讨论了下，发现会出现异常的基本是以下两种场景：  使用redis 的 incrBy 命令来防止重复提交，大致的redis">
+<meta name="description" content="异常场景最近一段时间时不时就有开发人员向我反应：redis的key有点问题，帮我删个key值、怎么key没有过期，我明明设了过期时间的。一开始没有放心上，以为只是程序逻辑处理不当或者redis偶尔抽风，不用在意。可是渐渐反应的人多了，觉得可能不是这么简单了，于是就和相关的开发人员讨论了下，发现会出现异常的基本是以下两种场景：">
 <meta name="keywords" content="Redis,Jedis,Redis Cluster,Wireshark">
 <meta property="og:type" content="article">
 <meta property="og:title" content="记一次线上Redis故障恢复和分析（二）">
 <meta property="og:url" content="http://blog.jobshen.com/posts/1461710894/index.html">
 <meta property="og:site_name" content="一杯咖啡的时间">
-<meta property="og:description" content="异常场景最近一段时间时不时就有开发人员向我反应：redis的key有点问题，帮我删个key值、怎么key没有过期，我明明设了过期时间的。一开始没有放心上，以为只是程序逻辑处理不当或者redis偶尔抽风，不用在意。可是渐渐反应的人多了，觉得可能不是这么简单了，于是就和相关的开发人员讨论了下，发现会出现异常的基本是以下两种场景：  使用redis 的 incrBy 命令来防止重复提交，大致的redis">
+<meta property="og:description" content="异常场景最近一段时间时不时就有开发人员向我反应：redis的key有点问题，帮我删个key值、怎么key没有过期，我明明设了过期时间的。一开始没有放心上，以为只是程序逻辑处理不当或者redis偶尔抽风，不用在意。可是渐渐反应的人多了，觉得可能不是这么简单了，于是就和相关的开发人员讨论了下，发现会出现异常的基本是以下两种场景：">
 <meta property="og:locale" content="zh-Hans">
 <meta property="og:image" content="https://picture.jobshen.com/blog/redis/redis-03.png">
 <meta property="og:image" content="https://picture.jobshen.com/blog/redis/redis-04.png">
 <meta property="og:image" content="https://picture.jobshen.com/blog/redis/redis-05.png">
 <meta property="og:image" content="https://picture.jobshen.com/blog/redis/redis-06.png">
 <meta property="og:image" content="https://picture.jobshen.com/blog/redis/redis-07.png">
-<meta property="og:updated_time" content="2017-09-23T07:40:03.615Z">
+<meta property="og:updated_time" content="2017-09-23T07:43:44.782Z">
 <meta name="twitter:card" content="summary">
 <meta name="twitter:title" content="记一次线上Redis故障恢复和分析（二）">
-<meta name="twitter:description" content="异常场景最近一段时间时不时就有开发人员向我反应：redis的key有点问题，帮我删个key值、怎么key没有过期，我明明设了过期时间的。一开始没有放心上，以为只是程序逻辑处理不当或者redis偶尔抽风，不用在意。可是渐渐反应的人多了，觉得可能不是这么简单了，于是就和相关的开发人员讨论了下，发现会出现异常的基本是以下两种场景：  使用redis 的 incrBy 命令来防止重复提交，大致的redis">
+<meta name="twitter:description" content="异常场景最近一段时间时不时就有开发人员向我反应：redis的key有点问题，帮我删个key值、怎么key没有过期，我明明设了过期时间的。一开始没有放心上，以为只是程序逻辑处理不当或者redis偶尔抽风，不用在意。可是渐渐反应的人多了，觉得可能不是这么简单了，于是就和相关的开发人员讨论了下，发现会出现异常的基本是以下两种场景：">
 <meta name="twitter:image" content="https://picture.jobshen.com/blog/redis/redis-03.png">
 
 
@@ -416,7 +416,7 @@
               
                 <span class="post-meta-item-text">更新于</span>
               
-              <time title="更新于" itemprop="dateModified" datetime="2017-09-23T15:40:03+08:00">
+              <time title="更新于" itemprop="dateModified" datetime="2017-09-23T15:43:44+08:00">
                 2017-09-23
               </time>
             
@@ -462,12 +462,13 @@
 
       
         <h2 id="异常场景"><a href="#异常场景" class="headerlink" title="异常场景"></a>异常场景</h2><p>最近一段时间时不时就有开发人员向我反应：redis的key有点问题，帮我删个key值、怎么key没有过期，我明明设了过期时间的。一开始没有放心上，以为只是程序逻辑处理不当或者redis偶尔抽风，不用在意。可是渐渐反应的人多了，觉得可能不是这么简单了，于是就和相关的开发人员讨论了下，发现会出现异常的基本是以下两种场景：</p>
+<a id="more"></a>
 <ul>
 <li><p>使用redis 的 <strong>incrBy</strong> 命令来防止重复提交，大致的redis交互如下：</p>
-<figure class="highlight shell"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div></pre></td><td class="code"><pre><div class="line"><span class="meta">&gt;</span><span class="bash"> incrBy key 1 <span class="comment"># 返回 1 表示正常 返回 &gt; 1  表示重复提交 直接 return</span></span></div><div class="line"><span class="meta">&gt;</span><span class="bash"> expire key 5 <span class="comment"># 5秒后过期</span></span></div><div class="line"><span class="meta">&gt;</span><span class="bash"> del key <span class="comment"># 正常业务逻辑走完后 显示删除key</span></span></div></pre></td></tr></table></figure>
+<figure class="highlight shell"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div></pre></td><td class="code"><pre><div class="line"><span class="meta">&gt;</span> incrBy key 1 # 返回 1 表示正常 返回 &gt; 1  表示重复提交 直接 return</div><div class="line"><span class="meta">&gt;</span> expire key 5 # 5秒后过期</div><div class="line"><span class="meta">&gt;</span> del key # 正常业务逻辑走完后 显示删除key</div></pre></td></tr></table></figure>
 </li>
 <li><p>使用 redis （<strong>set</strong>  <strong>setnx</strong> <strong>setex </strong>） +  <strong>expire</strong> 组合命令：</p>
-<figure class="highlight shell"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div></pre></td><td class="code"><pre><div class="line"><span class="meta">&gt;</span><span class="bash"> <span class="built_in">set</span> |setnx | setex key</span></div><div class="line"><span class="meta">&gt;</span><span class="bash"> expire key seconds <span class="comment"># 设置失败</span></span></div></pre></td></tr></table></figure>
+<figure class="highlight shell"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div></pre></td><td class="code"><pre><div class="line"><span class="meta">&gt;</span> set |setnx | setex key</div><div class="line"><span class="meta">&gt;</span> expire key seconds # 设置失败</div></pre></td></tr></table></figure>
 <p>​</p>
 <p>由于系统中大量使用了第一种方式来防止重复提交，所以这个问题对业务影响还是很大的，redis具体现象为：</p>
 <ul>
