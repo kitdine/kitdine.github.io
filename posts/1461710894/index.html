@@ -2,14 +2,23 @@
 
 
 
+
+
+
+
+
+
+
+
+
   
 
 
-<html class="theme-next gemini use-motion" lang="zh-Hans">
-<head>
-  <meta charset="UTF-8"/>
-<meta http-equiv="X-UA-Compatible" content="IE=edge" />
-<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1"/>
+<html class="theme-next gemini use-motion" lang="zh-CN">
+<head><meta name="generator" content="Hexo 3.8.0">
+  <meta charset="UTF-8">
+<meta http-equiv="X-UA-Compatible" content="IE=edge">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=2">
 <meta name="theme-color" content="#222">
 
 
@@ -20,8 +29,11 @@
 
 
 
-<meta http-equiv="Cache-Control" content="no-transform" />
-<meta http-equiv="Cache-Control" content="no-siteapp" />
+
+
+
+<meta http-equiv="Cache-Control" content="no-transform">
+<meta http-equiv="Cache-Control" content="no-siteapp">
 
 
 
@@ -37,9 +49,6 @@
 
 
 
-  
-  
-  <link href="/lib/fancybox/source/jquery.fancybox.css?v=2.1.5" rel="stylesheet" type="text/css" />
 
 
 
@@ -91,38 +100,69 @@
 
 
 
-<link href="/lib/font-awesome/css/font-awesome.min.css?v=4.6.2" rel="stylesheet" type="text/css" />
+<link href="/lib/font-awesome/css/font-awesome.min.css?v=4.6.2" rel="stylesheet" type="text/css">
 
-<link href="/css/main.css?v=5.1.2" rel="stylesheet" type="text/css" />
-
-
-  <meta name="keywords" content="Redis,Jedis,Redis Cluster,Wireshark," />
+<link href="/css/main.css?v=6.6.0" rel="stylesheet" type="text/css">
 
 
+  <link rel="apple-touch-icon" sizes="180x180" href="/images/apple-touch-icon-next.png?v=6.6.0">
 
 
+  <link rel="icon" type="image/png" sizes="32x32" href="/images/favicon-32x32-next.png?v=6.6.0">
 
 
+  <link rel="icon" type="image/png" sizes="16x16" href="/images/favicon-16x16-next.png?v=6.6.0">
 
 
-  <link rel="shortcut icon" type="image/x-icon" href="/favicon.ico?v=5.1.2" />
-
-
-
-
-  <meta property="fb:admins" content="" />
-  <meta property="fb:app_id" content="588587371311745" />
+  <link rel="mask-icon" href="/images/logo.svg?v=6.6.0" color="#222">
 
 
 
-<meta name="description" content="异常场景最近一段时间时不时就有开发人员向我反应：redis的key有点问题，帮我删个key值、怎么key没有过期，我明明设了过期时间的。一开始没有放心上，以为只是程序逻辑处理不当或者redis偶尔抽风，不用在意。可是渐渐反应的人多了，觉得可能不是这么简单了，于是就和相关的开发人员讨论了下，发现会出现异常的基本是以下两种场景：">
-<meta name="keywords" content="Redis,Jedis,Redis Cluster,Wireshark">
+
+
+
+  <meta property="fb:admins" content="">
+  <meta property="fb:app_id" content="588587371311745">
+
+
+
+
+<script type="text/javascript" id="hexo.configurations">
+  var NexT = window.NexT || {};
+  var CONFIG = {
+    root: '/',
+    scheme: 'Gemini',
+    version: '6.6.0',
+    sidebar: {"position":"left","display":"post","offset":12,"b2t":false,"scrollpercent":false,"onmobile":false},
+    fancybox: false,
+    fastclick: false,
+    lazyload: false,
+    tabs: true,
+    motion: {"enable":true,"async":false,"transition":{"post_block":"fadeIn","post_header":"slideDownIn","post_body":"slideDownIn","coll_header":"slideLeftIn","sidebar":"slideUpIn"}},
+    algolia: {
+      applicationID: '',
+      apiKey: '',
+      indexName: '',
+      hits: {"per_page":10},
+      labels: {"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}
+    }
+  };
+</script>
+
+
+  
+
+
+
+
+  <meta name="description" content="异常场景最近一段时间时不时就有开发人员向我反应：redis的key有点问题，帮我删个key值、怎么key没有过期，我明明设了过期时间的。一开始没有放心上，以为只是程序逻辑处理不当或者redis偶尔抽风，不用在意。可是渐渐反应的人多了，觉得可能不是这么简单了，于是就和相关的开发人员讨论了下，发现会出现异常的基本是以下两种场景：">
+<meta name="keywords" content="Redis,Redis Cluster,Jedis,Wireshark">
 <meta property="og:type" content="article">
 <meta property="og:title" content="记一次线上Redis故障恢复和分析（二）">
 <meta property="og:url" content="http://blog.jobshen.com/posts/1461710894/index.html">
 <meta property="og:site_name" content="一杯咖啡的时间">
 <meta property="og:description" content="异常场景最近一段时间时不时就有开发人员向我反应：redis的key有点问题，帮我删个key值、怎么key没有过期，我明明设了过期时间的。一开始没有放心上，以为只是程序逻辑处理不当或者redis偶尔抽风，不用在意。可是渐渐反应的人多了，觉得可能不是这么简单了，于是就和相关的开发人员讨论了下，发现会出现异常的基本是以下两种场景：">
-<meta property="og:locale" content="zh-Hans">
+<meta property="og:locale" content="zh-CN">
 <meta property="og:image" content="https://picture.jobshen.com/blog/redis/redis-03.png">
 <meta property="og:image" content="https://picture.jobshen.com/blog/redis/redis-04.png">
 <meta property="og:image" content="https://picture.jobshen.com/blog/redis/redis-05.png">
@@ -136,36 +176,18 @@
 
 
 
-<script type="text/javascript" id="hexo.configurations">
-  var NexT = window.NexT || {};
-  var CONFIG = {
-    root: '/',
-    scheme: 'Gemini',
-    sidebar: {"position":"left","display":"post","offset":12,"offset_float":12,"b2t":false,"scrollpercent":false,"onmobile":false},
-    fancybox: true,
-    tabs: true,
-    motion: true,
-    duoshuo: {
-      userId: '0',
-      author: '博主'
-    },
-    algolia: {
-      applicationID: '',
-      apiKey: '',
-      indexName: '',
-      hits: {"per_page":10},
-      labels: {"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}
-    }
+
+
+
+  <link rel="canonical" href="http://blog.jobshen.com/posts/1461710894/">
+
+
+
+<script type="text/javascript" id="page.configurations">
+  CONFIG.page = {
+    sidebar: "",
   };
 </script>
-
-
-
-  <link rel="canonical" href="http://blog.jobshen.com/posts/1461710894/"/>
-
-
-
-
 
   <title>记一次线上Redis故障恢复和分析（二） | 一杯咖啡的时间</title>
   
@@ -182,7 +204,7 @@
      var js, fjs = d.getElementsByTagName(s)[0];
      if (d.getElementById(id)) {return;}
      js = d.createElement(s); js.id = id;
-     js.src = "//connect.facebook.net/zh_Hans/sdk.js";
+     js.src = "//connect.facebook.net/zh_CN/sdk.js";
      fjs.parentNode.insertBefore(js, fjs);
    }(document, 'script', 'facebook-jssdk'));
 </script>
@@ -191,13 +213,13 @@
 
 
 
+<script async src="https://www.googletagmanager.com/gtag/js?id=UA-105338633-1"></script>
 <script>
-  (function(i,s,o,g,r,a,m){i['GoogleAnalyticsObject']=r;i[r]=i[r]||function(){
-            (i[r].q=i[r].q||[]).push(arguments)},i[r].l=1*new Date();a=s.createElement(o),
-          m=s.getElementsByTagName(o)[0];a.async=1;a.src=g;m.parentNode.insertBefore(a,m)
-  })(window,document,'script','https://www.google-analytics.com/analytics.js','ga');
-  ga('create', 'UA-105338633-1', 'auto');
-  ga('send', 'pageview');
+  window.dataLayer = window.dataLayer || [];
+  function gtag(){dataLayer.push(arguments);}
+  gtag('js', new Date());
+
+  gtag('config', 'UA-105338633-1');
 </script>
 
 
@@ -207,40 +229,66 @@
 
 
 
+  <noscript>
+  <style type="text/css">
+    .use-motion .motion-element,
+    .use-motion .brand,
+    .use-motion .menu-item,
+    .sidebar-inner,
+    .use-motion .post-block,
+    .use-motion .pagination,
+    .use-motion .comments,
+    .use-motion .post-header,
+    .use-motion .post-body,
+    .use-motion .collection-title { opacity: initial; }
 
+    .use-motion .logo,
+    .use-motion .site-title,
+    .use-motion .site-subtitle {
+      opacity: initial;
+      top: initial;
+    }
 
+    .use-motion {
+      .logo-line-before i { left: initial; }
+      .logo-line-after i { right: initial; }
+    }
+  </style>
+</noscript>
 
 </head>
 
-<body itemscope itemtype="http://schema.org/WebPage" lang="zh-Hans">
+<body itemscope="" itemtype="http://schema.org/WebPage" lang="zh-CN">
 
   
   
     
   
 
-  <div class="container sidebar-position-left page-post-detail ">
+  <div class="container sidebar-position-left page-post-detail">
     <div class="headband"></div>
 
-    <header id="header" class="header" itemscope itemtype="http://schema.org/WPHeader">
+    <header id="header" class="header" itemscope="" itemtype="http://schema.org/WPHeader">
       <div class="header-inner"><div class="site-brand-wrapper">
   <div class="site-meta ">
     
 
     <div class="custom-logo-site-title">
-      <a href="/"  class="brand" rel="start">
+      <a href="/" class="brand" rel="start">
         <span class="logo-line-before"><i></i></span>
         <span class="site-title">一杯咖啡的时间</span>
         <span class="logo-line-after"><i></i></span>
       </a>
     </div>
+    
       
         <p class="site-subtitle">苦中作乐</p>
       
+    
   </div>
 
   <div class="site-nav-toggle">
-    <button>
+    <button aria-label="切换导航栏">
       <span class="btn-bar"></span>
       <span class="btn-bar"></span>
       <span class="btn-bar"></span>
@@ -248,76 +296,111 @@
   </div>
 </div>
 
-<nav class="site-nav">
-  
 
+
+<nav class="site-nav">
   
     <ul id="menu" class="menu">
       
         
-        <li class="menu-item menu-item-home">
-          <a href="/" rel="section">
-            
-              <i class="menu-item-icon fa fa-fw fa-home"></i> <br />
-            
-            首页
-          </a>
-        </li>
-      
         
-        <li class="menu-item menu-item-about">
-          <a href="/about/" rel="section">
-            
-              <i class="menu-item-icon fa fa-fw fa-user"></i> <br />
-            
-            关于
-          </a>
-        </li>
-      
         
-        <li class="menu-item menu-item-archives">
-          <a href="/archives/" rel="section">
-            
-              <i class="menu-item-icon fa fa-fw fa-archive"></i> <br />
-            
-            归档
-          </a>
-        </li>
-      
-        
-        <li class="menu-item menu-item-tags">
-          <a href="/tags/" rel="section">
-            
-              <i class="menu-item-icon fa fa-fw fa-tags"></i> <br />
-            
-            标签
-          </a>
-        </li>
-      
-        
-        <li class="menu-item menu-item-commonweal">
-          <a href="/404/" rel="section">
-            
-              <i class="menu-item-icon fa fa-fw fa-heartbeat"></i> <br />
-            
-            公益404
-          </a>
-        </li>
-      
+          
+          <li class="menu-item menu-item-home">
 
+    
+    
+    
+      
+    
+
+    
+
+    <a href="/" rel="section"><i class="menu-item-icon fa fa-fw fa-home"></i> <br>首页</a>
+
+  </li>
+        
+        
+        
+          
+          <li class="menu-item menu-item-about">
+
+    
+    
+    
+      
+    
+
+    
+
+    <a href="/about/" rel="section"><i class="menu-item-icon fa fa-fw fa-user"></i> <br>关于</a>
+
+  </li>
+        
+        
+        
+          
+          <li class="menu-item menu-item-tags">
+
+    
+    
+    
+      
+    
+
+    
+
+    <a href="/tags/" rel="section"><i class="menu-item-icon fa fa-fw fa-tags"></i> <br>标签</a>
+
+  </li>
+        
+        
+        
+          
+          <li class="menu-item menu-item-archives">
+
+    
+    
+    
+      
+    
+
+    
+
+    <a href="/archives/" rel="section"><i class="menu-item-icon fa fa-fw fa-archive"></i> <br>归档</a>
+
+  </li>
+        
+        
+        
+          
+          <li class="menu-item menu-item-commonweal">
+
+    
+    
+    
+      
+    
+
+    
+
+    <a href="/404/" rel="section"><i class="menu-item-icon fa fa-fw fa-heartbeat"></i> <br>公益 404</a>
+
+  </li>
+
+      
       
         <li class="menu-item menu-item-search">
           
             <a href="javascript:;" class="popup-trigger">
           
             
-              <i class="menu-item-icon fa fa-search fa-fw"></i> <br />
-            
-            搜索
-          </a>
+              <i class="menu-item-icon fa fa-search fa-fw"></i> <br>搜索</a>
         </li>
       
     </ul>
+  
+
   
 
   
@@ -332,9 +415,7 @@
       <i class="fa fa-times-circle"></i>
     </span>
     <div class="local-search-input-wrapper">
-      <input autocomplete="off"
-             placeholder="搜索..." spellcheck="false"
-             type="text" id="local-search-input">
+      <input autocomplete="off" placeholder="搜索..." spellcheck="false" type="text" id="local-search-input">
     </div>
   </div>
   <div id="local-search-result"></div>
@@ -348,12 +429,23 @@
 
 
 
- </div>
+  
+
+
+
+</div>
     </header>
+
+    
+
 
     <main id="main" class="main">
       <div class="main-inner">
         <div class="content-wrap">
+          
+            
+
+          
           <div id="content" class="content">
             
 
@@ -366,20 +458,22 @@
   
   
 
-  <article class="post post-type-normal" itemscope itemtype="http://schema.org/Article">
+  
+
+  <article class="post post-type-normal" itemscope="" itemtype="http://schema.org/Article">
   
   
   
   <div class="post-block">
     <link itemprop="mainEntityOfPage" href="http://blog.jobshen.com/posts/1461710894/">
 
-    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+    <span hidden itemprop="author" itemscope="" itemtype="http://schema.org/Person">
       <meta itemprop="name" content="Job Shen">
       <meta itemprop="description" content="">
       <meta itemprop="image" content="/uploads/Avatar.png">
     </span>
 
-    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+    <span hidden itemprop="publisher" itemscope="" itemtype="http://schema.org/Organization">
       <meta itemprop="name" content="一杯咖啡的时间">
     </span>
 
@@ -388,11 +482,19 @@
 
         
         
-          <h1 class="post-title" itemprop="name headline">记一次线上Redis故障恢复和分析（二）</h1>
+          <h1 class="post-title" itemprop="name headline">记一次线上Redis故障恢复和分析（二）
+              
+            
+          </h1>
         
 
         <div class="post-meta">
           <span class="post-time">
+
+            
+            
+            
+
             
               <span class="post-meta-item-icon">
                 <i class="fa fa-calendar-o"></i>
@@ -400,25 +502,30 @@
               
                 <span class="post-meta-item-text">发表于</span>
               
-              <time title="创建于" itemprop="dateCreated datePublished" datetime="2017-09-21T20:08:56+08:00">
-                2017-09-21
-              </time>
+
+              
+                
+              
+
+              <time title="创建时间：2017-09-21 20:08:56" itemprop="dateCreated datePublished" datetime="2017-09-21T20:08:56+08:00">2017-09-21</time>
             
 
             
-              <span class="post-meta-divider">|</span>
-            
+              
 
-            
-              <span class="post-meta-item-icon">
-                <i class="fa fa-calendar-check-o"></i>
-              </span>
               
-                <span class="post-meta-item-text">更新于</span>
+                
+                <span class="post-meta-divider">|</span>
+                
+
+                <span class="post-meta-item-icon">
+                  <i class="fa fa-calendar-check-o"></i>
+                </span>
+                
+                  <span class="post-meta-item-text">更新于</span>
+                
+                <time title="修改时间：2017-09-23 15:54:37" itemprop="dateModified" datetime="2017-09-23T15:54:37+08:00">2017-09-23</time>
               
-              <time title="更新于" itemprop="dateModified" datetime="2017-09-23T15:54:37+08:00">
-                2017-09-23
-              </time>
             
           </span>
 
@@ -436,7 +543,7 @@
                  <i class="fa fa-eye"></i>
                </span>
                
-                 <span class="post-meta-item-text">阅读次数 </span>
+                 <span class="post-meta-item-text">阅读次数：</span>
                
                  <span class="leancloud-visitors-count"></span>
              </span>
@@ -465,10 +572,10 @@
 <a id="more"></a>
 <ul>
 <li><p>使用redis 的 <strong>incrBy</strong> 命令来防止重复提交，大致的redis交互如下：</p>
-<figure class="highlight shell"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div></pre></td><td class="code"><pre><div class="line"><span class="meta">&gt;</span> incrBy key 1 # 返回 1 表示正常 返回 &gt; 1  表示重复提交 直接 return</div><div class="line"><span class="meta">&gt;</span> expire key 5 # 5秒后过期</div><div class="line"><span class="meta">&gt;</span> del key # 正常业务逻辑走完后 显示删除key</div></pre></td></tr></table></figure>
+<figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">&gt;</span> incrBy key 1 # 返回 1 表示正常 返回 &gt; 1  表示重复提交 直接 return</span><br><span class="line"><span class="meta">&gt;</span> expire key 5 # 5秒后过期</span><br><span class="line"><span class="meta">&gt;</span> del key # 正常业务逻辑走完后 显示删除key</span><br></pre></td></tr></table></figure>
 </li>
 <li><p>使用 redis （<strong>set</strong>  <strong>setnx</strong> <strong>setex </strong>） +  <strong>expire</strong> 组合命令：</p>
-<figure class="highlight shell"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div></pre></td><td class="code"><pre><div class="line"><span class="meta">&gt;</span> set |setnx | setex key</div><div class="line"><span class="meta">&gt;</span> expire key seconds # 设置失败</div></pre></td></tr></table></figure>
+<figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">&gt;</span> set |setnx | setex key</span><br><span class="line"><span class="meta">&gt;</span> expire key seconds # 设置失败</span><br></pre></td></tr></table></figure>
 <p>​</p>
 <p>由于系统中大量使用了第一种方式来防止重复提交，所以这个问题对业务影响还是很大的，redis具体现象为：</p>
 <ul>
@@ -478,9 +585,9 @@
 </li>
 </ul>
 <h2 id="查找问题"><a href="#查找问题" class="headerlink" title="查找问题"></a>查找问题</h2><h3 id="编写测试程序"><a href="#编写测试程序" class="headerlink" title="编写测试程序"></a>编写测试程序</h3><p>为了排查问题写了一个简单的小程序：</p>
-<figure class="highlight java"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div><div class="line">17</div><div class="line">18</div><div class="line">19</div><div class="line">20</div><div class="line">21</div><div class="line">22</div><div class="line">23</div><div class="line">24</div><div class="line">25</div><div class="line">26</div><div class="line">27</div><div class="line">28</div><div class="line">29</div><div class="line">30</div><div class="line">31</div><div class="line">32</div><div class="line">33</div><div class="line">34</div><div class="line">35</div><div class="line">36</div><div class="line">37</div><div class="line">38</div><div class="line">39</div><div class="line">40</div><div class="line">41</div><div class="line">42</div><div class="line">43</div><div class="line">44</div><div class="line">45</div><div class="line">46</div><div class="line">47</div><div class="line">48</div><div class="line">49</div><div class="line">50</div><div class="line">51</div><div class="line">52</div><div class="line">53</div><div class="line">54</div><div class="line">55</div><div class="line">56</div><div class="line">57</div><div class="line">58</div><div class="line">59</div><div class="line">60</div><div class="line">61</div><div class="line">62</div><div class="line">63</div><div class="line">64</div><div class="line">65</div><div class="line">66</div><div class="line">67</div><div class="line">68</div><div class="line">69</div><div class="line">70</div><div class="line">71</div><div class="line">72</div><div class="line">73</div><div class="line">74</div><div class="line">75</div><div class="line">76</div><div class="line">77</div><div class="line">78</div><div class="line">79</div><div class="line">80</div><div class="line">81</div><div class="line">82</div><div class="line">83</div><div class="line">84</div><div class="line">85</div><div class="line">86</div><div class="line">87</div><div class="line">88</div><div class="line">89</div><div class="line">90</div><div class="line">91</div><div class="line">92</div><div class="line">93</div><div class="line">94</div><div class="line">95</div><div class="line">96</div><div class="line">97</div><div class="line">98</div><div class="line">99</div><div class="line">100</div><div class="line">101</div><div class="line">102</div><div class="line">103</div><div class="line">104</div><div class="line">105</div><div class="line">106</div><div class="line">107</div><div class="line">108</div><div class="line">109</div><div class="line">110</div><div class="line">111</div><div class="line">112</div><div class="line">113</div><div class="line">114</div><div class="line">115</div><div class="line">116</div><div class="line">117</div><div class="line">118</div><div class="line">119</div><div class="line">120</div><div class="line">121</div><div class="line">122</div><div class="line">123</div><div class="line">124</div><div class="line">125</div><div class="line">126</div><div class="line">127</div><div class="line">128</div><div class="line">129</div><div class="line">130</div><div class="line">131</div><div class="line">132</div><div class="line">133</div><div class="line">134</div><div class="line">135</div><div class="line">136</div><div class="line">137</div><div class="line">138</div><div class="line">139</div><div class="line">140</div><div class="line">141</div></pre></td><td class="code"><pre><div class="line"><span class="meta">@Test</span></div><div class="line"><span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">test</span><span class="params">()</span> <span class="keyword">throws</span> InterruptedException </span>&#123;</div><div class="line">    <span class="keyword">final</span> List&lt;Long&gt; list = Lists.newArrayListWithCapacity(<span class="number">5000000</span>);</div><div class="line">    Long first_id = <span class="number">500000000000000001L</span>;</div><div class="line">    <span class="keyword">for</span> (<span class="keyword">int</span> i = <span class="number">0</span>; i &lt; <span class="number">5000000</span>; i++) &#123;</div><div class="line">        list.add(first_id++);</div><div class="line">    &#125;</div><div class="line"></div><div class="line">    <span class="keyword">final</span> CountDownLatch allDone = <span class="keyword">new</span> CountDownLatch(<span class="number">2</span>);</div><div class="line"></div><div class="line">    <span class="comment">// incrby</span></div><div class="line">    <span class="keyword">new</span> Thread(</div><div class="line">        <span class="keyword">new</span> Runnable() &#123;</div><div class="line">            <span class="meta">@Override</span></div><div class="line">            <span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">run</span><span class="params">()</span> </span>&#123;</div><div class="line">                <span class="keyword">try</span> &#123;</div><div class="line">                    testIncrby(list);</div><div class="line">                &#125; <span class="keyword">catch</span> (InterruptedException e) &#123;</div><div class="line">                &#125;</div><div class="line">                allDone.countDown();</div><div class="line">            &#125;</div><div class="line">        &#125;</div><div class="line">    ).start();</div><div class="line"></div><div class="line">    <span class="keyword">new</span> Thread(</div><div class="line">        <span class="keyword">new</span> Runnable() &#123;</div><div class="line">            <span class="meta">@Override</span></div><div class="line">            <span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">run</span><span class="params">()</span> </span>&#123;</div><div class="line">                <span class="keyword">try</span> &#123;</div><div class="line">                    testIncrByAndDel(list);</div><div class="line">                &#125; <span class="keyword">catch</span> (InterruptedException e) &#123;</div><div class="line">                &#125;</div><div class="line">                allDone.countDown();</div><div class="line">            &#125;</div><div class="line">        &#125;</div><div class="line">    ).start();</div><div class="line"></div><div class="line">    allDone.await();</div><div class="line">    log.info(<span class="string">"finish method test"</span>);</div><div class="line">&#125;</div><div class="line"></div><div class="line"><span class="meta">@Test</span></div><div class="line"><span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">testDelAndTTL</span><span class="params">()</span> <span class="keyword">throws</span> InterruptedException </span>&#123;</div><div class="line">    <span class="keyword">final</span> List&lt;Long&gt; list = Lists.newArrayListWithCapacity(<span class="number">5000000</span>);</div><div class="line">    Long first_id = <span class="number">500000000000000001L</span>;</div><div class="line">    <span class="keyword">for</span> (<span class="keyword">int</span> i = <span class="number">0</span>; i &lt; <span class="number">5000000</span>; i++) &#123;</div><div class="line">        list.add(first_id++);</div><div class="line">    &#125;</div><div class="line"></div><div class="line">    <span class="keyword">final</span> CountDownLatch allDone = <span class="keyword">new</span> CountDownLatch(<span class="number">2</span>);</div><div class="line"></div><div class="line">    <span class="keyword">new</span> Thread(</div><div class="line">        <span class="keyword">new</span> Runnable() &#123;</div><div class="line">            <span class="meta">@Override</span></div><div class="line">            <span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">run</span><span class="params">()</span> </span>&#123;</div><div class="line">                testDelAndTTL(list, <span class="string">"walletMember"</span>);</div><div class="line">                allDone.countDown();</div><div class="line">                log.info(<span class="string">"finish walletMember keys"</span>);</div><div class="line">            &#125;</div><div class="line">        &#125;</div><div class="line">    ).start();</div><div class="line"></div><div class="line">    <span class="keyword">new</span> Thread(</div><div class="line">        <span class="keyword">new</span> Runnable() &#123;</div><div class="line">            <span class="meta">@Override</span></div><div class="line">            <span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">run</span><span class="params">()</span> </span>&#123;</div><div class="line">                testDelAndTTL(list, <span class="string">"walletMember1"</span>);</div><div class="line">                allDone.countDown();</div><div class="line">                log.info(<span class="string">"finish walletMember1 keys"</span>);</div><div class="line">            &#125;</div><div class="line">        &#125;</div><div class="line">    ).start();</div><div class="line"></div><div class="line">    allDone.await();</div><div class="line">    log.info(<span class="string">"finish all keys"</span>);</div><div class="line">&#125;</div><div class="line"></div><div class="line"><span class="function"><span class="keyword">private</span> <span class="keyword">void</span> <span class="title">testIncrby</span><span class="params">(<span class="keyword">final</span> List&lt;Long&gt; list)</span> <span class="keyword">throws</span> InterruptedException </span>&#123;</div><div class="line">    <span class="keyword">long</span> times = <span class="number">0L</span>;</div><div class="line">    <span class="keyword">for</span>(;;)&#123;</div><div class="line">        times ++;</div><div class="line">        <span class="keyword">for</span> (Long key : list) &#123;</div><div class="line">            Optional&lt;Long&gt; value = redisOperator.incrBy(<span class="string">"walletMember"</span> + key, <span class="number">1</span>);</div><div class="line">            <span class="keyword">if</span> (value.isPresent()) &#123;</div><div class="line">                <span class="keyword">if</span> (value.get() != <span class="number">1L</span>) &#123;</div><div class="line">                    log.error(<span class="string">"there is something wrong in &#123;&#125;: the incrBy method return wrong value, expact : &#123;&#125; , result : &#123;&#125;, key : &#123;&#125;"</span>, <span class="string">"testIncrby"</span>, <span class="number">1</span>, value.get(), <span class="string">"walletMember"</span> + key);</div><div class="line">                    <span class="keyword">continue</span>;</div><div class="line">                &#125;</div><div class="line">            &#125; <span class="keyword">else</span> &#123;</div><div class="line">                log.error(<span class="string">"there is something wrong in &#123;&#125;: the incrBy method return wrong value, expact : &#123;&#125; , result : &#123;&#125;, key : &#123;&#125;"</span>, <span class="string">"testIncrby"</span>, <span class="number">1</span>, <span class="keyword">null</span>, <span class="string">"walletMember"</span> + key);</div><div class="line">            &#125;</div><div class="line">            Optional&lt;Boolean&gt; isSuccess = redisOperator.expire(<span class="string">"walletMember"</span> + key, <span class="number">30</span>);</div><div class="line">            <span class="keyword">if</span> (!isSuccess.isPresent() || !isSuccess.get()) &#123;</div><div class="line">                log.error(<span class="string">"there is something wrong in &#123;&#125;: the expire method return wrong value, expact : &#123;&#125; , result : &#123;&#125;, key : &#123;&#125;"</span>, <span class="string">"testIncrby"</span>, <span class="string">"true"</span>, (isSuccess.isPresent() ? isSuccess.get() : <span class="keyword">null</span>), <span class="string">"walletMember"</span> + key);</div><div class="line">            &#125;</div><div class="line">        &#125;</div><div class="line">        log.info(<span class="string">"finish &#123;&#125; method &#123;&#125; times. sleep 35 seconds"</span>, <span class="string">"testIncrby"</span>, times);</div><div class="line">        Thread.sleep(<span class="number">60</span>*<span class="number">5</span>*<span class="number">1000L</span>);</div><div class="line">        <span class="keyword">if</span>(times &gt; <span class="number">1000000</span>) &#123;</div><div class="line">            <span class="keyword">return</span> ;</div><div class="line">        &#125;</div><div class="line">    &#125;</div><div class="line">&#125;</div><div class="line"></div><div class="line"><span class="function"><span class="keyword">private</span> <span class="keyword">void</span> <span class="title">testIncrByAndDel</span><span class="params">(<span class="keyword">final</span> List&lt;Long&gt; list)</span> <span class="keyword">throws</span> InterruptedException </span>&#123;</div><div class="line">    <span class="keyword">long</span> times = <span class="number">0L</span>;</div><div class="line">    <span class="keyword">for</span>(;;) &#123;</div><div class="line">        times ++;</div><div class="line">        <span class="keyword">for</span> (Long key : list) &#123;</div><div class="line">            Optional&lt;Long&gt; value = redisOperator.incrBy(<span class="string">"walletMember1"</span>+key, <span class="number">1</span>);</div><div class="line">            <span class="keyword">if</span>(value.isPresent()) &#123;</div><div class="line">                <span class="keyword">if</span>(value.get() != <span class="number">1L</span>) &#123;</div><div class="line">                    log.error(<span class="string">"there is something wrong in &#123;&#125; method: the incrBy method return wrong value, expact : &#123;&#125; , result : &#123;&#125;, key : &#123;&#125;"</span>, <span class="string">"testIncrByAndDel"</span>, <span class="number">1</span>, value.get(), <span class="string">"walletMember1"</span> + key);</div><div class="line">                    <span class="keyword">continue</span>;</div><div class="line">                &#125;</div><div class="line">            &#125; <span class="keyword">else</span> &#123;</div><div class="line">                log.error(<span class="string">"there is something wrong in &#123;&#125; method: the incrBy method return wrong value, expact : &#123;&#125; , result : &#123;&#125;, key : &#123;&#125;"</span>, <span class="string">"testIncrByAndDel"</span>, <span class="number">1</span>, <span class="keyword">null</span>, <span class="string">"walletMember1"</span> + key);</div><div class="line">            &#125;</div><div class="line">            Optional&lt;Boolean&gt; isSuccess= redisOperator.expire(<span class="string">"walletMember"</span>+key, <span class="number">60</span>);</div><div class="line">            <span class="keyword">if</span>(!isSuccess.isPresent() || !isSuccess.get()) &#123;</div><div class="line">                log.error(<span class="string">"there is something wrong in &#123;&#125;: the expire method return wrong value, expact : &#123;&#125; , result : &#123;&#125;, key : &#123;&#125;"</span>, <span class="string">"testIncrByAndDel"</span>, <span class="string">"true"</span>, (isSuccess.isPresent() ? isSuccess.get() : <span class="keyword">null</span>), <span class="string">"walletMember1"</span> + key);</div><div class="line">            &#125;</div><div class="line">            redisOperator.del(<span class="string">"walletMember1"</span>+key);</div><div class="line">        &#125;</div><div class="line">        log.info(<span class="string">"finish &#123;&#125; method &#123;&#125; times. sleep 35 seconds"</span>, <span class="string">"testIncrByAndDel"</span>, times);</div><div class="line">        Thread.sleep(<span class="number">60</span>*<span class="number">5</span>*<span class="number">1000L</span>);</div><div class="line">        <span class="keyword">if</span>(times &gt; <span class="number">1000000</span>) &#123;</div><div class="line">            <span class="keyword">return</span> ;</div><div class="line">        &#125;</div><div class="line">    &#125;</div><div class="line">&#125;</div><div class="line"></div><div class="line"><span class="function"><span class="keyword">private</span> <span class="keyword">void</span> <span class="title">testDelAndTTL</span><span class="params">(<span class="keyword">final</span> List&lt;Long&gt; list, String prefix)</span> </span>&#123;</div><div class="line">    <span class="keyword">for</span> (Long key : list) &#123;</div><div class="line">        Optional&lt;Integer&gt; value = redisOperator.get(prefix + key, Integer.class);</div><div class="line">        <span class="keyword">if</span>(value.isPresent()) &#123;</div><div class="line">            Long ttl = redisOperator.getFastJsonRedisTemplate().getExpire(prefix + key);</div><div class="line">        log.error(<span class="string">"there is something wrong : key : &#123;&#125;, value : &#123;&#125;, ttl : &#123;&#125;"</span>, prefix + key, value.get(), ttl);</div><div class="line">        &#125;</div><div class="line">    &#125;</div><div class="line">&#125;</div></pre></td></tr></table></figure>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br><span class="line">54</span><br><span class="line">55</span><br><span class="line">56</span><br><span class="line">57</span><br><span class="line">58</span><br><span class="line">59</span><br><span class="line">60</span><br><span class="line">61</span><br><span class="line">62</span><br><span class="line">63</span><br><span class="line">64</span><br><span class="line">65</span><br><span class="line">66</span><br><span class="line">67</span><br><span class="line">68</span><br><span class="line">69</span><br><span class="line">70</span><br><span class="line">71</span><br><span class="line">72</span><br><span class="line">73</span><br><span class="line">74</span><br><span class="line">75</span><br><span class="line">76</span><br><span class="line">77</span><br><span class="line">78</span><br><span class="line">79</span><br><span class="line">80</span><br><span class="line">81</span><br><span class="line">82</span><br><span class="line">83</span><br><span class="line">84</span><br><span class="line">85</span><br><span class="line">86</span><br><span class="line">87</span><br><span class="line">88</span><br><span class="line">89</span><br><span class="line">90</span><br><span class="line">91</span><br><span class="line">92</span><br><span class="line">93</span><br><span class="line">94</span><br><span class="line">95</span><br><span class="line">96</span><br><span class="line">97</span><br><span class="line">98</span><br><span class="line">99</span><br><span class="line">100</span><br><span class="line">101</span><br><span class="line">102</span><br><span class="line">103</span><br><span class="line">104</span><br><span class="line">105</span><br><span class="line">106</span><br><span class="line">107</span><br><span class="line">108</span><br><span class="line">109</span><br><span class="line">110</span><br><span class="line">111</span><br><span class="line">112</span><br><span class="line">113</span><br><span class="line">114</span><br><span class="line">115</span><br><span class="line">116</span><br><span class="line">117</span><br><span class="line">118</span><br><span class="line">119</span><br><span class="line">120</span><br><span class="line">121</span><br><span class="line">122</span><br><span class="line">123</span><br><span class="line">124</span><br><span class="line">125</span><br><span class="line">126</span><br><span class="line">127</span><br><span class="line">128</span><br><span class="line">129</span><br><span class="line">130</span><br><span class="line">131</span><br><span class="line">132</span><br><span class="line">133</span><br><span class="line">134</span><br><span class="line">135</span><br><span class="line">136</span><br><span class="line">137</span><br><span class="line">138</span><br><span class="line">139</span><br><span class="line">140</span><br><span class="line">141</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">@Test</span></span><br><span class="line"><span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">test</span><span class="params">()</span> <span class="keyword">throws</span> InterruptedException </span>&#123;</span><br><span class="line">    <span class="keyword">final</span> List&lt;Long&gt; list = Lists.newArrayListWithCapacity(<span class="number">5000000</span>);</span><br><span class="line">    Long first_id = <span class="number">500000000000000001L</span>;</span><br><span class="line">    <span class="keyword">for</span> (<span class="keyword">int</span> i = <span class="number">0</span>; i &lt; <span class="number">5000000</span>; i++) &#123;</span><br><span class="line">        list.add(first_id++);</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="keyword">final</span> CountDownLatch allDone = <span class="keyword">new</span> CountDownLatch(<span class="number">2</span>);</span><br><span class="line"></span><br><span class="line">    <span class="comment">// incrby</span></span><br><span class="line">    <span class="keyword">new</span> Thread(</span><br><span class="line">        <span class="keyword">new</span> Runnable() &#123;</span><br><span class="line">            <span class="meta">@Override</span></span><br><span class="line">            <span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">run</span><span class="params">()</span> </span>&#123;</span><br><span class="line">                <span class="keyword">try</span> &#123;</span><br><span class="line">                    testIncrby(list);</span><br><span class="line">                &#125; <span class="keyword">catch</span> (InterruptedException e) &#123;</span><br><span class="line">                &#125;</span><br><span class="line">                allDone.countDown();</span><br><span class="line">            &#125;</span><br><span class="line">        &#125;</span><br><span class="line">    ).start();</span><br><span class="line"></span><br><span class="line">    <span class="keyword">new</span> Thread(</span><br><span class="line">        <span class="keyword">new</span> Runnable() &#123;</span><br><span class="line">            <span class="meta">@Override</span></span><br><span class="line">            <span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">run</span><span class="params">()</span> </span>&#123;</span><br><span class="line">                <span class="keyword">try</span> &#123;</span><br><span class="line">                    testIncrByAndDel(list);</span><br><span class="line">                &#125; <span class="keyword">catch</span> (InterruptedException e) &#123;</span><br><span class="line">                &#125;</span><br><span class="line">                allDone.countDown();</span><br><span class="line">            &#125;</span><br><span class="line">        &#125;</span><br><span class="line">    ).start();</span><br><span class="line"></span><br><span class="line">    allDone.await();</span><br><span class="line">    log.info(<span class="string">"finish method test"</span>);</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="meta">@Test</span></span><br><span class="line"><span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">testDelAndTTL</span><span class="params">()</span> <span class="keyword">throws</span> InterruptedException </span>&#123;</span><br><span class="line">    <span class="keyword">final</span> List&lt;Long&gt; list = Lists.newArrayListWithCapacity(<span class="number">5000000</span>);</span><br><span class="line">    Long first_id = <span class="number">500000000000000001L</span>;</span><br><span class="line">    <span class="keyword">for</span> (<span class="keyword">int</span> i = <span class="number">0</span>; i &lt; <span class="number">5000000</span>; i++) &#123;</span><br><span class="line">        list.add(first_id++);</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="keyword">final</span> CountDownLatch allDone = <span class="keyword">new</span> CountDownLatch(<span class="number">2</span>);</span><br><span class="line"></span><br><span class="line">    <span class="keyword">new</span> Thread(</span><br><span class="line">        <span class="keyword">new</span> Runnable() &#123;</span><br><span class="line">            <span class="meta">@Override</span></span><br><span class="line">            <span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">run</span><span class="params">()</span> </span>&#123;</span><br><span class="line">                testDelAndTTL(list, <span class="string">"walletMember"</span>);</span><br><span class="line">                allDone.countDown();</span><br><span class="line">                log.info(<span class="string">"finish walletMember keys"</span>);</span><br><span class="line">            &#125;</span><br><span class="line">        &#125;</span><br><span class="line">    ).start();</span><br><span class="line"></span><br><span class="line">    <span class="keyword">new</span> Thread(</span><br><span class="line">        <span class="keyword">new</span> Runnable() &#123;</span><br><span class="line">            <span class="meta">@Override</span></span><br><span class="line">            <span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">run</span><span class="params">()</span> </span>&#123;</span><br><span class="line">                testDelAndTTL(list, <span class="string">"walletMember1"</span>);</span><br><span class="line">                allDone.countDown();</span><br><span class="line">                log.info(<span class="string">"finish walletMember1 keys"</span>);</span><br><span class="line">            &#125;</span><br><span class="line">        &#125;</span><br><span class="line">    ).start();</span><br><span class="line"></span><br><span class="line">    allDone.await();</span><br><span class="line">    log.info(<span class="string">"finish all keys"</span>);</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="function"><span class="keyword">private</span> <span class="keyword">void</span> <span class="title">testIncrby</span><span class="params">(<span class="keyword">final</span> List&lt;Long&gt; list)</span> <span class="keyword">throws</span> InterruptedException </span>&#123;</span><br><span class="line">    <span class="keyword">long</span> times = <span class="number">0L</span>;</span><br><span class="line">    <span class="keyword">for</span>(;;)&#123;</span><br><span class="line">        times ++;</span><br><span class="line">        <span class="keyword">for</span> (Long key : list) &#123;</span><br><span class="line">            Optional&lt;Long&gt; value = redisOperator.incrBy(<span class="string">"walletMember"</span> + key, <span class="number">1</span>);</span><br><span class="line">            <span class="keyword">if</span> (value.isPresent()) &#123;</span><br><span class="line">                <span class="keyword">if</span> (value.get() != <span class="number">1L</span>) &#123;</span><br><span class="line">                    log.error(<span class="string">"there is something wrong in &#123;&#125;: the incrBy method return wrong value, expact : &#123;&#125; , result : &#123;&#125;, key : &#123;&#125;"</span>, <span class="string">"testIncrby"</span>, <span class="number">1</span>, value.get(), <span class="string">"walletMember"</span> + key);</span><br><span class="line">                    <span class="keyword">continue</span>;</span><br><span class="line">                &#125;</span><br><span class="line">            &#125; <span class="keyword">else</span> &#123;</span><br><span class="line">                log.error(<span class="string">"there is something wrong in &#123;&#125;: the incrBy method return wrong value, expact : &#123;&#125; , result : &#123;&#125;, key : &#123;&#125;"</span>, <span class="string">"testIncrby"</span>, <span class="number">1</span>, <span class="keyword">null</span>, <span class="string">"walletMember"</span> + key);</span><br><span class="line">            &#125;</span><br><span class="line">            Optional&lt;Boolean&gt; isSuccess = redisOperator.expire(<span class="string">"walletMember"</span> + key, <span class="number">30</span>);</span><br><span class="line">            <span class="keyword">if</span> (!isSuccess.isPresent() || !isSuccess.get()) &#123;</span><br><span class="line">                log.error(<span class="string">"there is something wrong in &#123;&#125;: the expire method return wrong value, expact : &#123;&#125; , result : &#123;&#125;, key : &#123;&#125;"</span>, <span class="string">"testIncrby"</span>, <span class="string">"true"</span>, (isSuccess.isPresent() ? isSuccess.get() : <span class="keyword">null</span>), <span class="string">"walletMember"</span> + key);</span><br><span class="line">            &#125;</span><br><span class="line">        &#125;</span><br><span class="line">        log.info(<span class="string">"finish &#123;&#125; method &#123;&#125; times. sleep 35 seconds"</span>, <span class="string">"testIncrby"</span>, times);</span><br><span class="line">        Thread.sleep(<span class="number">60</span>*<span class="number">5</span>*<span class="number">1000L</span>);</span><br><span class="line">        <span class="keyword">if</span>(times &gt; <span class="number">1000000</span>) &#123;</span><br><span class="line">            <span class="keyword">return</span> ;</span><br><span class="line">        &#125;</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="function"><span class="keyword">private</span> <span class="keyword">void</span> <span class="title">testIncrByAndDel</span><span class="params">(<span class="keyword">final</span> List&lt;Long&gt; list)</span> <span class="keyword">throws</span> InterruptedException </span>&#123;</span><br><span class="line">    <span class="keyword">long</span> times = <span class="number">0L</span>;</span><br><span class="line">    <span class="keyword">for</span>(;;) &#123;</span><br><span class="line">        times ++;</span><br><span class="line">        <span class="keyword">for</span> (Long key : list) &#123;</span><br><span class="line">            Optional&lt;Long&gt; value = redisOperator.incrBy(<span class="string">"walletMember1"</span>+key, <span class="number">1</span>);</span><br><span class="line">            <span class="keyword">if</span>(value.isPresent()) &#123;</span><br><span class="line">                <span class="keyword">if</span>(value.get() != <span class="number">1L</span>) &#123;</span><br><span class="line">                    log.error(<span class="string">"there is something wrong in &#123;&#125; method: the incrBy method return wrong value, expact : &#123;&#125; , result : &#123;&#125;, key : &#123;&#125;"</span>, <span class="string">"testIncrByAndDel"</span>, <span class="number">1</span>, value.get(), <span class="string">"walletMember1"</span> + key);</span><br><span class="line">                    <span class="keyword">continue</span>;</span><br><span class="line">                &#125;</span><br><span class="line">            &#125; <span class="keyword">else</span> &#123;</span><br><span class="line">                log.error(<span class="string">"there is something wrong in &#123;&#125; method: the incrBy method return wrong value, expact : &#123;&#125; , result : &#123;&#125;, key : &#123;&#125;"</span>, <span class="string">"testIncrByAndDel"</span>, <span class="number">1</span>, <span class="keyword">null</span>, <span class="string">"walletMember1"</span> + key);</span><br><span class="line">            &#125;</span><br><span class="line">            Optional&lt;Boolean&gt; isSuccess= redisOperator.expire(<span class="string">"walletMember"</span>+key, <span class="number">60</span>);</span><br><span class="line">            <span class="keyword">if</span>(!isSuccess.isPresent() || !isSuccess.get()) &#123;</span><br><span class="line">                log.error(<span class="string">"there is something wrong in &#123;&#125;: the expire method return wrong value, expact : &#123;&#125; , result : &#123;&#125;, key : &#123;&#125;"</span>, <span class="string">"testIncrByAndDel"</span>, <span class="string">"true"</span>, (isSuccess.isPresent() ? isSuccess.get() : <span class="keyword">null</span>), <span class="string">"walletMember1"</span> + key);</span><br><span class="line">            &#125;</span><br><span class="line">            redisOperator.del(<span class="string">"walletMember1"</span>+key);</span><br><span class="line">        &#125;</span><br><span class="line">        log.info(<span class="string">"finish &#123;&#125; method &#123;&#125; times. sleep 35 seconds"</span>, <span class="string">"testIncrByAndDel"</span>, times);</span><br><span class="line">        Thread.sleep(<span class="number">60</span>*<span class="number">5</span>*<span class="number">1000L</span>);</span><br><span class="line">        <span class="keyword">if</span>(times &gt; <span class="number">1000000</span>) &#123;</span><br><span class="line">            <span class="keyword">return</span> ;</span><br><span class="line">        &#125;</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="function"><span class="keyword">private</span> <span class="keyword">void</span> <span class="title">testDelAndTTL</span><span class="params">(<span class="keyword">final</span> List&lt;Long&gt; list, String prefix)</span> </span>&#123;</span><br><span class="line">    <span class="keyword">for</span> (Long key : list) &#123;</span><br><span class="line">        Optional&lt;Integer&gt; value = redisOperator.get(prefix + key, Integer.class);</span><br><span class="line">        <span class="keyword">if</span>(value.isPresent()) &#123;</span><br><span class="line">            Long ttl = redisOperator.getFastJsonRedisTemplate().getExpire(prefix + key);</span><br><span class="line">        log.error(<span class="string">"there is something wrong : key : &#123;&#125;, value : &#123;&#125;, ttl : &#123;&#125;"</span>, prefix + key, value.get(), ttl);</span><br><span class="line">        &#125;</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
 <p>可能是测试用例写的不好，线上线下都没有发现明显的问题，于是对代码做了调整：</p>
-<figure class="highlight java"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div><div class="line">17</div><div class="line">18</div><div class="line">19</div><div class="line">20</div><div class="line">21</div><div class="line">22</div><div class="line">23</div><div class="line">24</div><div class="line">25</div><div class="line">26</div><div class="line">27</div><div class="line">28</div><div class="line">29</div><div class="line">30</div><div class="line">31</div><div class="line">32</div><div class="line">33</div><div class="line">34</div><div class="line">35</div><div class="line">36</div><div class="line">37</div><div class="line">38</div><div class="line">39</div><div class="line">40</div></pre></td><td class="code"><pre><div class="line"><span class="meta">@Autowired</span></div><div class="line">    <span class="keyword">private</span> StringRedisTemplate stringRedisTemplate;</div><div class="line"></div><div class="line">    <span class="keyword">private</span> <span class="keyword">static</span> List&lt;String&gt; keys = Lists.newArrayListWithCapacity(<span class="number">100</span>);</div><div class="line"></div><div class="line">    <span class="meta">@RequestMapping</span>(value = <span class="string">"/test/redis"</span>, method = RequestMethod.POST)</div><div class="line">    <span class="meta">@ResponseBody</span></div><div class="line">    <span class="function"><span class="keyword">public</span> String <span class="title">createGoogleAuth</span><span class="params">()</span> <span class="keyword">throws</span> InterruptedException </span>&#123;</div><div class="line">        <span class="keyword">final</span> <span class="keyword">int</span> numThreads = <span class="number">100</span>;</div><div class="line">        <span class="keyword">final</span> ExecutorService threadPool = Executors.newFixedThreadPool(numThreads);</div><div class="line">        log.info(<span class="string">"--------------start------------------"</span>);</div><div class="line">        <span class="keyword">for</span>(<span class="keyword">int</span> i = <span class="number">0</span>; i &lt; <span class="number">100</span>; i++) &#123;</div><div class="line">            threadPool.submit(<span class="keyword">new</span> Runnable() &#123;</div><div class="line"></div><div class="line">                <span class="meta">@Override</span></div><div class="line">                <span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">run</span><span class="params">()</span> </span>&#123;</div><div class="line">                    redis_incrby();</div><div class="line">                &#125;</div><div class="line">            &#125;);</div><div class="line">        &#125;</div><div class="line">        <span class="keyword">return</span> <span class="string">"OK"</span>;</div><div class="line">    &#125;</div><div class="line"></div><div class="line">    <span class="function"><span class="keyword">private</span> <span class="keyword">void</span> <span class="title">redis_incrby</span><span class="params">()</span> </span>&#123;</div><div class="line">        <span class="keyword">final</span> <span class="keyword">int</span> loops = <span class="number">2500</span>;</div><div class="line">        String key = UUID.randomUUID().toString();</div><div class="line">        keys.add(key);</div><div class="line">        <span class="keyword">for</span>(<span class="keyword">int</span> j=<span class="number">0</span>;j&lt;loops;j++) &#123;</div><div class="line">            log.info(<span class="string">"key : &#123;&#125;, return : &#123;&#125;"</span>, key, stringRedisTemplate.opsForValue().increment(key, <span class="number">1</span>));</div><div class="line">            log.info(<span class="string">"key : &#123;&#125;, expire : &#123;&#125;"</span>, key, stringRedisTemplate.expire(key, <span class="number">5</span>, TimeUnit.SECONDS));</div><div class="line">            log.info(<span class="string">"key : &#123;&#125;, return : &#123;&#125;"</span>, key, stringRedisTemplate.opsForValue().increment(key, <span class="number">1</span>));</div><div class="line">            log.info(<span class="string">"key : &#123;&#125;, expire : &#123;&#125;"</span>, key, stringRedisTemplate.expire(key, <span class="number">5</span>, TimeUnit.SECONDS));</div><div class="line">            log.info(<span class="string">"key : &#123;&#125;, return : &#123;&#125;"</span>, key, stringRedisTemplate.opsForValue().increment(key, <span class="number">1</span>));</div><div class="line">            log.info(<span class="string">"key : &#123;&#125;, expire : &#123;&#125;"</span>, key, stringRedisTemplate.expire(key, <span class="number">5</span>, TimeUnit.SECONDS));</div><div class="line">            log.info(<span class="string">"key : &#123;&#125;, return : &#123;&#125;"</span>, key, stringRedisTemplate.opsForValue().increment(key, <span class="number">1</span>));</div><div class="line">            log.info(<span class="string">"key : &#123;&#125;, expire : &#123;&#125;"</span>, key, stringRedisTemplate.expire(key, <span class="number">5</span>, TimeUnit.SECONDS));</div><div class="line">        &#125;</div><div class="line">        stringRedisTemplate.delete(key);</div><div class="line">        log.info(<span class="string">"key : &#123;&#125;, finish."</span>, key);</div><div class="line">    &#125;</div></pre></td></tr></table></figure>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">@Autowired</span></span><br><span class="line">    <span class="keyword">private</span> StringRedisTemplate stringRedisTemplate;</span><br><span class="line"></span><br><span class="line">    <span class="keyword">private</span> <span class="keyword">static</span> List&lt;String&gt; keys = Lists.newArrayListWithCapacity(<span class="number">100</span>);</span><br><span class="line"></span><br><span class="line">    <span class="meta">@RequestMapping</span>(value = <span class="string">"/test/redis"</span>, method = RequestMethod.POST)</span><br><span class="line">    <span class="meta">@ResponseBody</span></span><br><span class="line">    <span class="function"><span class="keyword">public</span> String <span class="title">createGoogleAuth</span><span class="params">()</span> <span class="keyword">throws</span> InterruptedException </span>&#123;</span><br><span class="line">        <span class="keyword">final</span> <span class="keyword">int</span> numThreads = <span class="number">100</span>;</span><br><span class="line">        <span class="keyword">final</span> ExecutorService threadPool = Executors.newFixedThreadPool(numThreads);</span><br><span class="line">        log.info(<span class="string">"--------------start------------------"</span>);</span><br><span class="line">        <span class="keyword">for</span>(<span class="keyword">int</span> i = <span class="number">0</span>; i &lt; <span class="number">100</span>; i++) &#123;</span><br><span class="line">            threadPool.submit(<span class="keyword">new</span> Runnable() &#123;</span><br><span class="line"></span><br><span class="line">                <span class="meta">@Override</span></span><br><span class="line">                <span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">run</span><span class="params">()</span> </span>&#123;</span><br><span class="line">                    redis_incrby();</span><br><span class="line">                &#125;</span><br><span class="line">            &#125;);</span><br><span class="line">        &#125;</span><br><span class="line">        <span class="keyword">return</span> <span class="string">"OK"</span>;</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="function"><span class="keyword">private</span> <span class="keyword">void</span> <span class="title">redis_incrby</span><span class="params">()</span> </span>&#123;</span><br><span class="line">        <span class="keyword">final</span> <span class="keyword">int</span> loops = <span class="number">2500</span>;</span><br><span class="line">        String key = UUID.randomUUID().toString();</span><br><span class="line">        keys.add(key);</span><br><span class="line">        <span class="keyword">for</span>(<span class="keyword">int</span> j=<span class="number">0</span>;j&lt;loops;j++) &#123;</span><br><span class="line">            log.info(<span class="string">"key : &#123;&#125;, return : &#123;&#125;"</span>, key, stringRedisTemplate.opsForValue().increment(key, <span class="number">1</span>));</span><br><span class="line">            log.info(<span class="string">"key : &#123;&#125;, expire : &#123;&#125;"</span>, key, stringRedisTemplate.expire(key, <span class="number">5</span>, TimeUnit.SECONDS));</span><br><span class="line">            log.info(<span class="string">"key : &#123;&#125;, return : &#123;&#125;"</span>, key, stringRedisTemplate.opsForValue().increment(key, <span class="number">1</span>));</span><br><span class="line">            log.info(<span class="string">"key : &#123;&#125;, expire : &#123;&#125;"</span>, key, stringRedisTemplate.expire(key, <span class="number">5</span>, TimeUnit.SECONDS));</span><br><span class="line">            log.info(<span class="string">"key : &#123;&#125;, return : &#123;&#125;"</span>, key, stringRedisTemplate.opsForValue().increment(key, <span class="number">1</span>));</span><br><span class="line">            log.info(<span class="string">"key : &#123;&#125;, expire : &#123;&#125;"</span>, key, stringRedisTemplate.expire(key, <span class="number">5</span>, TimeUnit.SECONDS));</span><br><span class="line">            log.info(<span class="string">"key : &#123;&#125;, return : &#123;&#125;"</span>, key, stringRedisTemplate.opsForValue().increment(key, <span class="number">1</span>));</span><br><span class="line">            log.info(<span class="string">"key : &#123;&#125;, expire : &#123;&#125;"</span>, key, stringRedisTemplate.expire(key, <span class="number">5</span>, TimeUnit.SECONDS));</span><br><span class="line">        &#125;</span><br><span class="line">        stringRedisTemplate.delete(key);</span><br><span class="line">        log.info(<span class="string">"key : &#123;&#125;, finish."</span>, key);</span><br><span class="line">    &#125;</span><br></pre></td></tr></table></figure>
 <p>执行几次后终于发现了问题：按照代码逻辑，每个<strong>key</strong>最后的<strong>value</strong>应该都为<strong>10000</strong>，然后有的key的结果大于10000，于是想到两种情况：</p>
 <ul>
 <li>1）客户端多发送了一次命令</li>
@@ -489,20 +596,20 @@
 <h3 id="验证原因"><a href="#验证原因" class="headerlink" title="验证原因"></a>验证原因</h3><p>为了验证到底是哪种原因，采取了以下方式：</p>
 <ul>
 <li><p>修改Jedis 源码：修改<strong>BinaryClient</strong>的<strong>incrBy</strong>方法，打印日志信息：</p>
-<figure class="highlight java"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div></pre></td><td class="code"><pre><div class="line"><span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">incrBy</span><span class="params">(<span class="keyword">final</span> <span class="keyword">byte</span>[] key, <span class="keyword">final</span> <span class="keyword">long</span> integer)</span> </span>&#123;</div><div class="line">  log.error(<span class="string">"key: &#123;&#125;, delta : &#123;&#125;"</span>, <span class="keyword">new</span> String(key), integer);</div><div class="line">  sendCommand(INCRBY, key, toByteArray(integer));</div><div class="line">&#125;</div></pre></td></tr></table></figure>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">incrBy</span><span class="params">(<span class="keyword">final</span> <span class="keyword">byte</span>[] key, <span class="keyword">final</span> <span class="keyword">long</span> integer)</span> </span>&#123;</span><br><span class="line">  log.error(<span class="string">"key: &#123;&#125;, delta : &#123;&#125;"</span>, <span class="keyword">new</span> String(key), integer);</span><br><span class="line">  sendCommand(INCRBY, key, toByteArray(integer));</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
 </li>
 <li><p>对redis进行监听，使用<strong>watch</strong>命令：</p>
-<figure class="highlight shell"><table><tr><td class="gutter"><pre><div class="line">1</div></pre></td><td class="code"><pre><div class="line">./redis-cli -c -h ip -p port watch</div></pre></td></tr></table></figure>
+<figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">./redis-cli -c -h ip -p port watch</span><br></pre></td></tr></table></figure>
 </li>
 <li><p>通过<strong>tcpdump</strong> 对所有流量记录进行保存</p>
-<figure class="highlight shell"><table><tr><td class="gutter"><pre><div class="line">1</div></pre></td><td class="code"><pre><div class="line">tcpdump -i eth0 -s 0 -w tcp.cap # 保存为.cap文件可以通过wireshark 进行分析</div></pre></td></tr></table></figure>
+<figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">tcpdump -i eth0 -s 0 -w tcp.cap # 保存为.cap文件可以通过wireshark 进行分析</span><br></pre></td></tr></table></figure>
 </li>
 </ul>
 <h3 id="分析原因"><a href="#分析原因" class="headerlink" title="分析原因"></a>分析原因</h3><p>通过重新执行上面的测试代码，对日志文件进行筛选：</p>
-<figure class="highlight shell"><table><tr><td class="gutter"><pre><div class="line">1</div></pre></td><td class="code"><pre><div class="line">grep 10001 nohup.out</div></pre></td></tr></table></figure>
+<figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">grep 10001 nohup.out</span><br></pre></td></tr></table></figure>
 <p>从中选取一个key：<strong>3e9dd73a-fee2-416c-b3c8-5369b2cd4ec8</strong></p>
 <p>然后继续筛选：</p>
-<figure class="highlight shell"><table><tr><td class="gutter"><pre><div class="line">1</div></pre></td><td class="code"><pre><div class="line">grep "key : 3e9dd73a-fee2-416c-b3c8-5369b2cd4ec8 return : " nohup.out</div></pre></td></tr></table></figure>
+<figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">grep "key : 3e9dd73a-fee2-416c-b3c8-5369b2cd4ec8 return : " nohup.out</span><br></pre></td></tr></table></figure>
 <p>仔细查看后发现：</p>
 <p><img src="https://picture.jobshen.com/blog/redis/redis-03.png" alt="value跳跃"></p>
 <p>直接从 <strong>2698</strong> 跳跃到了 <strong>2700</strong></p>
@@ -524,6 +631,9 @@
 
       
     </div>
+
+    
+
     
     
     
@@ -531,7 +641,33 @@
     
 
     
+       
+    
+    
 
+    
+      <div>
+        
+
+
+
+  
+
+
+
+<ul class="post-copyright">
+  <li class="post-copyright-author">
+    <strong>本文作者： </strong>Job Shen</li>
+  <li class="post-copyright-link">
+    <strong>本文链接：</strong>
+    
+    <a href="http://blog.jobshen.com/posts/1461710894/" title="记一次线上Redis故障恢复和分析（二）">http://blog.jobshen.com/posts/1461710894/</a>
+  </li>
+  <li class="post-copyright-license">
+    <strong>版权声明： </strong>本博客所有文章除特别声明外，均采用 <a href="https://creativecommons.org/licenses/by-nc-sa/4.0/" rel="noopener" target="_blank"><i class="fa fa-fw fa-creative-commons"></i>BY-NC-SA</a> 许可协议。转载请注明出处！</li>
+</ul>
+
+      </div>
     
 
     <footer class="post-footer">
@@ -540,20 +676,14 @@
           
             <a href="/tags/Redis/" rel="tag"># Redis</a>
           
-            <a href="/tags/Jedis/" rel="tag"># Jedis</a>
-          
             <a href="/tags/Redis-Cluster/" rel="tag"># Redis Cluster</a>
+          
+            <a href="/tags/Jedis/" rel="tag"># Jedis</a>
           
             <a href="/tags/Wireshark/" rel="tag"># Wireshark</a>
           
         </div>
       
-
-      <div>
-        
-          
-        
-      </div>
 
       
       
@@ -561,6 +691,7 @@
         
 
         
+          
           <div class="social-like">
             
 
@@ -570,6 +701,8 @@
               </div>
             
           </div>
+        
+
         
         </div>
       
@@ -607,21 +740,14 @@
   </article>
 
 
-
-    <div class="post-spread">
-      
-    </div>
   </div>
 
 
           </div>
           
 
+  
 
-          
-  <div class="comments" id="comments">
-    
-  </div>
 
 
         </div>
@@ -644,66 +770,114 @@
 
       
         <ul class="sidebar-nav motion-element">
-          <li class="sidebar-nav-toc sidebar-nav-active" data-target="post-toc-wrap" >
+          <li class="sidebar-nav-toc sidebar-nav-active" data-target="post-toc-wrap">
             文章目录
           </li>
-          <li class="sidebar-nav-overview" data-target="site-overview">
+          <li class="sidebar-nav-overview" data-target="site-overview-wrap">
             站点概览
           </li>
         </ul>
       
 
-      <section class="site-overview sidebar-panel">
-        <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
-          <img class="site-author-image" itemprop="image"
-               src="/uploads/Avatar.png"
-               alt="Job Shen" />
-          <p class="site-author-name" itemprop="name">Job Shen</p>
-           
+      <section class="site-overview-wrap sidebar-panel">
+        <div class="site-overview">
+          <div class="site-author motion-element" itemprop="author" itemscope="" itemtype="http://schema.org/Person">
+            
+              <img class="site-author-image" itemprop="image" src="/uploads/Avatar.png" alt="Job Shen">
+            
+              <p class="site-author-name" itemprop="name">Job Shen</p>
               <p class="site-description motion-element" itemprop="description"></p>
-          
-        </div>
-        <nav class="site-state motion-element">
+          </div>
 
           
-            <div class="site-state-item site-state-posts">
-              <a href="/archives/">
-                <span class="site-state-item-count">6</span>
-                <span class="site-state-item-name">日志</span>
-              </a>
+            <nav class="site-state motion-element">
+              
+                <div class="site-state-item site-state-posts">
+                
+                  <a href="/archives/">
+                
+                    <span class="site-state-item-count">6</span>
+                    <span class="site-state-item-name">日志</span>
+                  </a>
+                </div>
+              
+
+              
+
+              
+                
+                
+                <div class="site-state-item site-state-tags">
+                  <a href="/tags/index.html">
+                    
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                    <span class="site-state-item-count">10</span>
+                    <span class="site-state-item-name">标签</span>
+                  </a>
+                </div>
+              
+            </nav>
+          
+
+          
+
+          
+            <div class="links-of-author motion-element">
+              
+                <span class="links-of-author-item">
+                  
+                  
+                    
+                  
+                  
+                    
+                  
+                  <a href="https://github.com/kitdine" title="GitHub &rarr; https://github.com/kitdine" rel="noopener" target="_blank"><i class="fa fa-fw fa-github"></i>GitHub</a>
+                </span>
+              
             </div>
           
 
           
+             <div class="cc-license motion-element" itemprop="license">
+              
+                
+              
+              
+              
+              <a href="https://creativecommons.org/licenses/by-nc-sa/4.0/" class="cc-opacity" rel="noopener" target="_blank"><img src="/images/cc-by-nc-sa.svg" alt="Creative Commons"></a>
+             </div>
+          
+
+          
+          
 
           
             
-            
-            <div class="site-state-item site-state-tags">
-              <a href="/tags/index.html">
-                <span class="site-state-item-count">10</span>
-                <span class="site-state-item-name">标签</span>
-              </a>
-            </div>
+          
           
 
-        </nav>
-
-        
-
-        <div class="links-of-author motion-element">
-          
         </div>
-
-        
-        
-
-        
-        
-
-        
-
-
       </section>
 
       
@@ -736,30 +910,39 @@
 
     <footer id="footer" class="footer">
       <div class="footer-inner">
-        <div class="copyright" >
-  
-  &copy; 
-  <span itemprop="copyrightYear">2017</span>
-  <span class="with-love">
+        <div class="copyright">&copy; <span itemprop="copyrightYear">2018</span>
+  <span class="with-love" id="animate">
     <i class="fa fa-heart"></i>
   </span>
   <span class="author" itemprop="copyrightHolder">Job Shen</span>
+
+  
+
+  
 </div>
 
 
-<div class="powered-by">
-  由 <a class="theme-link" href="https://hexo.io">Hexo</a> 强力驱动
-</div>
+  <div class="powered-by">由 <a href="https://hexo.io" class="theme-link" rel="noopener" target="_blank">Hexo</a> 强力驱动 v3.8.0</div>
 
-<div class="theme-info">
-  主题 -
-  <a class="theme-link" href="https://github.com/iissnan/hexo-theme-next">
-    NexT.Gemini
-  </a>
-</div>
+
+
+  <span class="post-meta-divider">|</span>
+
+
+
+  <div class="theme-info">主题 – <a href="https://theme-next.org" class="theme-link" rel="noopener" target="_blank">NexT.Gemini</a> v6.6.0</div>
+
+
 
 
         
+
+
+
+
+
+
+
 
         
       </div>
@@ -772,6 +955,11 @@
       </div>
     
 
+    
+	
+    
+
+    
   </div>
 
   
@@ -790,49 +978,45 @@
 
 
 
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+  
+    <script type="text/javascript" src="/lib/jquery/index.js?v=2.1.3"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/velocity/velocity.min.js?v=1.2.1"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/velocity/velocity.ui.min.js?v=1.2.1"></script>
   
 
 
   
 
 
+  <script type="text/javascript" src="/js/src/utils.js?v=6.6.0"></script>
 
-
-
-
-
-
-
-
-
-  
-  <script type="text/javascript" src="/lib/jquery/index.js?v=2.1.3"></script>
-
-  
-  <script type="text/javascript" src="/lib/fastclick/lib/fastclick.min.js?v=1.0.6"></script>
-
-  
-  <script type="text/javascript" src="/lib/jquery_lazyload/jquery.lazyload.js?v=1.9.7"></script>
-
-  
-  <script type="text/javascript" src="/lib/velocity/velocity.min.js?v=1.2.1"></script>
-
-  
-  <script type="text/javascript" src="/lib/velocity/velocity.ui.min.js?v=1.2.1"></script>
-
-  
-  <script type="text/javascript" src="/lib/fancybox/source/jquery.fancybox.pack.js?v=2.1.5"></script>
-
-  
-  <script type="text/javascript" src="/lib/canvas-nest/canvas-nest.min.js"></script>
-
-
-  
-
-
-  <script type="text/javascript" src="/js/src/utils.js?v=5.1.2"></script>
-
-  <script type="text/javascript" src="/js/src/motion.js?v=5.1.2"></script>
+  <script type="text/javascript" src="/js/src/motion.js?v=6.6.0"></script>
 
 
 
@@ -840,36 +1024,26 @@
   
 
 
-  <script type="text/javascript" src="/js/src/affix.js?v=5.1.2"></script>
+  <script type="text/javascript" src="/js/src/affix.js?v=6.6.0"></script>
 
-  <script type="text/javascript" src="/js/src/schemes/pisces.js?v=5.1.2"></script>
-
-
-
-  
-  <script type="text/javascript" src="/js/src/scrollspy.js?v=5.1.2"></script>
-<script type="text/javascript" src="/js/src/post-details.js?v=5.1.2"></script>
+  <script type="text/javascript" src="/js/src/schemes/pisces.js?v=6.6.0"></script>
 
 
 
   
-
-
-  <script type="text/javascript" src="/js/src/bootstrap.js?v=5.1.2"></script>
+  <script type="text/javascript" src="/js/src/scrollspy.js?v=6.6.0"></script>
+<script type="text/javascript" src="/js/src/post-details.js?v=6.6.0"></script>
 
 
 
   
 
 
+  <script type="text/javascript" src="/js/src/bootstrap.js?v=6.6.0"></script>
+
+
+
   
-
-
-
-
-	
-
-
 
 
 
@@ -878,8 +1052,6 @@
 
 
 
-
-  
 
 
 
@@ -937,6 +1109,8 @@
         .css('overflow', 'hidden');
       $("#search-loading-icon").css('margin', '20% auto 0 auto').css('text-align', 'center');
 
+      
+
       $.ajax({
         url: path,
         dataType: isXml ? "xml" : "json",
@@ -970,6 +1144,7 @@
                 var title = data.title.trim();
                 var titleInLowerCase = title.toLowerCase();
                 var content = data.content.trim().replace(/<[^>]+>/g,"");
+                
                 var contentInLowerCase = content.toLowerCase();
                 var articleUrl = decodeURIComponent(data.url);
                 var indexOfTitle = [];
@@ -1212,107 +1387,59 @@
   
 
   
-  <script src="https://cdn1.lncld.net/static/js/av-core-mini-0.6.4.js"></script>
-  <script>AV.initialize("RiCpXfaVMc47cb5qeJHnhkKl-gzGzoHsz", "rUoXvclVKDDAqBQXOVaXgeyU");</script>
   <script>
-    function showTime(Counter) {
-      var query = new AV.Query(Counter);
-      var entries = [];
-      var $visitors = $(".leancloud_visitors");
-
-      $visitors.each(function () {
-        entries.push( $(this).attr("id").trim() );
-      });
-
-      query.containedIn('url', entries);
-      query.find()
-        .done(function (results) {
-          var COUNT_CONTAINER_REF = '.leancloud-visitors-count';
-
-          if (results.length === 0) {
-            $visitors.find(COUNT_CONTAINER_REF).text(0);
-            return;
-          }
-
-          for (var i = 0; i < results.length; i++) {
-            var item = results[i];
-            var url = item.get('url');
-            var time = item.get('time');
-            var element = document.getElementById(url);
-
-            $(element).find(COUNT_CONTAINER_REF).text(time);
-          }
-          for(var i = 0; i < entries.length; i++) {
-            var url = entries[i];
-            var element = document.getElementById(url);
-            var countSpan = $(element).find(COUNT_CONTAINER_REF);
-            if( countSpan.text() == '') {
-              countSpan.text(0);
-            }
-          }
-        })
-        .fail(function (object, error) {
-          console.log("Error: " + error.code + " " + error.message);
-        });
-    }
-
+    
     function addCount(Counter) {
       var $visitors = $(".leancloud_visitors");
       var url = $visitors.attr('id').trim();
       var title = $visitors.attr('data-flag-title').trim();
-      var query = new AV.Query(Counter);
 
-      query.equalTo("url", url);
-      query.find({
-        success: function(results) {
+      Counter('get', '/classes/Counter', { where: JSON.stringify({ url }) })
+        .done(function ({ results }) {
           if (results.length > 0) {
             var counter = results[0];
-            counter.fetchWhenSave(true);
-            counter.increment("time");
-            counter.save(null, {
-              success: function(counter) {
-                var $element = $(document.getElementById(url));
-                $element.find('.leancloud-visitors-count').text(counter.get('time'));
-              },
-              error: function(counter, error) {
-                console.log('Failed to save Visitor num, with error message: ' + error.message);
-              }
-            });
+            
+              var $element = $(document.getElementById(url));
+              $element.find('.leancloud-visitors-count').text(counter.time + 1);
+            
+            Counter('put', `/classes/Counter/${counter.objectId}`, JSON.stringify({ time: { "__op":"Increment", "amount":1 } }))
+            
+            .fail(function ({ responseJSON }) {
+                console.log('Failed to save Visitor num, with error message: ' + responseJSON.error);
+            })
           } else {
-            var newcounter = new Counter();
-            /* Set ACL */
-            var acl = new AV.ACL();
-            acl.setPublicReadAccess(true);
-            acl.setPublicWriteAccess(true);
-            newcounter.setACL(acl);
-            /* End Set ACL */
-            newcounter.set("title", title);
-            newcounter.set("url", url);
-            newcounter.set("time", 1);
-            newcounter.save(null, {
-              success: function(newcounter) {
-                var $element = $(document.getElementById(url));
-                $element.find('.leancloud-visitors-count').text(newcounter.get('time'));
-              },
-              error: function(newcounter, error) {
-                console.log('Failed to create');
-              }
-            });
+            
+              var $element = $(document.getElementById(url));
+              $element.find('.leancloud-visitors-count').text('Counter not initialized! See more at console err msg.');
+              console.error('ATTENTION! LeanCloud counter has security bug, see here how to solve it: https://github.com/theme-next/hexo-leancloud-counter-security. \n But you also can use LeanCloud without security, by set \'security\' option to \'false\'.');
+            
           }
-        },
-        error: function(error) {
-          console.log('Error:' + error.code + " " + error.message);
-        }
+        })
+      .fail(function ({ responseJSON }) {
+        console.log('LeanCloud Counter Error:' + responseJSON.code + " " + responseJSON.error);
       });
     }
+    
 
     $(function() {
-      var Counter = AV.Object.extend("Counter");
-      if ($('.leancloud_visitors').length == 1) {
-        addCount(Counter);
-      } else if ($('.post-title-link').length > 1) {
-        showTime(Counter);
-      }
+      $.get('https://app-router.leancloud.cn/2/route?appId=' + "RiCpXfaVMc47cb5qeJHnhkKl-gzGzoHsz")
+        .done(function ({ api_server }) {
+          var Counter = function (method, url, data) {
+            return $.ajax({
+              method: method,
+              url: `https://${api_server}/1.1${url}`,
+              headers: {
+                'X-LC-Id': "RiCpXfaVMc47cb5qeJHnhkKl-gzGzoHsz",
+                'X-LC-Key': "rUoXvclVKDDAqBQXOVaXgeyU",
+                'Content-Type': 'application/json',
+              },
+              data: data,
+            });
+          };
+          
+          addCount(Counter);
+          
+        })
     });
   </script>
 
@@ -1323,33 +1450,31 @@
   
 
   
-  
-    <script type="text/x-mathjax-config">
-      MathJax.Hub.Config({
-        tex2jax: {
-          inlineMath: [ ['$','$'], ["\\(","\\)"]  ],
-          processEscapes: true,
-          skipTags: ['script', 'noscript', 'style', 'textarea', 'pre', 'code']
-        }
-      });
-    </script>
 
-    <script type="text/x-mathjax-config">
-      MathJax.Hub.Queue(function() {
-        var all = MathJax.Hub.getAllJax(), i;
-        for (i=0; i < all.length; i += 1) {
-          all[i].SourceElement().parentNode.className += ' has-jax';
-        }
-      });
-    </script>
-    <script type="text/javascript" src="//cdn.bootcss.com/mathjax/2.7.1/latest.js?config=TeX-AMS-MML_HTMLorMML"></script>
+  
+  
+
+  
+  
+
   
 
 
   
-  <script type="text/javascript" src="/js/src/js.cookie.js?v=5.1.2"></script>
-  <script type="text/javascript" src="/js/src/scroll-cookie.js?v=5.1.2"></script>
+  
 
+  
+
+  
+  <script type="text/javascript" src="/js/src/js.cookie.js?v=6.6.0"></script>
+  <script type="text/javascript" src="/js/src/scroll-cookie.js?v=6.6.0"></script>
+
+
+  
+
+  
+
+  
 
   
 

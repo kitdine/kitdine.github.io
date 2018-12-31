@@ -2,14 +2,23 @@
 
 
 
+
+
+
+
+
+
+
+
+
   
 
 
-<html class="theme-next gemini use-motion" lang="zh-Hans">
-<head>
-  <meta charset="UTF-8"/>
-<meta http-equiv="X-UA-Compatible" content="IE=edge" />
-<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1"/>
+<html class="theme-next gemini use-motion" lang="zh-CN">
+<head><meta name="generator" content="Hexo 3.8.0">
+  <meta charset="UTF-8">
+<meta http-equiv="X-UA-Compatible" content="IE=edge">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=2">
 <meta name="theme-color" content="#222">
 
 
@@ -20,8 +29,11 @@
 
 
 
-<meta http-equiv="Cache-Control" content="no-transform" />
-<meta http-equiv="Cache-Control" content="no-siteapp" />
+
+
+
+<meta http-equiv="Cache-Control" content="no-transform">
+<meta http-equiv="Cache-Control" content="no-siteapp">
 
 
 
@@ -37,9 +49,6 @@
 
 
 
-  
-  
-  <link href="/lib/fancybox/source/jquery.fancybox.css?v=2.1.5" rel="stylesheet" type="text/css" />
 
 
 
@@ -91,42 +100,30 @@
 
 
 
-<link href="/lib/font-awesome/css/font-awesome.min.css?v=4.6.2" rel="stylesheet" type="text/css" />
+<link href="/lib/font-awesome/css/font-awesome.min.css?v=4.6.2" rel="stylesheet" type="text/css">
 
-<link href="/css/main.css?v=5.1.2" rel="stylesheet" type="text/css" />
-
-
-  <meta name="keywords" content="jdk,Centos,zookeeper," />
+<link href="/css/main.css?v=6.6.0" rel="stylesheet" type="text/css">
 
 
+  <link rel="apple-touch-icon" sizes="180x180" href="/images/apple-touch-icon-next.png?v=6.6.0">
 
 
+  <link rel="icon" type="image/png" sizes="32x32" href="/images/favicon-32x32-next.png?v=6.6.0">
 
 
+  <link rel="icon" type="image/png" sizes="16x16" href="/images/favicon-16x16-next.png?v=6.6.0">
 
 
-  <link rel="shortcut icon" type="image/x-icon" href="/favicon.ico?v=5.1.2" />
-
-
-
-
-  <meta property="fb:admins" content="" />
-  <meta property="fb:app_id" content="588587371311745" />
+  <link rel="mask-icon" href="/images/logo.svg?v=6.6.0" color="#222">
 
 
 
-<meta name="description" content="​    最近由于公司要切换IDC机房，新机房的服务器集群需要重新部署生产环境，于是又趁着这次机会把一些常用的中间件又重新部署了一次，版本有更新，部署方式也会有小变动，于是就有了这一系列的文档。整个系列主要是java运行环境下的中间件部署，也含有少量其他中间件的部署，像 Redis、 TiDB 等。">
-<meta name="keywords" content="jdk,Centos,zookeeper">
-<meta property="og:type" content="article">
-<meta property="og:title" content="Centos 7下常见中间件环境的安装（一）">
-<meta property="og:url" content="http://blog.jobshen.com/posts/3011500279/index.html">
-<meta property="og:site_name" content="一杯咖啡的时间">
-<meta property="og:description" content="​    最近由于公司要切换IDC机房，新机房的服务器集群需要重新部署生产环境，于是又趁着这次机会把一些常用的中间件又重新部署了一次，版本有更新，部署方式也会有小变动，于是就有了这一系列的文档。整个系列主要是java运行环境下的中间件部署，也含有少量其他中间件的部署，像 Redis、 TiDB 等。">
-<meta property="og:locale" content="zh-Hans">
-<meta property="og:updated_time" content="2017-12-07T15:30:55.000Z">
-<meta name="twitter:card" content="summary">
-<meta name="twitter:title" content="Centos 7下常见中间件环境的安装（一）">
-<meta name="twitter:description" content="​    最近由于公司要切换IDC机房，新机房的服务器集群需要重新部署生产环境，于是又趁着这次机会把一些常用的中间件又重新部署了一次，版本有更新，部署方式也会有小变动，于是就有了这一系列的文档。整个系列主要是java运行环境下的中间件部署，也含有少量其他中间件的部署，像 Redis、 TiDB 等。">
+
+
+
+  <meta property="fb:admins" content="">
+  <meta property="fb:app_id" content="588587371311745">
+
 
 
 
@@ -135,14 +132,13 @@
   var CONFIG = {
     root: '/',
     scheme: 'Gemini',
-    sidebar: {"position":"left","display":"post","offset":12,"offset_float":12,"b2t":false,"scrollpercent":false,"onmobile":false},
-    fancybox: true,
+    version: '6.6.0',
+    sidebar: {"position":"left","display":"post","offset":12,"b2t":false,"scrollpercent":false,"onmobile":false},
+    fancybox: false,
+    fastclick: false,
+    lazyload: false,
     tabs: true,
-    motion: true,
-    duoshuo: {
-      userId: '0',
-      author: '博主'
-    },
+    motion: {"enable":true,"async":false,"transition":{"post_block":"fadeIn","post_header":"slideDownIn","post_body":"slideDownIn","coll_header":"slideLeftIn","sidebar":"slideUpIn"}},
     algolia: {
       applicationID: '',
       apiKey: '',
@@ -154,12 +150,38 @@
 </script>
 
 
-
-  <link rel="canonical" href="http://blog.jobshen.com/posts/3011500279/"/>
-
+  
 
 
 
+
+  <meta name="description" content="​    最近由于公司要切换IDC机房，新机房的服务器集群需要重新部署生产环境，于是又趁着这次机会把一些常用的中间件又重新部署了一次，版本有更新，部署方式也会有小变动，于是就有了这一系列的文档。整个系列主要是java运行环境下的中间件部署，也含有少量其他中间件的部署，像 Redis、 TiDB 等。">
+<meta name="keywords" content="Centos,jdk,zookeeper">
+<meta property="og:type" content="article">
+<meta property="og:title" content="Centos 7下常见中间件环境的安装（一）">
+<meta property="og:url" content="http://blog.jobshen.com/posts/3011500279/index.html">
+<meta property="og:site_name" content="一杯咖啡的时间">
+<meta property="og:description" content="​    最近由于公司要切换IDC机房，新机房的服务器集群需要重新部署生产环境，于是又趁着这次机会把一些常用的中间件又重新部署了一次，版本有更新，部署方式也会有小变动，于是就有了这一系列的文档。整个系列主要是java运行环境下的中间件部署，也含有少量其他中间件的部署，像 Redis、 TiDB 等。">
+<meta property="og:locale" content="zh-CN">
+<meta property="og:updated_time" content="2017-12-07T15:30:55.000Z">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:title" content="Centos 7下常见中间件环境的安装（一）">
+<meta name="twitter:description" content="​    最近由于公司要切换IDC机房，新机房的服务器集群需要重新部署生产环境，于是又趁着这次机会把一些常用的中间件又重新部署了一次，版本有更新，部署方式也会有小变动，于是就有了这一系列的文档。整个系列主要是java运行环境下的中间件部署，也含有少量其他中间件的部署，像 Redis、 TiDB 等。">
+
+
+
+
+
+
+  <link rel="canonical" href="http://blog.jobshen.com/posts/3011500279/">
+
+
+
+<script type="text/javascript" id="page.configurations">
+  CONFIG.page = {
+    sidebar: "",
+  };
+</script>
 
   <title>Centos 7下常见中间件环境的安装（一） | 一杯咖啡的时间</title>
   
@@ -176,7 +198,7 @@
      var js, fjs = d.getElementsByTagName(s)[0];
      if (d.getElementById(id)) {return;}
      js = d.createElement(s); js.id = id;
-     js.src = "//connect.facebook.net/zh_Hans/sdk.js";
+     js.src = "//connect.facebook.net/zh_CN/sdk.js";
      fjs.parentNode.insertBefore(js, fjs);
    }(document, 'script', 'facebook-jssdk'));
 </script>
@@ -185,13 +207,13 @@
 
 
 
+<script async src="https://www.googletagmanager.com/gtag/js?id=UA-105338633-1"></script>
 <script>
-  (function(i,s,o,g,r,a,m){i['GoogleAnalyticsObject']=r;i[r]=i[r]||function(){
-            (i[r].q=i[r].q||[]).push(arguments)},i[r].l=1*new Date();a=s.createElement(o),
-          m=s.getElementsByTagName(o)[0];a.async=1;a.src=g;m.parentNode.insertBefore(a,m)
-  })(window,document,'script','https://www.google-analytics.com/analytics.js','ga');
-  ga('create', 'UA-105338633-1', 'auto');
-  ga('send', 'pageview');
+  window.dataLayer = window.dataLayer || [];
+  function gtag(){dataLayer.push(arguments);}
+  gtag('js', new Date());
+
+  gtag('config', 'UA-105338633-1');
 </script>
 
 
@@ -201,40 +223,66 @@
 
 
 
+  <noscript>
+  <style type="text/css">
+    .use-motion .motion-element,
+    .use-motion .brand,
+    .use-motion .menu-item,
+    .sidebar-inner,
+    .use-motion .post-block,
+    .use-motion .pagination,
+    .use-motion .comments,
+    .use-motion .post-header,
+    .use-motion .post-body,
+    .use-motion .collection-title { opacity: initial; }
 
+    .use-motion .logo,
+    .use-motion .site-title,
+    .use-motion .site-subtitle {
+      opacity: initial;
+      top: initial;
+    }
 
+    .use-motion {
+      .logo-line-before i { left: initial; }
+      .logo-line-after i { right: initial; }
+    }
+  </style>
+</noscript>
 
 </head>
 
-<body itemscope itemtype="http://schema.org/WebPage" lang="zh-Hans">
+<body itemscope="" itemtype="http://schema.org/WebPage" lang="zh-CN">
 
   
   
     
   
 
-  <div class="container sidebar-position-left page-post-detail ">
+  <div class="container sidebar-position-left page-post-detail">
     <div class="headband"></div>
 
-    <header id="header" class="header" itemscope itemtype="http://schema.org/WPHeader">
+    <header id="header" class="header" itemscope="" itemtype="http://schema.org/WPHeader">
       <div class="header-inner"><div class="site-brand-wrapper">
   <div class="site-meta ">
     
 
     <div class="custom-logo-site-title">
-      <a href="/"  class="brand" rel="start">
+      <a href="/" class="brand" rel="start">
         <span class="logo-line-before"><i></i></span>
         <span class="site-title">一杯咖啡的时间</span>
         <span class="logo-line-after"><i></i></span>
       </a>
     </div>
+    
       
         <p class="site-subtitle">苦中作乐</p>
       
+    
   </div>
 
   <div class="site-nav-toggle">
-    <button>
+    <button aria-label="切换导航栏">
       <span class="btn-bar"></span>
       <span class="btn-bar"></span>
       <span class="btn-bar"></span>
@@ -242,76 +290,111 @@
   </div>
 </div>
 
-<nav class="site-nav">
-  
 
+
+<nav class="site-nav">
   
     <ul id="menu" class="menu">
       
         
-        <li class="menu-item menu-item-home">
-          <a href="/" rel="section">
-            
-              <i class="menu-item-icon fa fa-fw fa-home"></i> <br />
-            
-            首页
-          </a>
-        </li>
-      
         
-        <li class="menu-item menu-item-about">
-          <a href="/about/" rel="section">
-            
-              <i class="menu-item-icon fa fa-fw fa-user"></i> <br />
-            
-            关于
-          </a>
-        </li>
-      
         
-        <li class="menu-item menu-item-archives">
-          <a href="/archives/" rel="section">
-            
-              <i class="menu-item-icon fa fa-fw fa-archive"></i> <br />
-            
-            归档
-          </a>
-        </li>
-      
-        
-        <li class="menu-item menu-item-tags">
-          <a href="/tags/" rel="section">
-            
-              <i class="menu-item-icon fa fa-fw fa-tags"></i> <br />
-            
-            标签
-          </a>
-        </li>
-      
-        
-        <li class="menu-item menu-item-commonweal">
-          <a href="/404/" rel="section">
-            
-              <i class="menu-item-icon fa fa-fw fa-heartbeat"></i> <br />
-            
-            公益404
-          </a>
-        </li>
-      
+          
+          <li class="menu-item menu-item-home">
 
+    
+    
+    
+      
+    
+
+    
+
+    <a href="/" rel="section"><i class="menu-item-icon fa fa-fw fa-home"></i> <br>首页</a>
+
+  </li>
+        
+        
+        
+          
+          <li class="menu-item menu-item-about">
+
+    
+    
+    
+      
+    
+
+    
+
+    <a href="/about/" rel="section"><i class="menu-item-icon fa fa-fw fa-user"></i> <br>关于</a>
+
+  </li>
+        
+        
+        
+          
+          <li class="menu-item menu-item-tags">
+
+    
+    
+    
+      
+    
+
+    
+
+    <a href="/tags/" rel="section"><i class="menu-item-icon fa fa-fw fa-tags"></i> <br>标签</a>
+
+  </li>
+        
+        
+        
+          
+          <li class="menu-item menu-item-archives">
+
+    
+    
+    
+      
+    
+
+    
+
+    <a href="/archives/" rel="section"><i class="menu-item-icon fa fa-fw fa-archive"></i> <br>归档</a>
+
+  </li>
+        
+        
+        
+          
+          <li class="menu-item menu-item-commonweal">
+
+    
+    
+    
+      
+    
+
+    
+
+    <a href="/404/" rel="section"><i class="menu-item-icon fa fa-fw fa-heartbeat"></i> <br>公益 404</a>
+
+  </li>
+
+      
       
         <li class="menu-item menu-item-search">
           
             <a href="javascript:;" class="popup-trigger">
           
             
-              <i class="menu-item-icon fa fa-search fa-fw"></i> <br />
-            
-            搜索
-          </a>
+              <i class="menu-item-icon fa fa-search fa-fw"></i> <br>搜索</a>
         </li>
       
     </ul>
+  
+
   
 
   
@@ -326,9 +409,7 @@
       <i class="fa fa-times-circle"></i>
     </span>
     <div class="local-search-input-wrapper">
-      <input autocomplete="off"
-             placeholder="搜索..." spellcheck="false"
-             type="text" id="local-search-input">
+      <input autocomplete="off" placeholder="搜索..." spellcheck="false" type="text" id="local-search-input">
     </div>
   </div>
   <div id="local-search-result"></div>
@@ -342,12 +423,23 @@
 
 
 
- </div>
+  
+
+
+
+</div>
     </header>
+
+    
+
 
     <main id="main" class="main">
       <div class="main-inner">
         <div class="content-wrap">
+          
+            
+
+          
           <div id="content" class="content">
             
 
@@ -360,20 +452,22 @@
   
   
 
-  <article class="post post-type-normal" itemscope itemtype="http://schema.org/Article">
+  
+
+  <article class="post post-type-normal" itemscope="" itemtype="http://schema.org/Article">
   
   
   
   <div class="post-block">
     <link itemprop="mainEntityOfPage" href="http://blog.jobshen.com/posts/3011500279/">
 
-    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+    <span hidden itemprop="author" itemscope="" itemtype="http://schema.org/Person">
       <meta itemprop="name" content="Job Shen">
       <meta itemprop="description" content="">
       <meta itemprop="image" content="/uploads/Avatar.png">
     </span>
 
-    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+    <span hidden itemprop="publisher" itemscope="" itemtype="http://schema.org/Organization">
       <meta itemprop="name" content="一杯咖啡的时间">
     </span>
 
@@ -382,11 +476,19 @@
 
         
         
-          <h1 class="post-title" itemprop="name headline">Centos 7下常见中间件环境的安装（一）</h1>
+          <h1 class="post-title" itemprop="name headline">Centos 7下常见中间件环境的安装（一）
+              
+            
+          </h1>
         
 
         <div class="post-meta">
           <span class="post-time">
+
+            
+            
+            
+
             
               <span class="post-meta-item-icon">
                 <i class="fa fa-calendar-o"></i>
@@ -394,25 +496,18 @@
               
                 <span class="post-meta-item-text">发表于</span>
               
-              <time title="创建于" itemprop="dateCreated datePublished" datetime="2017-12-07T20:54:37+08:00">
-                2017-12-07
-              </time>
+
+              
+                
+              
+
+              <time title="创建时间：2017-12-07 20:54:37 / 修改时间：23:30:55" itemprop="dateCreated datePublished" datetime="2017-12-07T20:54:37+08:00">2017-12-07</time>
             
 
             
-              <span class="post-meta-divider">|</span>
-            
+              
 
-            
-              <span class="post-meta-item-icon">
-                <i class="fa fa-calendar-check-o"></i>
-              </span>
               
-                <span class="post-meta-item-text">更新于</span>
-              
-              <time title="更新于" itemprop="dateModified" datetime="2017-12-07T23:30:55+08:00">
-                2017-12-07
-              </time>
             
           </span>
 
@@ -430,7 +525,7 @@
                  <i class="fa fa-eye"></i>
                </span>
                
-                 <span class="post-meta-item-text">阅读次数 </span>
+                 <span class="post-meta-item-text">阅读次数：</span>
                
                  <span class="leancloud-visitors-count"></span>
              </span>
@@ -458,9 +553,9 @@
         <p>​    最近由于公司要切换IDC机房，新机房的服务器集群需要重新部署生产环境，于是又趁着这次机会把一些常用的中间件又重新部署了一次，版本有更新，部署方式也会有小变动，于是就有了这一系列的文档。整个系列主要是java运行环境下的中间件部署，也含有少量其他中间件的部署，像 <strong>Redis</strong>、 <strong>TiDB</strong> 等。</p>
 <a id="more"></a>
 <h2 id="JDK-安装"><a href="#JDK-安装" class="headerlink" title="JDK 安装"></a>JDK 安装</h2><p>jdk当然是必不可少的，任何java程序允许都不能脱离JVM环境，而通过jdk安装jvm是最常见的方式，由于一些原因，公司在生产环境并没有使用 <em>open-jdk</em> 而是仍然使用了 <em>oralce-jdk</em> ，因此就不能通过 <code>yum install open-jdk</code>的方式来安装了，只能通过下载 <em>rpm</em> 文件来进行安装。</p>
-<h3 id="jdk下载"><a href="#jdk下载" class="headerlink" title="jdk下载"></a>jdk下载</h3><figure class="highlight shell"><table><tr><td class="gutter"><pre><div class="line">1</div></pre></td><td class="code"><pre><div class="line">jobshen@JobShen-PC:/mnt/d/download/softwares$ wget --no-cookies --no-check-certificate --header "Cookie: gpw_e24=http%3A%2F%2Fwww.oracle.com%2F; oraclelicense=accept-securebackup-cookie" "http://download.oracle.com/otn-pub/java/jdk/8u151-b12/e758a0de34e24606bca991d704f6dcbf/jdk-8u151-linux-x64.rpm"</div></pre></td></tr></table></figure>
-<h3 id="安装"><a href="#安装" class="headerlink" title="安装"></a>安装</h3><figure class="highlight shell"><table><tr><td class="gutter"><pre><div class="line">1</div></pre></td><td class="code"><pre><div class="line">jobshen@JobShen-PC:/mnt/d/download/softwares$ rpm -ivh jdk-8u151-linux-x64.rpm</div></pre></td></tr></table></figure>
-<h3 id="配置环境变量"><a href="#配置环境变量" class="headerlink" title="配置环境变量"></a>配置环境变量</h3><figure class="highlight shell"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div></pre></td><td class="code"><pre><div class="line">jobshen@JobShen-PC:/mnt/d/download/softwares$ vim /etc/profile</div><div class="line">// 在末尾添加以下内容</div><div class="line">export JAVA_HOME=/usr/java/latest</div><div class="line">export PATH=$JAVA_HOME/bin:$PATH</div><div class="line">export CLASSPATH=.:$JAVA_HOME/lib/dt.jar:$JAVA_HOME/lib/tools.jar</div><div class="line">// 保存 使其生效</div><div class="line">jobshen@JobShen-PC:/mnt/d/download/softwares$ source /etc/profile</div></pre></td></tr></table></figure>
+<h3 id="jdk下载"><a href="#jdk下载" class="headerlink" title="jdk下载"></a>jdk下载</h3><figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">jobshen@JobShen-PC:/mnt/d/download/softwares$ wget --no-cookies --no-check-certificate --header "Cookie: gpw_e24=http%3A%2F%2Fwww.oracle.com%2F; oraclelicense=accept-securebackup-cookie" "http://download.oracle.com/otn-pub/java/jdk/8u151-b12/e758a0de34e24606bca991d704f6dcbf/jdk-8u151-linux-x64.rpm"</span><br></pre></td></tr></table></figure>
+<h3 id="安装"><a href="#安装" class="headerlink" title="安装"></a>安装</h3><figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">jobshen@JobShen-PC:/mnt/d/download/softwares$ rpm -ivh jdk-8u151-linux-x64.rpm</span><br></pre></td></tr></table></figure>
+<h3 id="配置环境变量"><a href="#配置环境变量" class="headerlink" title="配置环境变量"></a>配置环境变量</h3><figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line">jobshen@JobShen-PC:/mnt/d/download/softwares$ vim /etc/profile</span><br><span class="line">// 在末尾添加以下内容</span><br><span class="line">export JAVA_HOME=/usr/java/latest</span><br><span class="line">export PATH=$JAVA_HOME/bin:$PATH</span><br><span class="line">export CLASSPATH=.:$JAVA_HOME/lib/dt.jar:$JAVA_HOME/lib/tools.jar</span><br><span class="line">// 保存 使其生效</span><br><span class="line">jobshen@JobShen-PC:/mnt/d/download/softwares$ source /etc/profile</span><br></pre></td></tr></table></figure>
 <h2 id="Zookeeper-集群安装"><a href="#Zookeeper-集群安装" class="headerlink" title="Zookeeper 集群安装"></a>Zookeeper 集群安装</h2><h3 id="集群机器信息"><a href="#集群机器信息" class="headerlink" title="集群机器信息"></a>集群机器信息</h3><table>
 <thead>
 <tr>
@@ -497,25 +592,28 @@
 </tr>
 </tbody>
 </table>
-<h3 id="下载"><a href="#下载" class="headerlink" title="下载"></a>下载</h3><figure class="highlight shell"><table><tr><td class="gutter"><pre><div class="line">1</div></pre></td><td class="code"><pre><div class="line">jobshen@JobShen-PC:/mnt/d/download/softwares$ curl -O https://mirrors.tuna.tsinghua.edu.cn/apache/zookeeper/stable/zookeeper-3.4.10.tar.gz</div></pre></td></tr></table></figure>
-<h3 id="解压"><a href="#解压" class="headerlink" title="解压"></a>解压</h3><figure class="highlight shell"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div></pre></td><td class="code"><pre><div class="line">jobshen@JobShen-PC:/mnt/d/download/softwares$ tar -zxf zookeeper-3.4.10.tar.gz -C /usr/local</div><div class="line">jobshen@JobShen-PC:/usr/lcoal$ mkdir -p zk_data/zookeeper zk_data/zoo-logs</div></pre></td></tr></table></figure>
-<h3 id="新建zoo-cfg"><a href="#新建zoo-cfg" class="headerlink" title="新建zoo.cfg"></a>新建zoo.cfg</h3><figure class="highlight shell"><table><tr><td class="gutter"><pre><div class="line">1</div></pre></td><td class="code"><pre><div class="line">jobshen@JobShen-PC:/usr/lcoal$ vim zookeeper-3.4.10/conf/zoo.cfg</div></pre></td></tr></table></figure>
-<figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div></pre></td><td class="code"><pre><div class="line">tickTime=2000</div><div class="line">initLimit=20</div><div class="line">syncLimit=10</div><div class="line">dataDir=/usr/local/zk_data/zookeeper</div><div class="line">dataLogDir=/usr/local/zk_data/zoo-logs</div><div class="line">clientPort=2181</div><div class="line">server.1=10.100.1.11:2888:3888</div><div class="line">server.2=10.100.1.12:2888:3888</div><div class="line">server.3=10.100.1.13:2888:3888</div><div class="line">server.4=10.100.1.14:2888:3888</div><div class="line">server.5=10.100.1.15:2888:3888</div></pre></td></tr></table></figure>
+<h3 id="下载"><a href="#下载" class="headerlink" title="下载"></a>下载</h3><figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">jobshen@JobShen-PC:/mnt/d/download/softwares$ curl -O https://mirrors.tuna.tsinghua.edu.cn/apache/zookeeper/stable/zookeeper-3.4.10.tar.gz</span><br></pre></td></tr></table></figure>
+<h3 id="解压"><a href="#解压" class="headerlink" title="解压"></a>解压</h3><figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">jobshen@JobShen-PC:/mnt/d/download/softwares$ tar -zxf zookeeper-3.4.10.tar.gz -C /usr/local</span><br><span class="line">jobshen@JobShen-PC:/usr/lcoal$ mkdir -p zk_data/zookeeper zk_data/zoo-logs</span><br></pre></td></tr></table></figure>
+<h3 id="新建zoo-cfg"><a href="#新建zoo-cfg" class="headerlink" title="新建zoo.cfg"></a>新建zoo.cfg</h3><figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">jobshen@JobShen-PC:/usr/lcoal$ vim zookeeper-3.4.10/conf/zoo.cfg</span><br></pre></td></tr></table></figure>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br></pre></td><td class="code"><pre><span class="line">tickTime=2000</span><br><span class="line">initLimit=20</span><br><span class="line">syncLimit=10</span><br><span class="line">dataDir=/usr/local/zk_data/zookeeper</span><br><span class="line">dataLogDir=/usr/local/zk_data/zoo-logs</span><br><span class="line">clientPort=2181</span><br><span class="line">server.1=10.100.1.11:2888:3888</span><br><span class="line">server.2=10.100.1.12:2888:3888</span><br><span class="line">server.3=10.100.1.13:2888:3888</span><br><span class="line">server.4=10.100.1.14:2888:3888</span><br><span class="line">server.5=10.100.1.15:2888:3888</span><br></pre></td></tr></table></figure>
 <h3 id="新建myid"><a href="#新建myid" class="headerlink" title="新建myid"></a>新建myid</h3><p>分别在各台机器上，新建对于<em>myid</em>值的<code>myid</code>文件</p>
-<figure class="highlight shell"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div></pre></td><td class="code"><pre><div class="line">jobshen@10.100.1.11:/usr/lcoal$ echo "1" &gt; /usr/local/zk_data/zookeeper/myid</div><div class="line">jobshen@10.100.1.12:/usr/lcoal$ echo "2" &gt; /usr/local/zk_data/zookeeper/myid</div><div class="line">jobshen@10.100.1.13:/usr/lcoal$ echo "3" &gt; /usr/local/zk_data/zookeeper/myid</div><div class="line">jobshen@10.100.1.14:/usr/lcoal$ echo "4" &gt; /usr/local/zk_data/zookeeper/myid</div><div class="line">jobshen@10.100.1.15:/usr/lcoal$ echo "5" &gt; /usr/local/zk_data/zookeeper/myid</div></pre></td></tr></table></figure>
-<h3 id="制作Systemd脚本"><a href="#制作Systemd脚本" class="headerlink" title="制作Systemd脚本"></a>制作Systemd脚本</h3><figure class="highlight shell"><table><tr><td class="gutter"><pre><div class="line">1</div></pre></td><td class="code"><pre><div class="line">jobshen@10.100.1.11:/usr/lcoal$ vim /lib/systemd/system/zookeeper.service</div></pre></td></tr></table></figure>
-<figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div></pre></td><td class="code"><pre><div class="line">[Unit]</div><div class="line">Description=zookeeper</div><div class="line">After=network.target</div><div class="line"></div><div class="line">[Service]</div><div class="line">Environment=JAVA_HOME=/usr/java/default</div><div class="line">PIDFile=/usr/local/zk_data/zookeeper/zookeeper_server.pid</div><div class="line">ExecStart=/usr/local/zookeeper-3.4.10/bin/zkServer.sh start</div><div class="line">ExecStop=/usr/local/zookeeper-3.4.10/bin/zkServer.sh stop</div><div class="line"></div><div class="line">[Install]</div><div class="line">WantedBy=multi-user.target</div></pre></td></tr></table></figure>
-<figure class="highlight shell"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div></pre></td><td class="code"><pre><div class="line">jobshen@10.100.1.11:/usr/lcoal$ ln -s /etc/systemd/system/zookeeper.service /lib/systemd/system/zookeeper.service</div><div class="line">jobshen@10.100.1.11:/usr/lcoal$ systemctl daemon-reload</div></pre></td></tr></table></figure>
+<figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line">jobshen@10.100.1.11:/usr/lcoal$ echo "1" &gt; /usr/local/zk_data/zookeeper/myid</span><br><span class="line">jobshen@10.100.1.12:/usr/lcoal$ echo "2" &gt; /usr/local/zk_data/zookeeper/myid</span><br><span class="line">jobshen@10.100.1.13:/usr/lcoal$ echo "3" &gt; /usr/local/zk_data/zookeeper/myid</span><br><span class="line">jobshen@10.100.1.14:/usr/lcoal$ echo "4" &gt; /usr/local/zk_data/zookeeper/myid</span><br><span class="line">jobshen@10.100.1.15:/usr/lcoal$ echo "5" &gt; /usr/local/zk_data/zookeeper/myid</span><br></pre></td></tr></table></figure>
+<h3 id="制作Systemd脚本"><a href="#制作Systemd脚本" class="headerlink" title="制作Systemd脚本"></a>制作Systemd脚本</h3><figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">jobshen@10.100.1.11:/usr/lcoal$ vim /lib/systemd/system/zookeeper.service</span><br></pre></td></tr></table></figure>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br></pre></td><td class="code"><pre><span class="line">[Unit]</span><br><span class="line">Description=zookeeper</span><br><span class="line">After=network.target</span><br><span class="line"></span><br><span class="line">[Service]</span><br><span class="line">Environment=JAVA_HOME=/usr/java/default</span><br><span class="line">PIDFile=/usr/local/zk_data/zookeeper/zookeeper_server.pid</span><br><span class="line">ExecStart=/usr/local/zookeeper-3.4.10/bin/zkServer.sh start</span><br><span class="line">ExecStop=/usr/local/zookeeper-3.4.10/bin/zkServer.sh stop</span><br><span class="line"></span><br><span class="line">[Install]</span><br><span class="line">WantedBy=multi-user.target</span><br></pre></td></tr></table></figure>
+<figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">jobshen@10.100.1.11:/usr/lcoal$ ln -s /etc/systemd/system/zookeeper.service /lib/systemd/system/zookeeper.service</span><br><span class="line">jobshen@10.100.1.11:/usr/lcoal$ systemctl daemon-reload</span><br></pre></td></tr></table></figure>
 <h3 id="启动zk集群"><a href="#启动zk集群" class="headerlink" title="启动zk集群"></a>启动zk集群</h3><p>在各个节点上分别启动zk：</p>
-<figure class="highlight shell"><table><tr><td class="gutter"><pre><div class="line">1</div></pre></td><td class="code"><pre><div class="line">jobshen@10.100.1.11:/usr/lcoal$ systemctl start zookeeper</div></pre></td></tr></table></figure>
+<figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">jobshen@10.100.1.11:/usr/lcoal$ systemctl start zookeeper</span><br></pre></td></tr></table></figure>
 <p>检查zk是否启动成功</p>
-<figure class="highlight shell"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div></pre></td><td class="code"><pre><div class="line">jobshen@10.100.1.11:/usr/lcoal$ cd zookeeper-3.4.10/bin</div><div class="line">jobshen@10.100.1.11:/usr/lcoal/zookeeper-3.4.10/bin$ ./zkServer.sh status</div></pre></td></tr></table></figure>
+<figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">jobshen@10.100.1.11:/usr/lcoal$ cd zookeeper-3.4.10/bin</span><br><span class="line">jobshen@10.100.1.11:/usr/lcoal/zookeeper-3.4.10/bin$ ./zkServer.sh status</span><br></pre></td></tr></table></figure>
 <p>输出以下内容即代表启动成功：</p>
-<figure class="highlight shell"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div></pre></td><td class="code"><pre><div class="line">ZooKeeper JMX enabled by default</div><div class="line">Using config: /usr/local/zookeeper-3.4.10/bin/../conf/zoo.cfg</div><div class="line">Mode: follower(master)</div></pre></td></tr></table></figure>
+<figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">ZooKeeper JMX enabled by default</span><br><span class="line">Using config: /usr/local/zookeeper-3.4.10/bin/../conf/zoo.cfg</span><br><span class="line">Mode: follower(master)</span><br></pre></td></tr></table></figure>
 <p>下篇文章将继续介绍 <em>RocketMQ</em>、 <em>Redis</em> 等集群的安装</p>
 
       
     </div>
+
+    
+
     
     
     
@@ -523,27 +621,47 @@
     
 
     
+       
+    
+    
 
+    
+      <div>
+        
+
+
+
+  
+
+
+
+<ul class="post-copyright">
+  <li class="post-copyright-author">
+    <strong>本文作者： </strong>Job Shen</li>
+  <li class="post-copyright-link">
+    <strong>本文链接：</strong>
+    
+    <a href="http://blog.jobshen.com/posts/3011500279/" title="Centos 7下常见中间件环境的安装（一）">http://blog.jobshen.com/posts/3011500279/</a>
+  </li>
+  <li class="post-copyright-license">
+    <strong>版权声明： </strong>本博客所有文章除特别声明外，均采用 <a href="https://creativecommons.org/licenses/by-nc-sa/4.0/" rel="noopener" target="_blank"><i class="fa fa-fw fa-creative-commons"></i>BY-NC-SA</a> 许可协议。转载请注明出处！</li>
+</ul>
+
+      </div>
     
 
     <footer class="post-footer">
       
         <div class="post-tags">
           
-            <a href="/tags/jdk/" rel="tag"># jdk</a>
-          
             <a href="/tags/Centos/" rel="tag"># Centos</a>
+          
+            <a href="/tags/jdk/" rel="tag"># jdk</a>
           
             <a href="/tags/zookeeper/" rel="tag"># zookeeper</a>
           
         </div>
       
-
-      <div>
-        
-          
-        
-      </div>
 
       
       
@@ -551,6 +669,7 @@
         
 
         
+          
           <div class="social-like">
             
 
@@ -560,6 +679,8 @@
               </div>
             
           </div>
+        
+
         
         </div>
       
@@ -597,21 +718,14 @@
   </article>
 
 
-
-    <div class="post-spread">
-      
-    </div>
   </div>
 
 
           </div>
           
 
+  
 
-          
-  <div class="comments" id="comments">
-    
-  </div>
 
 
         </div>
@@ -634,66 +748,114 @@
 
       
         <ul class="sidebar-nav motion-element">
-          <li class="sidebar-nav-toc sidebar-nav-active" data-target="post-toc-wrap" >
+          <li class="sidebar-nav-toc sidebar-nav-active" data-target="post-toc-wrap">
             文章目录
           </li>
-          <li class="sidebar-nav-overview" data-target="site-overview">
+          <li class="sidebar-nav-overview" data-target="site-overview-wrap">
             站点概览
           </li>
         </ul>
       
 
-      <section class="site-overview sidebar-panel">
-        <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
-          <img class="site-author-image" itemprop="image"
-               src="/uploads/Avatar.png"
-               alt="Job Shen" />
-          <p class="site-author-name" itemprop="name">Job Shen</p>
-           
+      <section class="site-overview-wrap sidebar-panel">
+        <div class="site-overview">
+          <div class="site-author motion-element" itemprop="author" itemscope="" itemtype="http://schema.org/Person">
+            
+              <img class="site-author-image" itemprop="image" src="/uploads/Avatar.png" alt="Job Shen">
+            
+              <p class="site-author-name" itemprop="name">Job Shen</p>
               <p class="site-description motion-element" itemprop="description"></p>
-          
-        </div>
-        <nav class="site-state motion-element">
+          </div>
 
           
-            <div class="site-state-item site-state-posts">
-              <a href="/archives/">
-                <span class="site-state-item-count">6</span>
-                <span class="site-state-item-name">日志</span>
-              </a>
+            <nav class="site-state motion-element">
+              
+                <div class="site-state-item site-state-posts">
+                
+                  <a href="/archives/">
+                
+                    <span class="site-state-item-count">6</span>
+                    <span class="site-state-item-name">日志</span>
+                  </a>
+                </div>
+              
+
+              
+
+              
+                
+                
+                <div class="site-state-item site-state-tags">
+                  <a href="/tags/index.html">
+                    
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                    <span class="site-state-item-count">10</span>
+                    <span class="site-state-item-name">标签</span>
+                  </a>
+                </div>
+              
+            </nav>
+          
+
+          
+
+          
+            <div class="links-of-author motion-element">
+              
+                <span class="links-of-author-item">
+                  
+                  
+                    
+                  
+                  
+                    
+                  
+                  <a href="https://github.com/kitdine" title="GitHub &rarr; https://github.com/kitdine" rel="noopener" target="_blank"><i class="fa fa-fw fa-github"></i>GitHub</a>
+                </span>
+              
             </div>
           
 
           
+             <div class="cc-license motion-element" itemprop="license">
+              
+                
+              
+              
+              
+              <a href="https://creativecommons.org/licenses/by-nc-sa/4.0/" class="cc-opacity" rel="noopener" target="_blank"><img src="/images/cc-by-nc-sa.svg" alt="Creative Commons"></a>
+             </div>
+          
+
+          
+          
 
           
             
-            
-            <div class="site-state-item site-state-tags">
-              <a href="/tags/index.html">
-                <span class="site-state-item-count">10</span>
-                <span class="site-state-item-name">标签</span>
-              </a>
-            </div>
+          
           
 
-        </nav>
-
-        
-
-        <div class="links-of-author motion-element">
-          
         </div>
-
-        
-        
-
-        
-        
-
-        
-
-
       </section>
 
       
@@ -726,30 +888,39 @@
 
     <footer id="footer" class="footer">
       <div class="footer-inner">
-        <div class="copyright" >
-  
-  &copy; 
-  <span itemprop="copyrightYear">2017</span>
-  <span class="with-love">
+        <div class="copyright">&copy; <span itemprop="copyrightYear">2018</span>
+  <span class="with-love" id="animate">
     <i class="fa fa-heart"></i>
   </span>
   <span class="author" itemprop="copyrightHolder">Job Shen</span>
+
+  
+
+  
 </div>
 
 
-<div class="powered-by">
-  由 <a class="theme-link" href="https://hexo.io">Hexo</a> 强力驱动
-</div>
+  <div class="powered-by">由 <a href="https://hexo.io" class="theme-link" rel="noopener" target="_blank">Hexo</a> 强力驱动 v3.8.0</div>
 
-<div class="theme-info">
-  主题 -
-  <a class="theme-link" href="https://github.com/iissnan/hexo-theme-next">
-    NexT.Gemini
-  </a>
-</div>
+
+
+  <span class="post-meta-divider">|</span>
+
+
+
+  <div class="theme-info">主题 – <a href="https://theme-next.org" class="theme-link" rel="noopener" target="_blank">NexT.Gemini</a> v6.6.0</div>
+
+
 
 
         
+
+
+
+
+
+
+
 
         
       </div>
@@ -762,6 +933,11 @@
       </div>
     
 
+    
+	
+    
+
+    
   </div>
 
   
@@ -780,49 +956,45 @@
 
 
 
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+  
+    <script type="text/javascript" src="/lib/jquery/index.js?v=2.1.3"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/velocity/velocity.min.js?v=1.2.1"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/velocity/velocity.ui.min.js?v=1.2.1"></script>
   
 
 
   
 
 
+  <script type="text/javascript" src="/js/src/utils.js?v=6.6.0"></script>
 
-
-
-
-
-
-
-
-
-  
-  <script type="text/javascript" src="/lib/jquery/index.js?v=2.1.3"></script>
-
-  
-  <script type="text/javascript" src="/lib/fastclick/lib/fastclick.min.js?v=1.0.6"></script>
-
-  
-  <script type="text/javascript" src="/lib/jquery_lazyload/jquery.lazyload.js?v=1.9.7"></script>
-
-  
-  <script type="text/javascript" src="/lib/velocity/velocity.min.js?v=1.2.1"></script>
-
-  
-  <script type="text/javascript" src="/lib/velocity/velocity.ui.min.js?v=1.2.1"></script>
-
-  
-  <script type="text/javascript" src="/lib/fancybox/source/jquery.fancybox.pack.js?v=2.1.5"></script>
-
-  
-  <script type="text/javascript" src="/lib/canvas-nest/canvas-nest.min.js"></script>
-
-
-  
-
-
-  <script type="text/javascript" src="/js/src/utils.js?v=5.1.2"></script>
-
-  <script type="text/javascript" src="/js/src/motion.js?v=5.1.2"></script>
+  <script type="text/javascript" src="/js/src/motion.js?v=6.6.0"></script>
 
 
 
@@ -830,36 +1002,26 @@
   
 
 
-  <script type="text/javascript" src="/js/src/affix.js?v=5.1.2"></script>
+  <script type="text/javascript" src="/js/src/affix.js?v=6.6.0"></script>
 
-  <script type="text/javascript" src="/js/src/schemes/pisces.js?v=5.1.2"></script>
-
-
-
-  
-  <script type="text/javascript" src="/js/src/scrollspy.js?v=5.1.2"></script>
-<script type="text/javascript" src="/js/src/post-details.js?v=5.1.2"></script>
+  <script type="text/javascript" src="/js/src/schemes/pisces.js?v=6.6.0"></script>
 
 
 
   
-
-
-  <script type="text/javascript" src="/js/src/bootstrap.js?v=5.1.2"></script>
+  <script type="text/javascript" src="/js/src/scrollspy.js?v=6.6.0"></script>
+<script type="text/javascript" src="/js/src/post-details.js?v=6.6.0"></script>
 
 
 
   
 
 
+  <script type="text/javascript" src="/js/src/bootstrap.js?v=6.6.0"></script>
+
+
+
   
-
-
-
-
-	
-
-
 
 
 
@@ -868,8 +1030,6 @@
 
 
 
-
-  
 
 
 
@@ -927,6 +1087,8 @@
         .css('overflow', 'hidden');
       $("#search-loading-icon").css('margin', '20% auto 0 auto').css('text-align', 'center');
 
+      
+
       $.ajax({
         url: path,
         dataType: isXml ? "xml" : "json",
@@ -960,6 +1122,7 @@
                 var title = data.title.trim();
                 var titleInLowerCase = title.toLowerCase();
                 var content = data.content.trim().replace(/<[^>]+>/g,"");
+                
                 var contentInLowerCase = content.toLowerCase();
                 var articleUrl = decodeURIComponent(data.url);
                 var indexOfTitle = [];
@@ -1202,107 +1365,59 @@
   
 
   
-  <script src="https://cdn1.lncld.net/static/js/av-core-mini-0.6.4.js"></script>
-  <script>AV.initialize("RiCpXfaVMc47cb5qeJHnhkKl-gzGzoHsz", "rUoXvclVKDDAqBQXOVaXgeyU");</script>
   <script>
-    function showTime(Counter) {
-      var query = new AV.Query(Counter);
-      var entries = [];
-      var $visitors = $(".leancloud_visitors");
-
-      $visitors.each(function () {
-        entries.push( $(this).attr("id").trim() );
-      });
-
-      query.containedIn('url', entries);
-      query.find()
-        .done(function (results) {
-          var COUNT_CONTAINER_REF = '.leancloud-visitors-count';
-
-          if (results.length === 0) {
-            $visitors.find(COUNT_CONTAINER_REF).text(0);
-            return;
-          }
-
-          for (var i = 0; i < results.length; i++) {
-            var item = results[i];
-            var url = item.get('url');
-            var time = item.get('time');
-            var element = document.getElementById(url);
-
-            $(element).find(COUNT_CONTAINER_REF).text(time);
-          }
-          for(var i = 0; i < entries.length; i++) {
-            var url = entries[i];
-            var element = document.getElementById(url);
-            var countSpan = $(element).find(COUNT_CONTAINER_REF);
-            if( countSpan.text() == '') {
-              countSpan.text(0);
-            }
-          }
-        })
-        .fail(function (object, error) {
-          console.log("Error: " + error.code + " " + error.message);
-        });
-    }
-
+    
     function addCount(Counter) {
       var $visitors = $(".leancloud_visitors");
       var url = $visitors.attr('id').trim();
       var title = $visitors.attr('data-flag-title').trim();
-      var query = new AV.Query(Counter);
 
-      query.equalTo("url", url);
-      query.find({
-        success: function(results) {
+      Counter('get', '/classes/Counter', { where: JSON.stringify({ url }) })
+        .done(function ({ results }) {
           if (results.length > 0) {
             var counter = results[0];
-            counter.fetchWhenSave(true);
-            counter.increment("time");
-            counter.save(null, {
-              success: function(counter) {
-                var $element = $(document.getElementById(url));
-                $element.find('.leancloud-visitors-count').text(counter.get('time'));
-              },
-              error: function(counter, error) {
-                console.log('Failed to save Visitor num, with error message: ' + error.message);
-              }
-            });
+            
+              var $element = $(document.getElementById(url));
+              $element.find('.leancloud-visitors-count').text(counter.time + 1);
+            
+            Counter('put', `/classes/Counter/${counter.objectId}`, JSON.stringify({ time: { "__op":"Increment", "amount":1 } }))
+            
+            .fail(function ({ responseJSON }) {
+                console.log('Failed to save Visitor num, with error message: ' + responseJSON.error);
+            })
           } else {
-            var newcounter = new Counter();
-            /* Set ACL */
-            var acl = new AV.ACL();
-            acl.setPublicReadAccess(true);
-            acl.setPublicWriteAccess(true);
-            newcounter.setACL(acl);
-            /* End Set ACL */
-            newcounter.set("title", title);
-            newcounter.set("url", url);
-            newcounter.set("time", 1);
-            newcounter.save(null, {
-              success: function(newcounter) {
-                var $element = $(document.getElementById(url));
-                $element.find('.leancloud-visitors-count').text(newcounter.get('time'));
-              },
-              error: function(newcounter, error) {
-                console.log('Failed to create');
-              }
-            });
+            
+              var $element = $(document.getElementById(url));
+              $element.find('.leancloud-visitors-count').text('Counter not initialized! See more at console err msg.');
+              console.error('ATTENTION! LeanCloud counter has security bug, see here how to solve it: https://github.com/theme-next/hexo-leancloud-counter-security. \n But you also can use LeanCloud without security, by set \'security\' option to \'false\'.');
+            
           }
-        },
-        error: function(error) {
-          console.log('Error:' + error.code + " " + error.message);
-        }
+        })
+      .fail(function ({ responseJSON }) {
+        console.log('LeanCloud Counter Error:' + responseJSON.code + " " + responseJSON.error);
       });
     }
+    
 
     $(function() {
-      var Counter = AV.Object.extend("Counter");
-      if ($('.leancloud_visitors').length == 1) {
-        addCount(Counter);
-      } else if ($('.post-title-link').length > 1) {
-        showTime(Counter);
-      }
+      $.get('https://app-router.leancloud.cn/2/route?appId=' + "RiCpXfaVMc47cb5qeJHnhkKl-gzGzoHsz")
+        .done(function ({ api_server }) {
+          var Counter = function (method, url, data) {
+            return $.ajax({
+              method: method,
+              url: `https://${api_server}/1.1${url}`,
+              headers: {
+                'X-LC-Id': "RiCpXfaVMc47cb5qeJHnhkKl-gzGzoHsz",
+                'X-LC-Key': "rUoXvclVKDDAqBQXOVaXgeyU",
+                'Content-Type': 'application/json',
+              },
+              data: data,
+            });
+          };
+          
+          addCount(Counter);
+          
+        })
     });
   </script>
 
@@ -1313,33 +1428,31 @@
   
 
   
-  
-    <script type="text/x-mathjax-config">
-      MathJax.Hub.Config({
-        tex2jax: {
-          inlineMath: [ ['$','$'], ["\\(","\\)"]  ],
-          processEscapes: true,
-          skipTags: ['script', 'noscript', 'style', 'textarea', 'pre', 'code']
-        }
-      });
-    </script>
 
-    <script type="text/x-mathjax-config">
-      MathJax.Hub.Queue(function() {
-        var all = MathJax.Hub.getAllJax(), i;
-        for (i=0; i < all.length; i += 1) {
-          all[i].SourceElement().parentNode.className += ' has-jax';
-        }
-      });
-    </script>
-    <script type="text/javascript" src="//cdn.bootcss.com/mathjax/2.7.1/latest.js?config=TeX-AMS-MML_HTMLorMML"></script>
+  
+  
+
+  
+  
+
   
 
 
   
-  <script type="text/javascript" src="/js/src/js.cookie.js?v=5.1.2"></script>
-  <script type="text/javascript" src="/js/src/scroll-cookie.js?v=5.1.2"></script>
+  
 
+  
+
+  
+  <script type="text/javascript" src="/js/src/js.cookie.js?v=6.6.0"></script>
+  <script type="text/javascript" src="/js/src/scroll-cookie.js?v=6.6.0"></script>
+
+
+  
+
+  
+
+  
 
   
 
