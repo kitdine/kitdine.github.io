@@ -169,7 +169,7 @@
 <meta name="keywords" content="Redis,Redis Cluster,Jedis,Wireshark">
 <meta property="og:type" content="article">
 <meta property="og:title" content="记一次线上Redis故障恢复和分析（二）">
-<meta property="og:url" content="http://blog.jobshen.com/posts/1461710894/index.html">
+<meta property="og:url" content="http://blog.jobshen.com/posts/1461710894.html">
 <meta property="og:site_name" content="一杯咖啡的时间">
 <meta property="og:description" content="异常场景最近一段时间时不时就有开发人员向我反应：redis的key有点问题，帮我删个key值、怎么key没有过期，我明明设了过期时间的。一开始没有放心上，以为只是程序逻辑处理不当或者redis偶尔抽风，不用在意。可是渐渐反应的人多了，觉得可能不是这么简单了，于是就和相关的开发人员讨论了下，发现会出现异常的基本是以下两种场景：">
 <meta property="og:locale" content="zh-CN">
@@ -178,7 +178,7 @@
 <meta property="og:image" content="https://picture.jobshen.com/blog/redis/redis-05.png">
 <meta property="og:image" content="https://picture.jobshen.com/blog/redis/redis-06.png">
 <meta property="og:image" content="https://picture.jobshen.com/blog/redis/redis-07.png">
-<meta property="og:updated_time" content="2017-09-23T07:54:37.000Z">
+<meta property="og:updated_time" content="2019-01-02T14:15:53.287Z">
 <meta name="twitter:card" content="summary">
 <meta name="twitter:title" content="记一次线上Redis故障恢复和分析（二）">
 <meta name="twitter:description" content="异常场景最近一段时间时不时就有开发人员向我反应：redis的key有点问题，帮我删个key值、怎么key没有过期，我明明设了过期时间的。一开始没有放心上，以为只是程序逻辑处理不当或者redis偶尔抽风，不用在意。可是渐渐反应的人多了，觉得可能不是这么简单了，于是就和相关的开发人员讨论了下，发现会出现异常的基本是以下两种场景：">
@@ -191,7 +191,7 @@
 
 
 
-  <link rel="canonical" href="http://blog.jobshen.com/posts/1461710894/">
+  <link rel="canonical" href="http://blog.jobshen.com/posts/1461710894.html">
 
 
 
@@ -369,6 +369,23 @@
         
         
           
+          <li class="menu-item menu-item-categories">
+
+    
+    
+    
+      
+    
+
+    
+
+    <a href="/categories/" rel="section"><i class="menu-item-icon fa fa-fw fa-th"></i> <br>分类</a>
+
+  </li>
+        
+        
+        
+          
           <li class="menu-item menu-item-archives">
 
     
@@ -471,13 +488,15 @@
   
 
   
+    <div class="reading-progress-bar"></div>
+  
 
   <article class="post post-type-normal" itemscope="" itemtype="http://schema.org/Article">
   
   
   
   <div class="post-block">
-    <link itemprop="mainEntityOfPage" href="http://blog.jobshen.com/posts/1461710894/">
+    <link itemprop="mainEntityOfPage" href="http://blog.jobshen.com/posts/1461710894.html">
 
     <span hidden itemprop="author" itemscope="" itemtype="http://schema.org/Person">
       <meta itemprop="name" content="Job Shen">
@@ -536,12 +555,30 @@
                 
                   <span class="post-meta-item-text">更新于</span>
                 
-                <time title="修改时间：2017-09-23 15:54:37" itemprop="dateModified" datetime="2017-09-23T15:54:37+08:00">2017-09-23</time>
+                <time title="修改时间：2019-01-02 22:15:53" itemprop="dateModified" datetime="2019-01-02T22:15:53+08:00">2019-01-02</time>
               
             
           </span>
 
           
+            <span class="post-category">
+            
+              <span class="post-meta-divider">|</span>
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-folder-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">分类于</span>
+              
+              
+                <span itemprop="about" itemscope="" itemtype="http://schema.org/Thing"><a href="/categories/redis/" itemprop="url" rel="index"><span itemprop="name">redis</span></a></span>
+
+                
+                
+              
+            </span>
+          
 
           
             
@@ -549,7 +586,7 @@
 
           
           
-             <span id="/posts/1461710894/" class="leancloud_visitors" data-flag-title="记一次线上Redis故障恢复和分析（二）">
+             <span id="/posts/1461710894.html" class="leancloud_visitors" data-flag-title="记一次线上Redis故障恢复和分析（二）">
                <span class="post-meta-divider">|</span>
                <span class="post-meta-item-icon">
                  <i class="fa fa-eye"></i>
@@ -563,6 +600,34 @@
 
           
 
+          
+            <div class="post-symbolscount">
+              
+
+              
+                <span class="post-meta-item-icon">
+                  <i class="fa fa-file-word-o"></i>
+                </span>
+                
+                  <span class="post-meta-item-text">本文字数：</span>
+                
+                <span title="本文字数">10k</span>
+              
+
+              
+                <span class="post-meta-divider">|</span>
+              
+
+              
+                <span class="post-meta-item-icon">
+                  <i class="fa fa-clock-o"></i>
+                </span>
+                
+                  <span class="post-meta-item-text">阅读时长 &asymp;</span>
+                
+                <span title="阅读时长">9 分钟</span>
+              
+            </div>
           
 
           
@@ -673,7 +738,7 @@
   <li class="post-copyright-link">
     <strong>本文链接：</strong>
     
-    <a href="http://blog.jobshen.com/posts/1461710894/" title="记一次线上Redis故障恢复和分析（二）">http://blog.jobshen.com/posts/1461710894/</a>
+    <a href="http://blog.jobshen.com/posts/1461710894.html" title="记一次线上Redis故障恢复和分析（二）">http://blog.jobshen.com/posts/1461710894.html</a>
   </li>
   <li class="post-copyright-license">
     <strong>版权声明： </strong>本博客所有文章除特别声明外，均采用 <a href="https://creativecommons.org/licenses/by-nc-sa/4.0/" rel="noopener" target="_blank"><i class="fa fa-fw fa-creative-commons"></i>BY-NC-SA</a> 许可协议。转载请注明出处！</li>
@@ -724,7 +789,7 @@
         <div class="post-nav">
           <div class="post-nav-next post-nav-item">
             
-              <a href="/posts/1728650486/" rel="next" title="记一次线上Redis故障恢复和分析（一）">
+              <a href="/posts/1728650486.html" rel="next" title="记一次线上Redis故障恢复和分析（一）">
                 <i class="fa fa-chevron-left"></i> 记一次线上Redis故障恢复和分析（一）
               </a>
             
@@ -734,7 +799,7 @@
 
           <div class="post-nav-prev post-nav-item">
             
-              <a href="/posts/3011500279/" rel="prev" title="Centos 7下常见中间件环境的安装（一）">
+              <a href="/posts/3011500279.html" rel="prev" title="Centos 7下常见中间件环境的安装（一）">
                 Centos 7下常见中间件环境的安装（一） <i class="fa fa-chevron-right"></i>
               </a>
             
@@ -812,12 +877,31 @@
                 
                   <a href="/archives/">
                 
-                    <span class="site-state-item-count">6</span>
+                    <span class="site-state-item-count">7</span>
                     <span class="site-state-item-name">日志</span>
                   </a>
                 </div>
               
 
+              
+                
+                
+                <div class="site-state-item site-state-categories">
+                  
+                    
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                    <span class="site-state-item-count">4</span>
+                    <span class="site-state-item-name">分类</span>
+                  
+                </div>
               
 
               
@@ -847,7 +931,13 @@
                     
                       
                     
-                    <span class="site-state-item-count">10</span>
+                      
+                    
+                      
+                    
+                      
+                    
+                    <span class="site-state-item-count">13</span>
                     <span class="site-state-item-name">标签</span>
                   </a>
                 </div>
@@ -940,7 +1030,25 @@
   <span class="author" itemprop="copyrightHolder">Job Shen</span>
 
   
+    <span class="post-meta-divider">|</span>
+    <span class="post-meta-item-icon">
+      <i class="fa fa-area-chart"></i>
+    </span>
+    
+      <span class="post-meta-item-text">站点总字数：</span>
+    
+    <span title="站点总字数">40k</span>
+  
 
+  
+    <span class="post-meta-divider">|</span>
+    <span class="post-meta-item-icon">
+      <i class="fa fa-coffee"></i>
+    </span>
+    
+      <span class="post-meta-item-text">站点阅读时长 &asymp;</span>
+    
+    <span title="站点阅读时长">36 分钟</span>
   
 </div>
 
@@ -1024,6 +1132,8 @@
 
 
 
+  
+
 
 
   
@@ -1044,6 +1154,11 @@
   
   
     <script type="text/javascript" src="/lib/fancybox/source/jquery.fancybox.pack.js?v=2.1.5"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/reading_progress/reading_progress.js"></script>
   
 
 

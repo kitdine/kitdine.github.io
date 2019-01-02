@@ -165,13 +165,22 @@
 
 
 
-  <meta property="og:type" content="website">
-<meta property="og:title" content="一杯咖啡的时间">
-<meta property="og:url" content="http://blog.jobshen.com/tags/rocketmq/index.html">
+  <meta name="description" content="问题描述1在我们中应用有一个使用到`Http Long Poll`的场景，它需要一个http请求保持最长30秒，用于即使获取到最新的数据。在k8s环境下，发现应该存在偶发的异常，表现为长连接没有正常关闭，抛出异常： 1java.net.SocketException: Unexpected end of file from server 问题排查应用异常排查首先我们先对应用程序的代码进行了排查，并">
+<meta name="keywords" content="k8s,ingress,nginx">
+<meta property="og:type" content="article">
+<meta property="og:title" content="关于k8s下使用Ingress保持长连接的异常情况排查">
+<meta property="og:url" content="http://blog.jobshen.com/posts/eee2bd13.html">
 <meta property="og:site_name" content="一杯咖啡的时间">
+<meta property="og:description" content="问题描述1在我们中应用有一个使用到`Http Long Poll`的场景，它需要一个http请求保持最长30秒，用于即使获取到最新的数据。在k8s环境下，发现应该存在偶发的异常，表现为长连接没有正常关闭，抛出异常： 1java.net.SocketException: Unexpected end of file from server 问题排查应用异常排查首先我们先对应用程序的代码进行了排查，并">
 <meta property="og:locale" content="zh-CN">
+<meta property="og:image" content="https://picture.jobshen.com/blog/tcpdump/client-tcpdump.png">
+<meta property="og:image" content="https://picture.jobshen.com/blog/tcpdump/nginx-tcpdump.png">
+<meta property="og:image" content="https://picture.jobshen.com/blog/tcpdump/server-tcpdump.png">
+<meta property="og:updated_time" content="2019-01-02T14:31:55.137Z">
 <meta name="twitter:card" content="summary">
-<meta name="twitter:title" content="一杯咖啡的时间">
+<meta name="twitter:title" content="关于k8s下使用Ingress保持长连接的异常情况排查">
+<meta name="twitter:description" content="问题描述1在我们中应用有一个使用到`Http Long Poll`的场景，它需要一个http请求保持最长30秒，用于即使获取到最新的数据。在k8s环境下，发现应该存在偶发的异常，表现为长连接没有正常关闭，抛出异常： 1java.net.SocketException: Unexpected end of file from server 问题排查应用异常排查首先我们先对应用程序的代码进行了排查，并">
+<meta name="twitter:image" content="https://picture.jobshen.com/blog/tcpdump/client-tcpdump.png">
 
 
 
@@ -180,7 +189,7 @@
 
 
 
-  <link rel="canonical" href="http://blog.jobshen.com/tags/rocketmq/">
+  <link rel="canonical" href="http://blog.jobshen.com/posts/eee2bd13.html">
 
 
 
@@ -190,7 +199,7 @@
   };
 </script>
 
-  <title>标签: rocketmq | 一杯咖啡的时间</title>
+  <title>关于k8s下使用Ingress保持长连接的异常情况排查 | 一杯咖啡的时间</title>
   
 <script>
   window.fbAsyncInit = function() {
@@ -266,7 +275,7 @@
     
   
 
-  <div class="container sidebar-position-left ">
+  <div class="container sidebar-position-left page-post-detail">
     <div class="headband"></div>
 
     <header id="header" class="header" itemscope="" itemtype="http://schema.org/WPHeader">
@@ -341,7 +350,7 @@
         
         
           
-          <li class="menu-item menu-item-tags menu-item-active">
+          <li class="menu-item menu-item-tags">
 
     
     
@@ -463,85 +472,312 @@
           
             
 
-    
-    
-      
-      
-    
-      
-      
-    
-      
-      
-    
-      
-      
-    
-      
-      
-    
-      
-      
-    
-    
-
-  
-
-
           
           <div id="content" class="content">
             
 
-  
-  
-  
-  <div class="post-block tag">
+  <div id="posts" class="posts-expand">
+    
 
-    <div id="posts" class="posts-collapse">
-      <div class="collection-title">
-        <h1>rocketmq<small>标签</small>
-        </h1>
-      </div>
+  
 
-      
-        
+  
+  
+  
+
+  
+    <div class="reading-progress-bar"></div>
+  
 
   <article class="post post-type-normal" itemscope="" itemtype="http://schema.org/Article">
-    <header class="post-header">
+  
+  
+  
+  <div class="post-block">
+    <link itemprop="mainEntityOfPage" href="http://blog.jobshen.com/posts/eee2bd13.html">
 
-      <h2 class="post-title">
+    <span hidden itemprop="author" itemscope="" itemtype="http://schema.org/Person">
+      <meta itemprop="name" content="Job Shen">
+      <meta itemprop="description" content="">
+      <meta itemprop="image" content="/uploads/Avatar.png">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope="" itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="一杯咖啡的时间">
+    </span>
+
+    
+      <header class="post-header">
+
         
-            <a class="post-title-link" href="/posts/2345740436.html" itemprop="url">
-              
-                <span itemprop="name">Centos-7下常见中间件环境的安装（二）</span>
-              
-            </a>
         
-      </h2>
+          <h1 class="post-title" itemprop="name headline">关于k8s下使用Ingress保持长连接的异常情况排查
+              
+            
+          </h1>
+        
 
-      <div class="post-meta">
-        <time class="post-time" itemprop="dateCreated" datetime="2017-12-09T20:53:12+08:00" content="2017-12-09">
-          12-09
-        </time>
-      </div>
+        <div class="post-meta">
+          <span class="post-time">
 
-    </header>
-  </article>
+            
+            
+            
 
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">发表于</span>
+              
+
+              
+                
+              
+
+              <time title="创建时间：2019-01-02 22:19:02 / 修改时间：22:31:55" itemprop="dateCreated datePublished" datetime="2019-01-02T22:19:02+08:00">2019-01-02</time>
+            
+
+            
+              
+
+              
+            
+          </span>
+
+          
+            <span class="post-category">
+            
+              <span class="post-meta-divider">|</span>
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-folder-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">分类于</span>
+              
+              
+                <span itemprop="about" itemscope="" itemtype="http://schema.org/Thing"><a href="/categories/k8s/" itemprop="url" rel="index"><span itemprop="name">k8s</span></a></span>
+
+                
+                
+              
+            </span>
+          
+
+          
+            
+          
+
+          
+          
+             <span id="/posts/eee2bd13.html" class="leancloud_visitors" data-flag-title="关于k8s下使用Ingress保持长连接的异常情况排查">
+               <span class="post-meta-divider">|</span>
+               <span class="post-meta-item-icon">
+                 <i class="fa fa-eye"></i>
+               </span>
+               
+                 <span class="post-meta-item-text">阅读次数：</span>
+               
+                 <span class="leancloud-visitors-count"></span>
+             </span>
+          
+
+          
+
+          
+            <div class="post-symbolscount">
+              
+
+              
+                <span class="post-meta-item-icon">
+                  <i class="fa fa-file-word-o"></i>
+                </span>
+                
+                  <span class="post-meta-item-text">本文字数：</span>
+                
+                <span title="本文字数">1.4k</span>
+              
+
+              
+                <span class="post-meta-divider">|</span>
+              
+
+              
+                <span class="post-meta-item-icon">
+                  <i class="fa fa-clock-o"></i>
+                </span>
+                
+                  <span class="post-meta-item-text">阅读时长 &asymp;</span>
+                
+                <span title="阅读时长">1 分钟</span>
+              
+            </div>
+          
+
+          
+
+        </div>
+      </header>
+    
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+      
+
+      
+        <h2 id="问题描述"><a href="#问题描述" class="headerlink" title="问题描述"></a>问题描述</h2><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">在我们中应用有一个使用到`Http Long Poll`的场景，它需要一个http请求保持最长30秒，用于即使获取到最新的数据。在k8s环境下，发现应该存在偶发的异常，表现为长连接没有正常关闭，抛出异常：</span><br></pre></td></tr></table></figure>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">java.net.SocketException: Unexpected end of file from server</span><br></pre></td></tr></table></figure>
+<h2 id="问题排查"><a href="#问题排查" class="headerlink" title="问题排查"></a>问题排查</h2><h3 id="应用异常排查"><a href="#应用异常排查" class="headerlink" title="应用异常排查"></a>应用异常排查</h3><p>首先我们先对应用程序的代码进行了排查，并没有发现代码上的bug，可以排除是由于代码bug导致的这个问题。</p>
+<h3 id="抓包"><a href="#抓包" class="headerlink" title="抓包"></a>抓包</h3><p>接下来考虑的方式就是抓包，分别在三个节点上进行抓包：应用程序所在pod、ingress-nginx所在pod、服务端pod。</p>
+<p>分别执行以下shell脚本：</p>
+<figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">tcpdump tcp -s 0  -w ./target.cap</span><br></pre></td></tr></table></figure>
+<p>抓取当前网卡下的所有tcp流量，然后使用wireshark进行分析。发现了一个比较奇怪的现象：</p>
+<p><img src="https://picture.jobshen.com/blog/tcpdump/client-tcpdump.png" alt="client-tcpdump.png"></p>
+<p><img src="https://picture.jobshen.com/blog/tcpdump/nginx-tcpdump.png" alt="nginx-tcpdump.png"></p>
+<p><img src="https://picture.jobshen.com/blog/tcpdump/server-tcpdump.png" alt="server-tcpdump.png"></p>
+<p>从上到下三张图片分别是应用程序端、nginx端、服务端的抓包数据，可以发现连接的关闭是由nginx这个节点发起的，应用端和服务端同时收到了来自nginx的<code>FIN ACK</code>包，要求关闭当前连接，并且都开始执行四次握手过程。但是在这个过程中又发生了什么异常导致这个过程并没有正常完成。</p>
+<p>通过观察大量的抓包数据后发现这个情况发生的非常多，但并不是每次都会导致连接的异常关闭，大部分还是能够正常关闭连接并建立新的连接的。</p>
+<p>通过仔细观察发现被异常关闭的连接，都是发生在<code>Seq=1</code>的情况下，这个原因还不是很清楚。</p>
+<p>那为什么<strong>nginx</strong>会主动发起关闭连接呢？</p>
+<h3 id="Nginx-排查"><a href="#Nginx-排查" class="headerlink" title="Nginx 排查"></a>Nginx 排查</h3><p>这时候首先想到的就是nginx的日志，在翻查了nginx的<code>access.log</code>后，发现在相同的时间端，nginx都发生了<code>reload</code>现象：</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">backend reload required</span><br><span class="line">ingress backend successfully reloaded</span><br></pre></td></tr></table></figure>
+<p>难道是由于nginx的reload导致的问题吗？</p>
+<p>通过查询发现，nginx reload的大致流程为：</p>
+<ul>
+<li>reload命令触发nginx生成新的worker进程用于接受新的连接请求</li>
+<li><code>old worker</code> 进程不再接受请求</li>
+<li>对于仍然存在于<code>old worker</code>进程上的<code>keep alive</code>的连接，主动发送<code>FIN ACK</code> 包，通知对方关闭当前连接</li>
+<li>当所有old worker 上的连接都关闭或者超过<code>worker-shutdown-timeout</code>所设定的时间后，会关闭old worker 进程</li>
+</ul>
+<p>通过查询k8s上ingress的默认配置发现，<code>worker-shutdown-timeout</code>被设置为了10s，这时候基本可以确定问题了，由于<code>old worker</code>关闭的窗口时间只有10s，如果在这个时间段内有连接还没有完成关闭，而此时<code>old worker</code>已经被关闭了，client端当然不能正常处理请求，因为它所连接的server端已经被提前关闭了。</p>
+<h2 id="解决"><a href="#解决" class="headerlink" title="解决"></a>解决</h2><p>找到问题原因了当然接下来就是解决了，将<code>worker-shutdown-timeout</code>该字段的值增大为：3600s，即1小时，理论上这个时间足够该worker上的连接全部完成关闭了。</p>
+<p>在调整了k8s上ingress的这个参数后，又进行了反复测试，并没有再次发现同样的问题，该问题得到解决。</p>
+<h2 id="遗留"><a href="#遗留" class="headerlink" title="遗留"></a>遗留</h2><p>然后，为什么是<code>Seq=1</code>的连接会发生这个异常，还是没有完全想明白。</p>
 
       
     </div>
 
+    
+
+    
+    
+    
+
+    
+
+    
+       
+    
+    
+
+    
+      <div>
+        
+
+
+
+  
+
+
+
+<ul class="post-copyright">
+  <li class="post-copyright-author">
+    <strong>本文作者： </strong>Job Shen</li>
+  <li class="post-copyright-link">
+    <strong>本文链接：</strong>
+    
+    <a href="http://blog.jobshen.com/posts/eee2bd13.html" title="关于k8s下使用Ingress保持长连接的异常情况排查">http://blog.jobshen.com/posts/eee2bd13.html</a>
+  </li>
+  <li class="post-copyright-license">
+    <strong>版权声明： </strong>本博客所有文章除特别声明外，均采用 <a href="https://creativecommons.org/licenses/by-nc-sa/4.0/" rel="noopener" target="_blank"><i class="fa fa-fw fa-creative-commons"></i>BY-NC-SA</a> 许可协议。转载请注明出处！</li>
+</ul>
+
+      </div>
+    
+
+    <footer class="post-footer">
+      
+        <div class="post-tags">
+          
+            <a href="/tags/k8s/" rel="tag"># k8s</a>
+          
+            <a href="/tags/ingress/" rel="tag"># ingress</a>
+          
+            <a href="/tags/nginx/" rel="tag"># nginx</a>
+          
+        </div>
+      
+
+      
+      
+        <div class="post-widgets">
+        
+
+        
+          
+          <div class="social-like">
+            
+
+            
+              <div class="fb_like">
+                <div class="fb-like" data-layout="button_count" data-share="true"></div>
+              </div>
+            
+          </div>
+        
+
+        
+        </div>
+      
+      
+
+      
+        <div class="post-nav">
+          <div class="post-nav-next post-nav-item">
+            
+              <a href="/posts/3335490502.html" rel="next" title="Centos-7下常见中间件环境的安装（三）">
+                <i class="fa fa-chevron-left"></i> Centos-7下常见中间件环境的安装（三）
+              </a>
+            
+          </div>
+
+          <span class="post-nav-divider"></span>
+
+          <div class="post-nav-prev post-nav-item">
+            
+          </div>
+        </div>
+      
+
+      
+      
+    </footer>
   </div>
   
   
   
+  </article>
 
-  
+
+  </div>
 
 
           </div>
           
+
+  
+    <div id="gitalk-container">
+    </div>
+    
+  
+
+
 
         </div>
         
@@ -562,8 +798,17 @@
       
 
       
+        <ul class="sidebar-nav motion-element">
+          <li class="sidebar-nav-toc sidebar-nav-active" data-target="post-toc-wrap">
+            文章目录
+          </li>
+          <li class="sidebar-nav-overview" data-target="site-overview-wrap">
+            站点概览
+          </li>
+        </ul>
+      
 
-      <section class="site-overview-wrap sidebar-panel sidebar-panel-active">
+      <section class="site-overview-wrap sidebar-panel">
         <div class="site-overview">
           <div class="site-author motion-element" itemprop="author" itemscope="" itemtype="http://schema.org/Person">
             
@@ -696,6 +941,22 @@
         </div>
       </section>
 
+      
+      <!--noindex-->
+        <section class="post-toc-wrap motion-element sidebar-panel sidebar-panel-active">
+          <div class="post-toc">
+
+            
+              
+            
+
+            
+              <div class="post-toc-content"><ol class="nav"><li class="nav-item nav-level-2"><a class="nav-link" href="#问题描述"><span class="nav-number">1.</span> <span class="nav-text">问题描述</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#问题排查"><span class="nav-number">2.</span> <span class="nav-text">问题排查</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#应用异常排查"><span class="nav-number">2.1.</span> <span class="nav-text">应用异常排查</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#抓包"><span class="nav-number">2.2.</span> <span class="nav-text">抓包</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#Nginx-排查"><span class="nav-number">2.3.</span> <span class="nav-text">Nginx 排查</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#解决"><span class="nav-number">3.</span> <span class="nav-text">解决</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#遗留"><span class="nav-number">4.</span> <span class="nav-text">遗留</span></a></li></ol></div>
+            
+
+          </div>
+        </section>
+      <!--/noindex-->
       
 
       
@@ -869,6 +1130,10 @@
 
 
   
+  <script type="text/javascript" src="/js/src/scrollspy.js?v=6.6.0"></script>
+<script type="text/javascript" src="/js/src/post-details.js?v=6.6.0"></script>
+
+
 
   
 
@@ -891,6 +1156,32 @@
 
 
 
+
+
+  
+  
+  <script type="text/javascript" src="//cdn.jsdelivr.net/npm/gitalk@1.4.0/dist/gitalk.min.js"></script>
+
+  
+  
+  <link rel="stylesheet" href="//cdn.jsdelivr.net/npm/gitalk@1.4.0/dist/gitalk.css">
+
+  
+  
+  <script type="text/javascript" src="//cdn.jsdelivr.net/npm/js-md5@0.7.3/src/md5.min.js"></script>
+    
+   <script type="text/javascript">
+        var gitalk = new Gitalk({
+          clientID: '0027cb40e78eba0adbfe',
+          clientSecret: '133ffa343a0ee4b23fef6d2ea7e36244770c2df9',
+          repo: 'blog_git_talk',
+          owner: 'kitdine',
+          admin: ['kitdine'],
+          id: md5(location.pathname),
+          distractionFreeMode: 'true'
+        })
+        gitalk.render('gitalk-container')           
+       </script>
 
   
 
@@ -1223,43 +1514,35 @@
   
   <script>
     
-    function showTime(Counter) {
-      var entries = [];
+    function addCount(Counter) {
       var $visitors = $(".leancloud_visitors");
+      var url = $visitors.attr('id').trim();
+      var title = $visitors.attr('data-flag-title').trim();
 
-      $visitors.each(function () {
-        entries.push( $(this).attr("id").trim() );
-      });
-
-      Counter('get', '/classes/Counter', { where: JSON.stringify({ url: { "$in": entries } }) })
+      Counter('get', '/classes/Counter', { where: JSON.stringify({ url }) })
         .done(function ({ results }) {
-          var COUNT_CONTAINER_REF = '.leancloud-visitors-count';
-
-          if (results.length === 0) {
-            $visitors.find(COUNT_CONTAINER_REF).text(0);
-            return;
-          }
-
-          for (var i = 0; i < results.length; i++) {
-            var item = results[i];
-            var url = item.url;
-            var time = item.time;
-            var element = document.getElementById(url);
-
-            $(element).find(COUNT_CONTAINER_REF).text(time);
-          }
-          for(var i = 0; i < entries.length; i++) {
-            var url = entries[i];
-            var element = document.getElementById(url);
-            var countSpan = $(element).find(COUNT_CONTAINER_REF);
-            if( countSpan.text() == '') {
-              countSpan.text(0);
-            }
+          if (results.length > 0) {
+            var counter = results[0];
+            
+              var $element = $(document.getElementById(url));
+              $element.find('.leancloud-visitors-count').text(counter.time + 1);
+            
+            Counter('put', `/classes/Counter/${counter.objectId}`, JSON.stringify({ time: { "__op":"Increment", "amount":1 } }))
+            
+            .fail(function ({ responseJSON }) {
+                console.log('Failed to save Visitor num, with error message: ' + responseJSON.error);
+            })
+          } else {
+            
+              var $element = $(document.getElementById(url));
+              $element.find('.leancloud-visitors-count').text('Counter not initialized! See more at console err msg.');
+              console.error('ATTENTION! LeanCloud counter has security bug, see here how to solve it: https://github.com/theme-next/hexo-leancloud-counter-security. \n But you also can use LeanCloud without security, by set \'security\' option to \'false\'.');
+            
           }
         })
-        .fail(function ({ responseJSON }) {
-          console.log("LeanCloud Counter Error: " + responseJSON.code + " " + responseJSON.error);
-        });
+      .fail(function ({ responseJSON }) {
+        console.log('LeanCloud Counter Error:' + responseJSON.code + " " + responseJSON.error);
+      });
     }
     
 
@@ -1279,9 +1562,7 @@
             });
           };
           
-          if ($('.post-title-link').length >= 1) {
-            showTime(Counter);
-          }
+          addCount(Counter);
           
         })
     });
@@ -1324,7 +1605,7 @@
   <script src="//cdn.jsdelivr.net/gh/theme-next/theme-next-bookmark@1.0.0/bookmark.min.js"></script>
   <script type="text/javascript">
   
-    bookmark.loadBookmark();
+    bookmark.scrollToMark('auto', "#更多");
   
   </script>
 

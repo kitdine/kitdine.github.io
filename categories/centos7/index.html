@@ -165,18 +165,13 @@
 
 
 
-  <meta name="description" content="接着上篇文章，现在开始部署Redis集群，采用方案为四主四从，暂时不考虑搭建哨兵，因此需要八台机器，以下是部署过程中的一些记录。">
-<meta name="keywords" content="Redis,Redis Cluster">
-<meta property="og:type" content="article">
-<meta property="og:title" content="Centos-7下常见中间件环境的安装（三）">
-<meta property="og:url" content="http://blog.jobshen.com/posts/3335490502/index.html">
+  <meta property="og:type" content="website">
+<meta property="og:title" content="一杯咖啡的时间">
+<meta property="og:url" content="http://blog.jobshen.com/categories/centos7/index.html">
 <meta property="og:site_name" content="一杯咖啡的时间">
-<meta property="og:description" content="接着上篇文章，现在开始部署Redis集群，采用方案为四主四从，暂时不考虑搭建哨兵，因此需要八台机器，以下是部署过程中的一些记录。">
 <meta property="og:locale" content="zh-CN">
-<meta property="og:updated_time" content="2017-12-18T12:31:57.000Z">
 <meta name="twitter:card" content="summary">
-<meta name="twitter:title" content="Centos-7下常见中间件环境的安装（三）">
-<meta name="twitter:description" content="接着上篇文章，现在开始部署Redis集群，采用方案为四主四从，暂时不考虑搭建哨兵，因此需要八台机器，以下是部署过程中的一些记录。">
+<meta name="twitter:title" content="一杯咖啡的时间">
 
 
 
@@ -185,7 +180,7 @@
 
 
 
-  <link rel="canonical" href="http://blog.jobshen.com/posts/3335490502/">
+  <link rel="canonical" href="http://blog.jobshen.com/categories/centos7/">
 
 
 
@@ -195,7 +190,7 @@
   };
 </script>
 
-  <title>Centos-7下常见中间件环境的安装（三） | 一杯咖啡的时间</title>
+  <title>分类: centos7 | 一杯咖啡的时间</title>
   
 <script>
   window.fbAsyncInit = function() {
@@ -271,7 +266,7 @@
     
   
 
-  <div class="container sidebar-position-left page-post-detail">
+  <div class="container sidebar-position-left ">
     <div class="headband"></div>
 
     <header id="header" class="header" itemscope="" itemtype="http://schema.org/WPHeader">
@@ -357,6 +352,23 @@
     
 
     <a href="/tags/" rel="section"><i class="menu-item-icon fa fa-fw fa-tags"></i> <br>标签</a>
+
+  </li>
+        
+        
+        
+          
+          <li class="menu-item menu-item-categories menu-item-active">
+
+    
+    
+    
+      
+    
+
+    
+
+    <a href="/categories/" rel="section"><i class="menu-item-icon fa fa-fw fa-th"></i> <br>分类</a>
 
   </li>
         
@@ -451,305 +463,138 @@
           
             
 
+    
+    
+      
+      
+    
+      
+      
+    
+      
+      
+    
+      
+      
+    
+      
+      
+    
+      
+      
+    
+    
+
+  
+
+
           
           <div id="content" class="content">
             
 
-  <div id="posts" class="posts-expand">
-    
+  
+  
+  
+  <div class="post-block category">
 
-  
+    <div id="posts" class="posts-collapse">
+      <div class="collection-title">
+        <h1>centos7<small>分类</small>
+        </h1>
+      </div>
 
-  
-  
-  
-
-  
+      
+        
 
   <article class="post post-type-normal" itemscope="" itemtype="http://schema.org/Article">
-  
-  
-  
-  <div class="post-block">
-    <link itemprop="mainEntityOfPage" href="http://blog.jobshen.com/posts/3335490502/">
+    <header class="post-header">
 
-    <span hidden itemprop="author" itemscope="" itemtype="http://schema.org/Person">
-      <meta itemprop="name" content="Job Shen">
-      <meta itemprop="description" content="">
-      <meta itemprop="image" content="/uploads/Avatar.png">
-    </span>
-
-    <span hidden itemprop="publisher" itemscope="" itemtype="http://schema.org/Organization">
-      <meta itemprop="name" content="一杯咖啡的时间">
-    </span>
-
-    
-      <header class="post-header">
-
+      <h2 class="post-title">
         
+            <a class="post-title-link" href="/posts/3335490502.html" itemprop="url">
+              
+                <span itemprop="name">Centos-7下常见中间件环境的安装（三）</span>
+              
+            </a>
         
-          <h1 class="post-title" itemprop="name headline">Centos-7下常见中间件环境的安装（三）
-              
-            
-          </h1>
-        
+      </h2>
 
-        <div class="post-meta">
-          <span class="post-time">
-
-            
-            
-            
-
-            
-              <span class="post-meta-item-icon">
-                <i class="fa fa-calendar-o"></i>
-              </span>
-              
-                <span class="post-meta-item-text">发表于</span>
-              
-
-              
-                
-              
-
-              <time title="创建时间：2017-12-17 20:29:46" itemprop="dateCreated datePublished" datetime="2017-12-17T20:29:46+08:00">2017-12-17</time>
-            
-
-            
-              
-
-              
-                
-                <span class="post-meta-divider">|</span>
-                
-
-                <span class="post-meta-item-icon">
-                  <i class="fa fa-calendar-check-o"></i>
-                </span>
-                
-                  <span class="post-meta-item-text">更新于</span>
-                
-                <time title="修改时间：2017-12-18 20:31:57" itemprop="dateModified" datetime="2017-12-18T20:31:57+08:00">2017-12-18</time>
-              
-            
-          </span>
-
-          
-
-          
-            
-          
-
-          
-          
-             <span id="/posts/3335490502/" class="leancloud_visitors" data-flag-title="Centos-7下常见中间件环境的安装（三）">
-               <span class="post-meta-divider">|</span>
-               <span class="post-meta-item-icon">
-                 <i class="fa fa-eye"></i>
-               </span>
-               
-                 <span class="post-meta-item-text">阅读次数：</span>
-               
-                 <span class="leancloud-visitors-count"></span>
-             </span>
-          
-
-          
-
-          
-
-          
-
-        </div>
-      </header>
-    
-
-    
-    
-    
-    <div class="post-body" itemprop="articleBody">
-
-      
-      
-
-      
-        <p>接着上篇文章，现在开始部署Redis集群，采用方案为四主四从，暂时不考虑搭建哨兵，因此需要八台机器，以下是部署过程中的一些记录。</p>
-<a id="more"></a>
-<h2 id="准备工作"><a href="#准备工作" class="headerlink" title="准备工作"></a>准备工作</h2><h3 id="集群机器信息"><a href="#集群机器信息" class="headerlink" title="集群机器信息"></a>集群机器信息</h3><table>
-<thead>
-<tr>
-<th style="text-align:center">IP</th>
-<th style="text-align:center">CPU、RAM</th>
-</tr>
-</thead>
-<tbody>
-<tr>
-<td style="text-align:center">10.100.1.31</td>
-<td style="text-align:center">16 vcpu、64G ram</td>
-</tr>
-<tr>
-<td style="text-align:center">10.100.1.32</td>
-<td style="text-align:center">16 vcpu、64G ram</td>
-</tr>
-<tr>
-<td style="text-align:center">10.100.1.33</td>
-<td style="text-align:center">16 vcpu、64G ram</td>
-</tr>
-<tr>
-<td style="text-align:center">10.100.1.34</td>
-<td style="text-align:center">16 vcpu、64G ram</td>
-</tr>
-<tr>
-<td style="text-align:center">10.100.1.35</td>
-<td style="text-align:center">16 vcpu、64G ram</td>
-</tr>
-<tr>
-<td style="text-align:center">10.100.1.36</td>
-<td style="text-align:center">16 vcpu、64G ram</td>
-</tr>
-<tr>
-<td style="text-align:center">10.100.1.37</td>
-<td style="text-align:center">16 vcpu、64G ram</td>
-</tr>
-<tr>
-<td style="text-align:center">10.100.1.38</td>
-<td style="text-align:center">16 vcpu、64G ram</td>
-</tr>
-</tbody>
-</table>
-<p><em>Redis 为内存数据库，因此机器内存必须较大，根据经验，Redis占用内存一般不能超过机器内存的一半，不否则Redis的性能就会开始下降</em></p>
-<h3 id="Redis编译"><a href="#Redis编译" class="headerlink" title="Redis编译"></a>Redis编译</h3><p>由于Redis并不能通过包管理工具（例如 <em>yum</em>、<em>apt-get</em>等）进行快速安装，只能下载源码进行编译安装。</p>
-<figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line">jobshen@JobShen-PC:/usr/local$ curl -O http://download.redis.io/releases/redis-4.0.6.tar.gz</span><br><span class="line">jobshen@JobShen-PC:/usr/local$ tar -zxf redis-4.0.6.tar.gz</span><br><span class="line">jobshen@JobShen-PC:/usr/local$ ln -s redis-4.0.6 redis</span><br><span class="line">jobshen@JobShen-PC:/usr/local$ cd redis</span><br><span class="line">jobshen@JobShen-PC:/usr/local/redis$ make &amp;&amp; make install</span><br></pre></td></tr></table></figure>
-<h2 id="Redis-Cluster-部署"><a href="#Redis-Cluster-部署" class="headerlink" title="Redis Cluster 部署"></a>Redis Cluster 部署</h2><h3 id="Redis-conf"><a href="#Redis-conf" class="headerlink" title="Redis.conf"></a>Redis.conf</h3><p>新建<strong><em>cluster</em></strong>文件夹，以及新建<strong><em>redis.conf</em></strong>文件并添加以下内容：</p>
-<figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">jobshen@JobShen-PC:/usr/local/redis$ mkdir cluster</span><br><span class="line">jobshen@JobShen-PC:/usr/local/redis$ vim cluster/redis.conf</span><br></pre></td></tr></table></figure>
-<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br></pre></td><td class="code"><pre><span class="line">bind 10.100.1.31 127.0.0.1</span><br><span class="line">protected-mode yes</span><br><span class="line">port 6379</span><br><span class="line">daemonize yes</span><br><span class="line">supervised systemd</span><br><span class="line">pidfile /var/run/redis_6379.pid</span><br><span class="line">logfile &quot;/usr/local/redis/cluster/redis.log&quot;</span><br><span class="line">databases 16</span><br><span class="line">save 900 1</span><br><span class="line">save 300 10</span><br><span class="line">save 60 10000</span><br><span class="line">stop-writes-on-bgsave-error yes</span><br><span class="line">dbfilename dump.rdb</span><br><span class="line">slave-serve-stale-data yes</span><br><span class="line">slave-read-only yes</span><br><span class="line">slave-priority 100</span><br><span class="line">maxmemory 34359738368</span><br><span class="line">appendonly yes</span><br><span class="line">cluster-enabled yes</span><br><span class="line">cluster-config-file nodes-6379.conf</span><br><span class="line">cluster-node-timeout 15000</span><br></pre></td></tr></table></figure>
-<h3 id="Redis-service"><a href="#Redis-service" class="headerlink" title="Redis.service"></a>Redis.service</h3><p>创建<em>systemd</em>服务，</p>
-<figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">jobshen@JobShen-PC:/usr/local/redis$ vim /lib/systemd/system/redis.service</span><br></pre></td></tr></table></figure>
-<figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br></pre></td><td class="code"><pre><span class="line">[Unit]</span><br><span class="line">Description=Redis</span><br><span class="line">After=network.target</span><br><span class="line"></span><br><span class="line">[Service]</span><br><span class="line">ExecStart=/usr/local/redis/src/redis-server /usr/local/redis/cluster/redis.conf --daemonize no</span><br><span class="line">ExecStop=/usr/local/redis/src/redis-cli -h 127.0.0.1 -p 6379 shutdown</span><br><span class="line"></span><br><span class="line">[Install]</span><br><span class="line">WantedBy=multi-user.target</span><br></pre></td></tr></table></figure>
-<h3 id="启动Redis"><a href="#启动Redis" class="headerlink" title="启动Redis"></a>启动Redis</h3><figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">jobshen@JobShen-PC:/usr/local/redis$ systemctl start redis</span><br></pre></td></tr></table></figure>
-<h3 id="创建Redis集群"><a href="#创建Redis集群" class="headerlink" title="创建Redis集群"></a>创建Redis集群</h3><p>以下命令可以只在一台机器上执行，但为了后期维护Redis集群方便，可以在所有redis机器上都安装集群管理工具。</p>
-<figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line">jobshen@JobShen-PC:/usr/local/redis$ gpg --keyserver hkp://keys.gnupg.net --recv-keys 409B6B1796C275462A1703113804BB82D39DC0E3 7D2BAF1CF37B13E2069D6956105BD0E739499BDB</span><br><span class="line">jobshen@JobShen-PC:/usr/local/redis$ curl -sSL https://get.rvm.io | bash -s stable</span><br><span class="line">jobshen@JobShen-PC:/usr/local/redis$ rvm install 2.4.3</span><br><span class="line">jobshen@JobShen-PC:/usr/local/redis$ rvm use 2.4.3 --default --create</span><br><span class="line">jobshen@JobShen-PC:/usr/local/redis$ gem install redis</span><br><span class="line">jobshen@JobShen-PC:/usr/local/redis$ ./src/redis-trib.rb create --replicas 1 10.100.1.31:6379 10.100.1.32:6379 10.100.1.33:6379 10.100.1.34:6379 10.100.1.35:6379 10.100.1.36:6379 10.100.1.37:6379 10.100.1.38:6379</span><br></pre></td></tr></table></figure>
-<h3 id="验证"><a href="#验证" class="headerlink" title="验证"></a>验证</h3><p>登入任意一台redis，查看集群信息</p>
-<figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br></pre></td><td class="code"><pre><span class="line">jobshen@JobShen-PC:/usr/local/redis$ ./src/redis-cli -c -p 6369</span><br><span class="line">127.0.0.1:6379&gt; cluster nodes</span><br><span class="line">31f29a40699e44ae9b0dce5c8ded53cc92546c7f 10.100.1.31:6379@16379 master - 0 1513599855000 2 connected 4096-8191</span><br><span class="line">bd148fc244c821f0ebc502e2ef80e90e3ce8020f 10.100.1.32:6379@16379 master - 0 1513599857582 4 connected 12288-16383</span><br><span class="line">24c0c11cceb08a0a2c0f76773a1c3ecb5553fdd1 10.100.1.33:6379@16379 slave bd148fc244c821f0ebc502e2ef80e90e3ce8020f 0 1513599857000 8 connected</span><br><span class="line">b8ed99aef612d728f69015b20dae32751af5a668 10.100.1.34:6379@16379 myself,master - 0 1513599854000 1 connected 0-4095</span><br><span class="line">ee420f56a64c89c519c82adf2131724456656711 10.100.1.35:6379@16379 slave b8ed99aef612d728f69015b20dae32751af5a668 0 1513599856000 5 connected</span><br><span class="line">fa8f3b33ed93a8bb76c3f44b410436f12ca45d8c 10.100.1.36:6379@16379 slave 914483a3760cc5f7fc4422ea3326f39b0fc505b4 0 1513599854000 7 connected</span><br><span class="line">914483a3760cc5f7fc4422ea3326f39b0fc505b4 10.100.1.37:6379@16379 master - 0 1513599854000 3 connected 8192-12287</span><br><span class="line">da57f16f2f5b86cae95478157723c9b2972d460d 10.100.1.38:6379@16379 slave 31f29a40699e44ae9b0dce5c8ded53cc92546c7f 0 1513599854000 6 connected</span><br><span class="line">127.0.0.1:6379&gt;</span><br></pre></td></tr></table></figure>
-<p>到现在为止，整个<em>Redis集群</em>的搭建就完成了。</p>
-
-      
-    </div>
-
-    
-
-    
-    
-    
-
-    
-
-    
-       
-    
-    
-
-    
-      <div>
-        
-
-
-
-  
-
-
-
-<ul class="post-copyright">
-  <li class="post-copyright-author">
-    <strong>本文作者： </strong>Job Shen</li>
-  <li class="post-copyright-link">
-    <strong>本文链接：</strong>
-    
-    <a href="http://blog.jobshen.com/posts/3335490502/" title="Centos-7下常见中间件环境的安装（三）">http://blog.jobshen.com/posts/3335490502/</a>
-  </li>
-  <li class="post-copyright-license">
-    <strong>版权声明： </strong>本博客所有文章除特别声明外，均采用 <a href="https://creativecommons.org/licenses/by-nc-sa/4.0/" rel="noopener" target="_blank"><i class="fa fa-fw fa-creative-commons"></i>BY-NC-SA</a> 许可协议。转载请注明出处！</li>
-</ul>
-
+      <div class="post-meta">
+        <time class="post-time" itemprop="dateCreated" datetime="2017-12-17T20:29:46+08:00" content="2017-12-17">
+          12-17
+        </time>
       </div>
-    
 
-    <footer class="post-footer">
-      
-        <div class="post-tags">
-          
-            <a href="/tags/Redis/" rel="tag"># Redis</a>
-          
-            <a href="/tags/Redis-Cluster/" rel="tag"># Redis Cluster</a>
-          
-        </div>
-      
-
-      
-      
-        <div class="post-widgets">
-        
-
-        
-          
-          <div class="social-like">
-            
-
-            
-              <div class="fb_like">
-                <div class="fb-like" data-layout="button_count" data-share="true"></div>
-              </div>
-            
-          </div>
-        
-
-        
-        </div>
-      
-      
-
-      
-        <div class="post-nav">
-          <div class="post-nav-next post-nav-item">
-            
-              <a href="/posts/2345740436/" rel="next" title="Centos-7下常见中间件环境的安装（二）">
-                <i class="fa fa-chevron-left"></i> Centos-7下常见中间件环境的安装（二）
-              </a>
-            
-          </div>
-
-          <span class="post-nav-divider"></span>
-
-          <div class="post-nav-prev post-nav-item">
-            
-          </div>
-        </div>
-      
-
-      
-      
-    </footer>
-  </div>
-  
-  
-  
+    </header>
   </article>
 
 
+      
+        
+
+  <article class="post post-type-normal" itemscope="" itemtype="http://schema.org/Article">
+    <header class="post-header">
+
+      <h2 class="post-title">
+        
+            <a class="post-title-link" href="/posts/2345740436.html" itemprop="url">
+              
+                <span itemprop="name">Centos-7下常见中间件环境的安装（二）</span>
+              
+            </a>
+        
+      </h2>
+
+      <div class="post-meta">
+        <time class="post-time" itemprop="dateCreated" datetime="2017-12-09T20:53:12+08:00" content="2017-12-09">
+          12-09
+        </time>
+      </div>
+
+    </header>
+  </article>
+
+
+      
+        
+
+  <article class="post post-type-normal" itemscope="" itemtype="http://schema.org/Article">
+    <header class="post-header">
+
+      <h2 class="post-title">
+        
+            <a class="post-title-link" href="/posts/3011500279.html" itemprop="url">
+              
+                <span itemprop="name">Centos 7下常见中间件环境的安装（一）</span>
+              
+            </a>
+        
+      </h2>
+
+      <div class="post-meta">
+        <time class="post-time" itemprop="dateCreated" datetime="2017-12-07T20:54:37+08:00" content="2017-12-07">
+          12-07
+        </time>
+      </div>
+
+    </header>
+  </article>
+
+
+      
+    </div>
+
   </div>
+  
+  
+  
+
+  
+
 
 
           </div>
           
-
-  
-    <div id="gitalk-container">
-    </div>
-    
-  
-
-
 
         </div>
         
@@ -770,17 +615,8 @@
       
 
       
-        <ul class="sidebar-nav motion-element">
-          <li class="sidebar-nav-toc sidebar-nav-active" data-target="post-toc-wrap">
-            文章目录
-          </li>
-          <li class="sidebar-nav-overview" data-target="site-overview-wrap">
-            站点概览
-          </li>
-        </ul>
-      
 
-      <section class="site-overview-wrap sidebar-panel">
+      <section class="site-overview-wrap sidebar-panel sidebar-panel-active">
         <div class="site-overview">
           <div class="site-author motion-element" itemprop="author" itemscope="" itemtype="http://schema.org/Person">
             
@@ -797,12 +633,31 @@
                 
                   <a href="/archives/">
                 
-                    <span class="site-state-item-count">6</span>
+                    <span class="site-state-item-count">7</span>
                     <span class="site-state-item-name">日志</span>
                   </a>
                 </div>
               
 
+              
+                
+                
+                <div class="site-state-item site-state-categories">
+                  
+                    
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                    <span class="site-state-item-count">4</span>
+                    <span class="site-state-item-name">分类</span>
+                  
+                </div>
               
 
               
@@ -832,7 +687,13 @@
                     
                       
                     
-                    <span class="site-state-item-count">10</span>
+                      
+                    
+                      
+                    
+                      
+                    
+                    <span class="site-state-item-count">13</span>
                     <span class="site-state-item-name">标签</span>
                   </a>
                 </div>
@@ -889,22 +750,6 @@
       </section>
 
       
-      <!--noindex-->
-        <section class="post-toc-wrap motion-element sidebar-panel sidebar-panel-active">
-          <div class="post-toc">
-
-            
-              
-            
-
-            
-              <div class="post-toc-content"><ol class="nav"><li class="nav-item nav-level-2"><a class="nav-link" href="#准备工作"><span class="nav-number">1.</span> <span class="nav-text">准备工作</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#集群机器信息"><span class="nav-number">1.1.</span> <span class="nav-text">集群机器信息</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#Redis编译"><span class="nav-number">1.2.</span> <span class="nav-text">Redis编译</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#Redis-Cluster-部署"><span class="nav-number">2.</span> <span class="nav-text">Redis Cluster 部署</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#Redis-conf"><span class="nav-number">2.1.</span> <span class="nav-text">Redis.conf</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#Redis-service"><span class="nav-number">2.2.</span> <span class="nav-text">Redis.service</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#启动Redis"><span class="nav-number">2.3.</span> <span class="nav-text">启动Redis</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#创建Redis集群"><span class="nav-number">2.4.</span> <span class="nav-text">创建Redis集群</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#验证"><span class="nav-number">2.5.</span> <span class="nav-text">验证</span></a></li></ol></li></ol></div>
-            
-
-          </div>
-        </section>
-      <!--/noindex-->
-      
 
       
 
@@ -925,7 +770,25 @@
   <span class="author" itemprop="copyrightHolder">Job Shen</span>
 
   
+    <span class="post-meta-divider">|</span>
+    <span class="post-meta-item-icon">
+      <i class="fa fa-area-chart"></i>
+    </span>
+    
+      <span class="post-meta-item-text">站点总字数：</span>
+    
+    <span title="站点总字数">40k</span>
+  
 
+  
+    <span class="post-meta-divider">|</span>
+    <span class="post-meta-item-icon">
+      <i class="fa fa-coffee"></i>
+    </span>
+    
+      <span class="post-meta-item-text">站点阅读时长 &asymp;</span>
+    
+    <span title="站点阅读时长">36 分钟</span>
   
 </div>
 
@@ -1009,6 +872,8 @@
 
 
 
+  
+
 
 
   
@@ -1029,6 +894,11 @@
   
   
     <script type="text/javascript" src="/lib/fancybox/source/jquery.fancybox.pack.js?v=2.1.5"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/reading_progress/reading_progress.js"></script>
   
 
 
@@ -1052,10 +922,6 @@
 
 
   
-  <script type="text/javascript" src="/js/src/scrollspy.js?v=6.6.0"></script>
-<script type="text/javascript" src="/js/src/post-details.js?v=6.6.0"></script>
-
-
 
   
 
@@ -1078,32 +944,6 @@
 
 
 
-
-
-  
-  
-  <script type="text/javascript" src="//cdn.jsdelivr.net/npm/gitalk@1.4.0/dist/gitalk.min.js"></script>
-
-  
-  
-  <link rel="stylesheet" href="//cdn.jsdelivr.net/npm/gitalk@1.4.0/dist/gitalk.css">
-
-  
-  
-  <script type="text/javascript" src="//cdn.jsdelivr.net/npm/js-md5@0.7.3/src/md5.min.js"></script>
-    
-   <script type="text/javascript">
-        var gitalk = new Gitalk({
-          clientID: '0027cb40e78eba0adbfe',
-          clientSecret: '133ffa343a0ee4b23fef6d2ea7e36244770c2df9',
-          repo: 'blog_git_talk',
-          owner: 'kitdine',
-          admin: ['kitdine'],
-          id: md5(location.pathname),
-          distractionFreeMode: 'true'
-        })
-        gitalk.render('gitalk-container')           
-       </script>
 
   
 
@@ -1436,35 +1276,43 @@
   
   <script>
     
-    function addCount(Counter) {
+    function showTime(Counter) {
+      var entries = [];
       var $visitors = $(".leancloud_visitors");
-      var url = $visitors.attr('id').trim();
-      var title = $visitors.attr('data-flag-title').trim();
 
-      Counter('get', '/classes/Counter', { where: JSON.stringify({ url }) })
+      $visitors.each(function () {
+        entries.push( $(this).attr("id").trim() );
+      });
+
+      Counter('get', '/classes/Counter', { where: JSON.stringify({ url: { "$in": entries } }) })
         .done(function ({ results }) {
-          if (results.length > 0) {
-            var counter = results[0];
-            
-              var $element = $(document.getElementById(url));
-              $element.find('.leancloud-visitors-count').text(counter.time + 1);
-            
-            Counter('put', `/classes/Counter/${counter.objectId}`, JSON.stringify({ time: { "__op":"Increment", "amount":1 } }))
-            
-            .fail(function ({ responseJSON }) {
-                console.log('Failed to save Visitor num, with error message: ' + responseJSON.error);
-            })
-          } else {
-            
-              var $element = $(document.getElementById(url));
-              $element.find('.leancloud-visitors-count').text('Counter not initialized! See more at console err msg.');
-              console.error('ATTENTION! LeanCloud counter has security bug, see here how to solve it: https://github.com/theme-next/hexo-leancloud-counter-security. \n But you also can use LeanCloud without security, by set \'security\' option to \'false\'.');
-            
+          var COUNT_CONTAINER_REF = '.leancloud-visitors-count';
+
+          if (results.length === 0) {
+            $visitors.find(COUNT_CONTAINER_REF).text(0);
+            return;
+          }
+
+          for (var i = 0; i < results.length; i++) {
+            var item = results[i];
+            var url = item.url;
+            var time = item.time;
+            var element = document.getElementById(url);
+
+            $(element).find(COUNT_CONTAINER_REF).text(time);
+          }
+          for(var i = 0; i < entries.length; i++) {
+            var url = entries[i];
+            var element = document.getElementById(url);
+            var countSpan = $(element).find(COUNT_CONTAINER_REF);
+            if( countSpan.text() == '') {
+              countSpan.text(0);
+            }
           }
         })
-      .fail(function ({ responseJSON }) {
-        console.log('LeanCloud Counter Error:' + responseJSON.code + " " + responseJSON.error);
-      });
+        .fail(function ({ responseJSON }) {
+          console.log("LeanCloud Counter Error: " + responseJSON.code + " " + responseJSON.error);
+        });
     }
     
 
@@ -1484,7 +1332,9 @@
             });
           };
           
-          addCount(Counter);
+          if ($('.post-title-link').length >= 1) {
+            showTime(Counter);
+          }
           
         })
     });
@@ -1527,7 +1377,7 @@
   <script src="//cdn.jsdelivr.net/gh/theme-next/theme-next-bookmark@1.0.0/bookmark.min.js"></script>
   <script type="text/javascript">
   
-    bookmark.scrollToMark('auto', "#更多");
+    bookmark.loadBookmark();
   
   </script>
 
