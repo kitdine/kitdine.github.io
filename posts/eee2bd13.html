@@ -266,14 +266,14 @@
                 <i class="far fa-file-word"></i>
               </span>
                 <span class="post-meta-item-text">本文字数：</span>
-              <span>0</span>
+              <span>1.4k</span>
             </span>
             <span class="post-meta-item" title="阅读时长">
               <span class="post-meta-item-icon">
                 <i class="far fa-clock"></i>
               </span>
                 <span class="post-meta-item-text">阅读时长 &asymp;</span>
-              <span>1 分钟</span>
+              <span>2 分钟</span>
             </span>
 
         </div>
@@ -293,9 +293,9 @@
 <p>分别执行以下shell脚本：</p>
 <figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">tcpdump tcp -s 0  -w ./target.cap</span><br></pre></td></tr></table></figure>
 <p>抓取当前网卡下的所有tcp流量，然后使用wireshark进行分析。发现了一个比较奇怪的现象：</p>
-<p><img src="https://picture.jobshen.com/blog/tcpdump/client-tcpdump.png" alt="client-tcpdump.png"></p>
-<p><img src="https://picture.jobshen.com/blog/tcpdump/nginx-tcpdump.png" alt="nginx-tcpdump.png"></p>
-<p><img src="https://picture.jobshen.com/blog/tcpdump/server-tcpdump.png" alt="server-tcpdump.png"></p>
+<p><img data-src="https://picture.jobshen.com/blog/tcpdump/client-tcpdump.png" alt="client-tcpdump.png"></p>
+<p><img data-src="https://picture.jobshen.com/blog/tcpdump/nginx-tcpdump.png" alt="nginx-tcpdump.png"></p>
+<p><img data-src="https://picture.jobshen.com/blog/tcpdump/server-tcpdump.png" alt="server-tcpdump.png"></p>
 <p>从上到下三张图片分别是应用程序端、nginx端、服务端的抓包数据，可以发现连接的关闭是由nginx这个节点发起的，应用端和服务端同时收到了来自nginx的<code>FIN ACK</code>包，要求关闭当前连接，并且都开始执行四次握手过程。但是在这个过程中又发生了什么异常导致这个过程并没有正常完成。</p>
 <p>通过观察大量的抓包数据后发现这个情况发生的非常多，但并不是每次都会导致连接的异常关闭，大部分还是能够正常关闭连接并建立新的连接的。</p>
 <p>通过仔细观察发现被异常关闭的连接，都是发生在<code>Seq=1</code>的情况下，这个原因还不是很清楚。</p>
@@ -490,12 +490,12 @@
     <span class="post-meta-item-icon">
       <i class="fa fa-chart-area"></i>
     </span>
-    <span title="站点总字数">50k</span>
+    <span title="站点总字数">45k</span>
     <span class="post-meta-divider">|</span>
     <span class="post-meta-item-icon">
       <i class="fa fa-coffee"></i>
     </span>
-    <span title="站点阅读时长">46 分钟</span>
+    <span title="站点阅读时长">1:15</span>
 </div>
   <div class="powered-by">由 <a href="https://hexo.io/" class="theme-link" rel="noopener" target="_blank">Hexo</a> & <a href="https://theme-next.org/" class="theme-link" rel="noopener" target="_blank">NexT.Gemini</a> 强力驱动
   </div>
