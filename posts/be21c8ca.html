@@ -4,7 +4,9 @@
   <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=2">
 <meta name="theme-color" content="#222">
-<meta name="generator" content="Hexo 4.2.0">
+<meta name="generator" content="Hexo 5.2.0">
+
+
   <link rel="apple-touch-icon" sizes="180x180" href="/images/apple-touch-icon.png">
   <link rel="icon" type="image/png" sizes="32x32" href="/images/favicon-32x32.png">
   <link rel="icon" type="image/png" sizes="16x16" href="/images/favicon-16x16.png">
@@ -12,12 +14,14 @@
 
 <link rel="stylesheet" href="/css/main.css">
 
-<link rel="stylesheet" href="//fonts.googleapis.com/css?family=Noto Sans SC:300,300italic,400,400italic,700,700italic|Cascadia Code:300,300italic,400,400italic,700,700italic&display=swap&subset=latin,latin-ext">
-<link rel="stylesheet" href="/lib/font-awesome/css/all.min.css">
+<link rel="stylesheet" href="//fonts.googleapis.com/css?family=Noto+Sans+SC:300,300italic,400,400italic,700,700italic|Cascadia+Code:300,300italic,400,400italic,700,700italic&display=swap&subset=latin,latin-ext">
 
-<script id="hexo-configurations">
+<link rel="stylesheet" href="//cdn.jsdelivr.net/npm/@fortawesome/fontawesome-free@5.15.1/css/all.min.css">
+  <link rel="stylesheet" href="//cdn.jsdelivr.net/npm/animate.css@3.1.1/animate.min.css">
+
+<script class="hexo-configurations">
     var NexT = window.NexT || {};
-    var CONFIG = {"hostname":"blog.jobshen.com","root":"/","scheme":"Gemini","version":"7.8.0","exturl":false,"sidebar":{"position":"left","display":"post","padding":18,"offset":12,"onmobile":false},"copycode":{"enable":false,"show_result":false,"style":null},"back2top":{"enable":true,"sidebar":false,"scrollpercent":false},"bookmark":{"enable":true,"color":"#222","save":"auto"},"fancybox":false,"mediumzoom":false,"lazyload":true,"pangu":false,"comments":{"style":"tabs","active":null,"storage":true,"lazyload":false,"nav":null},"algolia":{"hits":{"per_page":10},"labels":{"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}},"localsearch":{"enable":true,"trigger":"auto","top_n_per_article":1,"unescape":false,"preload":false},"motion":{"enable":true,"async":false,"transition":{"post_block":"fadeIn","post_header":"slideDownIn","post_body":"slideDownIn","coll_header":"slideLeftIn","sidebar":"slideUpIn"}},"path":"search.xml"};
+    var CONFIG = {"hostname":"blog.jobshen.com","root":"/","scheme":"Gemini","version":"8.0.2","exturl":false,"sidebar":{"position":"left","display":"post","padding":18,"offset":12},"copycode":true,"bookmark":{"enable":true,"color":"#222","save":"auto"},"fancybox":false,"mediumzoom":false,"lazyload":true,"pangu":false,"comments":{"style":"tabs","active":null,"storage":true,"lazyload":false,"nav":null},"motion":{"enable":true,"async":false,"transition":{"post_block":"fadeIn","post_header":"fadeInDown","post_body":"fadeInDown","coll_header":"fadeInLeft","sidebar":"fadeInUp"}},"prism":false,"i18n":{"placeholder":"搜索...","empty":"没有找到任何搜索结果：${query}","hits_time":"找到 ${hits} 个搜索结果（用时 ${time} 毫秒）","hits":"找到 ${hits} 个搜索结果"},"path":"/search.xml","localsearch":{"enable":true,"trigger":"auto","top_n_per_article":1,"unescape":false,"preload":false}};
   </script>
 
   <meta name="description" content="背景​    我们都知道日志至于任何系统、软件都是十分重要的组成部分，通过日志我们可以方便地了解到现在系统运行是否正常、是否有异常情况。但有时候日志太多了也会有幸福地烦恼，发生异常想通过日志进行排查，可是满屏地日志都是不那么重要地内容，像心跳日志、debug日志等等。 ​    这在java应用尤为严重，你每引入地一个jar都有可能引入一堆打印的日志，这样一来要从日志中找到你所需要的内容将是一件极">
@@ -28,16 +32,17 @@
 <meta property="og:description" content="背景​    我们都知道日志至于任何系统、软件都是十分重要的组成部分，通过日志我们可以方便地了解到现在系统运行是否正常、是否有异常情况。但有时候日志太多了也会有幸福地烦恼，发生异常想通过日志进行排查，可是满屏地日志都是不那么重要地内容，像心跳日志、debug日志等等。 ​    这在java应用尤为严重，你每引入地一个jar都有可能引入一堆打印的日志，这样一来要从日志中找到你所需要的内容将是一件极">
 <meta property="og:locale" content="zh_CN">
 <meta property="article:published_time" content="2019-01-21T14:20:16.000Z">
-<meta property="article:modified_time" content="2019-01-21T14:40:15.000Z">
+<meta property="article:modified_time" content="2019-01-21T14:20:16.000Z">
 <meta property="article:author" content="Job Shen">
 <meta property="article:tag" content="log">
 <meta property="article:tag" content="隔离">
 <meta name="twitter:card" content="summary">
 
+
 <link rel="canonical" href="http://blog.jobshen.com/posts/be21c8ca.html">
 
 
-<script id="page-configurations">
+<script class="page-configurations">
   // https://hexo.io/docs/variables.html
   CONFIG.page = {
     sidebar: "",
@@ -66,49 +71,62 @@
 
   <noscript>
   <style>
-  .use-motion .brand,
+  body { margin-top: 2rem; }
+
   .use-motion .menu-item,
-  .sidebar-inner,
+  .use-motion .sidebar,
   .use-motion .post-block,
   .use-motion .pagination,
   .use-motion .comments,
   .use-motion .post-header,
   .use-motion .post-body,
-  .use-motion .collection-header { opacity: initial; }
+  .use-motion .collection-header {
+    visibility: visible;
+  }
+
+  .use-motion .header,
+  .use-motion .site-brand-container .toggle,
+  .use-motion .footer { opacity: initial; }
 
   .use-motion .site-title,
-  .use-motion .site-subtitle {
+  .use-motion .site-subtitle,
+  .use-motion .custom-logo-image {
     opacity: initial;
     top: initial;
   }
 
-  .use-motion .logo-line-before i { left: initial; }
-  .use-motion .logo-line-after i { right: initial; }
+  .use-motion .logo-line {
+    transform: scaleX(1);
+  }
+
+  .search-pop-overlay, .sidebar-nav { display: none; }
+  .sidebar-panel { display: block; }
   </style>
 </noscript>
 
+<link rel="alternate" href="/atom.xml" title="一杯咖啡的时间" type="application/atom+xml">
 </head>
 
-<body itemscope itemtype="http://schema.org/WebPage">
-  <div class="container use-motion">
-    <div class="headband"></div>
+<body itemscope itemtype="http://schema.org/WebPage" class="use-motion">
+  <div class="headband"></div>
 
+  <main class="main">
     <header class="header" itemscope itemtype="http://schema.org/WPHeader">
       <div class="header-inner"><div class="site-brand-container">
   <div class="site-nav-toggle">
     <div class="toggle" aria-label="切换导航栏">
-      <span class="toggle-line toggle-line-first"></span>
-      <span class="toggle-line toggle-line-middle"></span>
-      <span class="toggle-line toggle-line-last"></span>
+        <span class="toggle-line"></span>
+        <span class="toggle-line"></span>
+        <span class="toggle-line"></span>
     </div>
   </div>
 
   <div class="site-meta">
 
     <a href="/" class="brand" rel="start">
-      <span class="logo-line-before"><i></i></span>
+      <i class="logo-line"></i>
       <h1 class="site-title">一杯咖啡的时间</h1>
-      <span class="logo-line-after"><i></i></span>
+      <i class="logo-line"></i>
     </a>
       <p class="site-subtitle" itemprop="description">苦中作乐</p>
   </div>
@@ -122,9 +140,8 @@
 
 
 
-
 <nav class="site-nav">
-  <ul id="menu" class="main-menu menu">
+  <ul class="main-menu menu">
         <li class="menu-item menu-item-home">
 
     <a href="/" rel="section"><i class="fa fa-home fa-fw"></i>首页</a>
@@ -171,7 +188,7 @@
     <i class="fa fa-search"></i>
   </span>
   <div class="search-input-container">
-    <input autocomplete="off" autocapitalize="off"
+    <input autocomplete="off" autocapitalize="off" maxlength="80"
            placeholder="搜索..." spellcheck="false"
            type="search" class="search-input">
   </div>
@@ -179,9 +196,9 @@
     <i class="fa fa-times-circle"></i>
   </span>
 </div>
-<div id="search-result">
-  <div id="no-result">
-    <i class="fa fa-spinner fa-pulse fa-5x fa-fw"></i>
+<div class="search-result-container no-result">
+  <div class="search-result-icon">
+    <i class="fa fa-spinner fa-pulse fa-5x"></i>
   </div>
 </div>
 
@@ -189,222 +206,18 @@
   </div>
 
 </div>
-    </header>
-
-    
-  <div class="back-to-top">
-    <i class="fa fa-arrow-up"></i>
-    <span>0%</span>
-  </div>
-  <div class="reading-progress-bar"></div>
-  <a role="button" class="book-mark-link book-mark-link-fixed"></a>
-
-
-    <main class="main">
-      <div class="main-inner">
-        <div class="content-wrap">
-          
-
-          <div class="content post posts-expand">
-            
-
-    
-  
-  
-  <article itemscope itemtype="http://schema.org/Article" class="post-block" lang="zh-CN">
-    <link itemprop="mainEntityOfPage" href="http://blog.jobshen.com/posts/be21c8ca.html">
-
-    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
-      <meta itemprop="image" content="/images/Avatar.png">
-      <meta itemprop="name" content="Job Shen">
-      <meta itemprop="description" content="">
-    </span>
-
-    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
-      <meta itemprop="name" content="一杯咖啡的时间">
-    </span>
-      <header class="post-header">
-        <h1 class="post-title" itemprop="name headline">
-          关于Java日志隔离功能的闲谈
-        </h1>
-
-        <div class="post-meta">
-            <span class="post-meta-item">
-              <span class="post-meta-item-icon">
-                <i class="far fa-calendar"></i>
-              </span>
-              <span class="post-meta-item-text">发表于</span>
-              
-
-              <time title="创建时间：2019-01-21 22:20:16 / 修改时间：22:40:15" itemprop="dateCreated datePublished" datetime="2019-01-21T22:20:16+08:00">2019-01-21</time>
-            </span>
-            <span class="post-meta-item">
-              <span class="post-meta-item-icon">
-                <i class="far fa-folder"></i>
-              </span>
-              <span class="post-meta-item-text">分类于</span>
-                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
-                  <a href="/categories/Java/" itemprop="url" rel="index"><span itemprop="name">Java</span></a>
-                </span>
-            </span>
-
-          
-            <span id="/posts/be21c8ca.html" class="post-meta-item leancloud_visitors" data-flag-title="关于Java日志隔离功能的闲谈" title="阅读次数">
-              <span class="post-meta-item-icon">
-                <i class="fa fa-eye"></i>
-              </span>
-              <span class="post-meta-item-text">阅读次数：</span>
-              <span class="leancloud-visitors-count"></span>
-            </span><br>
-            <span class="post-meta-item" title="本文字数">
-              <span class="post-meta-item-icon">
-                <i class="far fa-file-word"></i>
-              </span>
-                <span class="post-meta-item-text">本文字数：</span>
-              <span>8.8k</span>
-            </span>
-            <span class="post-meta-item" title="阅读时长">
-              <span class="post-meta-item-icon">
-                <i class="far fa-clock"></i>
-              </span>
-                <span class="post-meta-item-text">阅读时长 &asymp;</span>
-              <span>15 分钟</span>
-            </span>
-
-        </div>
-      </header>
-
-    
-    
-    
-    <div class="post-body" itemprop="articleBody">
-
-      
-        <h2 id="背景"><a href="#背景" class="headerlink" title="背景"></a>背景</h2><p>​    我们都知道日志至于任何系统、软件都是十分重要的组成部分，通过日志我们可以方便地了解到现在系统运行是否正常、是否有异常情况。但有时候日志太多了也会有幸福地烦恼，发生异常想通过日志进行排查，可是满屏地日志都是不那么重要地内容，像心跳日志、debug日志等等。</p>
-<p>​    这在java应用尤为严重，你每引入地一个jar都有可能引入一堆打印的日志，这样一来要从日志中找到你所需要的内容将是一件极其困难的事情。当然，你会说，java拥有这么多优秀的日志框架系统，可以简单地通过相应地配置文件将这些内容根据不同的输出级别输出到不同的目录文件，可是如果将这件事情都交给终端用户去处理，那将会是一件极其复杂的工程，他得明白哪些是他需要的、哪些是他不需要的，而这些信息应该是对应的开发人员最清楚不过的，因此让开发人员提前将这些日志进行归类，输出到指定的文件，那对应使用者来说将会变得很简单。</p>
-<a id="more"></a>
-<h2 id="实现方法一"><a href="#实现方法一" class="headerlink" title="实现方法一"></a>实现方法一</h2><p>​    首先想到的应该就是通过日志的配置文件，添加不同的<code>appender</code>和<code>logger</code>。可是这些配置文件应该是存在与用户的应用中的，作为一个被引入的module该如何去修改这份文件呢？而且用户最终采用的是哪个日志框架我同样不能左右，我该根据哪个实现呢？</p>
-<p>​    第一个问题，很好解决，现在大部分的日志框架都提供了基于java 代码的方式来添加<code>appender</code>和<code>logger</code>的配置，因此我们只需要在应用启动时，获取<code>LoggerContext</code>对象，然后添加自定义的<code>appender</code>和<code>logger</code>即可，例如阿里的TDDL中就有相关的实现：</p>
-<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">// slf4j只是一个代理工程，需要判断一下具体的实现类</span></span><br><span class="line"><span class="keyword">if</span> (checkLogger(logger, LOGBACK)) &#123;</span><br><span class="line">    <span class="keyword">if</span> (canUseEncoder) &#123;</span><br><span class="line">        dynamic = <span class="keyword">new</span> DynamicLogbackLogger();</span><br><span class="line">    &#125; <span class="keyword">else</span> &#123;</span><br><span class="line">        dynamic = <span class="keyword">new</span> DynamicLogback918Logger();</span><br><span class="line">    &#125;</span><br><span class="line">&#125; <span class="keyword">else</span> <span class="keyword">if</span> (checkLogger(logger, LOG4J_Adapter)) &#123;</span><br><span class="line">    dynamic = <span class="keyword">new</span> DynamicLog4jAdapterLogger();</span><br><span class="line">&#125; <span class="keyword">else</span> <span class="keyword">if</span> (checkLogger(logger, LOG4J)) &#123;</span><br><span class="line">    dynamic = <span class="keyword">new</span> DynamicLog4jLogger();</span><br><span class="line">&#125;  <span class="keyword">else</span> &#123;</span><br><span class="line">    logger.warn(<span class="string">"logger is not a log4j/logback instance, dynamic logger is disabled"</span>);</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
-<p>先判断具体地实现框架是哪个，然后再获得对应实现框架的<code>loggerContext</code>，例如<code>logback</code>：</p>
-<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">if</span> (loggerContext == <span class="keyword">null</span>) &#123;</span><br><span class="line">    ILoggerFactory lcObject = LoggerFactory.getILoggerFactory();</span><br><span class="line">    <span class="keyword">if</span> (!(lcObject <span class="keyword">instanceof</span> LoggerContext)) &#123;</span><br><span class="line">        <span class="keyword">throw</span> <span class="keyword">new</span> LogbackException(<span class="string">"Expected LOGBACK binding with SLF4J, but another log system has taken the place: "</span> + lcObject.getClass().getSimpleName());</span><br><span class="line">    &#125;</span><br><span class="line">    loggerContext = (LoggerContext) lcObject;</span><br><span class="line">    <span class="keyword">if</span> (props != <span class="keyword">null</span>) &#123;</span><br><span class="line">        <span class="keyword">for</span> (Map.Entry&lt;String, String&gt; entry : props.entrySet()) &#123;</span><br><span class="line">            loggerContext.putProperty(entry.getKey(), entry.getValue());</span><br><span class="line">        &#125;</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
-<p>接着再添加自身所需的<code>appender</code>和<code>logger</code>：</p>
-<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="keyword">protected</span> Appender <span class="title">buildAppender</span><span class="params">(String name, String fileName, String pattern)</span> </span>&#123;</span><br><span class="line">	RollingFileAppender appender = <span class="keyword">new</span> RollingFileAppender();</span><br><span class="line">	appender.setContext(loggerContext);</span><br><span class="line">	appender.setName(name);</span><br><span class="line">	appender.setAppend(<span class="keyword">true</span>);</span><br><span class="line">	appender.setFile(<span class="keyword">new</span> File(getLogPath(), fileName).getAbsolutePath());</span><br><span class="line"></span><br><span class="line">	TimeBasedRollingPolicy rolling = <span class="keyword">new</span> TimeBasedRollingPolicy();</span><br><span class="line">	rolling.setContext(loggerContext);</span><br><span class="line">	rolling.setParent(appender);</span><br><span class="line">	rolling.setFileNamePattern(<span class="keyword">new</span> File(getLogPath(), fileName).getAbsolutePath() + <span class="string">".%d&#123;yyyy-MM-dd&#125;"</span>);</span><br><span class="line">	rolling.start();</span><br><span class="line">	appender.setRollingPolicy(rolling);</span><br><span class="line"></span><br><span class="line">	PatternLayoutEncoder layout = <span class="keyword">new</span> PatternLayoutEncoder();</span><br><span class="line">	layout.setContext(loggerContext);</span><br><span class="line">	layout.setPattern(pattern);</span><br><span class="line">	layout.setCharset(Charset.forName(getEncoding()));</span><br><span class="line">	layout.start();</span><br><span class="line">	appender.setEncoder(layout);</span><br><span class="line">	<span class="comment">// 启动</span></span><br><span class="line">	appender.start();</span><br><span class="line">	<span class="keyword">return</span> appender;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
-<p>可是这样做，存在的问题也是很明显的：</p>
-<ul>
-<li>需自己判断应用采用的实现框架，但可以通过抽取的方式构建一个公共jar，例如common包</li>
-<li>该实现框架需要能够支持通过动态的形式添加<code>appender</code></li>
-<li>仍然与应用的<code>Log</code>耦合在一起</li>
-</ul>
-<p>那除此之外，还有其他的方式能够实现同样的功能吗？答案当时是<strong><em>有</em></strong>。</p>
-<h2 id="实现方法二"><a href="#实现方法二" class="headerlink" title="实现方法二"></a>实现方法二</h2><p>默认情况下一个应用启动后，只会存在一个<code>loggerContext</code>，因为日志框架都是单例模式的，也是为了减少开销。那如果我们有多个<code>loggerContext</code>呢，是不是可以每个需要的<code>modeule</code>都拥有一份单独的<code>loggerContext</code>，那不就可以通过加载配置文件的形式更轻量级地来实现需要动态添加<code>appender</code>的功能呢。</p>
-<p>大致的实现逻辑应该是这样：</p>
-<ul>
-<li>需要一个<code>map</code>来管理所有的这些<code>loggerContext</code>，以每个<code>module</code>的<code>groupId</code>+<code>artifactId</code>（现在90%以上的工程都提供maven坐标）为唯一标识 – <code>key</code></li>
-<li>每个module自身需要有一份配置文件，当然由于日志实现很多你可能需要多份文件，同样你可以定义自己的格式，然后通过java code的形式去转化为最终的各个不同实现</li>
-<li>需要能通过唯一的Id，例如<code>groupId</code>+<code>artifactId</code>定位到你的配置文件</li>
-</ul>
-<p>这样大致的一个可以做到日志隔离的简单框架就搭建起来了，使用配置文件还有一个好处就是，一些日志框架可以动态刷新配置文件，这就使得你可以在运行时动态改变日志参数，例如日志级别。</p>
-<p>获取一个单独的logger对象：</p>
-<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">ModuleLoggerManager.getLoggerByCoordinate(name, <span class="string">"coordinate"</span>);</span><br></pre></td></tr></table></figure>
-<p>维护<code>logger</code>相关对象：</p>
-<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">final</span> ConcurrentHashMap&lt;ModuleLogId, ModuleLogInfo&gt; MODULE_LOGGER_MAP =</span><br><span class="line">            <span class="keyword">new</span> ConcurrentHashMap&lt;&gt;(<span class="number">8</span>)</span><br></pre></td></tr></table></figure>
-<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">@Data</span></span><br><span class="line"><span class="keyword">public</span> <span class="class"><span class="keyword">class</span> <span class="title">ModuleLogId</span> </span>&#123;</span><br><span class="line"></span><br><span class="line">    <span class="comment">// 一些可修改的日志配置信息，可通过$&#123;key&#125;的形式传递</span></span><br><span class="line">    <span class="keyword">private</span> <span class="keyword">final</span> Map&lt;String, String&gt; tags = <span class="keyword">new</span> HashMap&lt;&gt;(<span class="number">8</span>);</span><br><span class="line"></span><br><span class="line">    <span class="keyword">private</span> <span class="keyword">final</span> String              coordinate;</span><br><span class="line"></span><br><span class="line">    <span class="function"><span class="keyword">public</span> ModuleLogId <span class="title">addTag</span><span class="params">(String key, String value)</span> </span>&#123;</span><br><span class="line">        tags.put(key, value);</span><br><span class="line">        <span class="keyword">return</span> <span class="keyword">this</span>;</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
-<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">@NoArgsConstructor</span></span><br><span class="line"><span class="keyword">public</span> <span class="class"><span class="keyword">class</span> <span class="title">ModuleLogInfo</span> </span>&#123;</span><br><span class="line">    <span class="meta">@Getter</span></span><br><span class="line">    <span class="meta">@Setter</span></span><br><span class="line">    <span class="comment">// 根据具体实现会创建不同的loggerFactory对象，然后不同的logFactory对象会创建不同的loggerContext对象</span></span><br><span class="line">    <span class="keyword">private</span> AbstractLoggerModuleFactory abstractLoggerModuleFactory;</span><br><span class="line">    <span class="meta">@Getter</span></span><br><span class="line">    <span class="keyword">private</span> Properties properties = <span class="keyword">new</span> Properties();</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
-<p>创建factory过程：</p>
-<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="keyword">private</span> <span class="keyword">static</span> AbstractLoggerModuleFactory <span class="title">createILoggerFactory</span><span class="params">(ModuleLogId moduleLogId, ClassLoader moduleClassLoader)</span> </span>&#123;</span><br><span class="line">	<span class="keyword">if</span> (System.getProperty(Constants.Module_LOGGER_DISABLE_PROP_KEY) != <span class="keyword">null</span></span><br><span class="line">			&amp;&amp; Boolean.TRUE.toString().equalsIgnoreCase(</span><br><span class="line">			System.getProperty(Constants.Module_LOGGER_DISABLE_PROP_KEY))) &#123;</span><br><span class="line">		Constants.DEFAULT_LOGGER.warn(<span class="string">"Module Logger is disabled!  -D&#123;&#125;=true"</span>, Constants.Module_LOGGER_DISABLE_PROP_KEY);</span><br><span class="line">		<span class="keyword">return</span> JVM_LOGGER_FACTORY;</span><br><span class="line">	&#125;</span><br><span class="line">	<span class="comment">// set log props</span></span><br><span class="line">	LogTypeJudgeUtil.processGlobalSystemLogProperties();</span><br><span class="line"></span><br><span class="line">	<span class="comment">// do create</span></span><br><span class="line">	<span class="keyword">try</span> &#123;</span><br><span class="line">		<span class="comment">// first log4j2</span></span><br><span class="line">		<span class="keyword">if</span> (LogTypeJudgeUtil.isLog4j2Usable(moduleClassLoader)) &#123;</span><br><span class="line">            ...</span><br><span class="line">			<span class="keyword">return</span> log4j2LoggerFactory;</span><br><span class="line">		&#125;</span><br><span class="line"></span><br><span class="line">		<span class="comment">//second logback</span></span><br><span class="line">		<span class="keyword">if</span> (LogTypeJudgeUtil.isLogbackUsable(moduleClassLoader)) &#123;</span><br><span class="line">			...</span><br><span class="line">            <span class="keyword">return</span> logbackLoggerFactory;</span><br><span class="line">		&#125;</span><br><span class="line"></span><br><span class="line">		<span class="comment">// third log4j</span></span><br><span class="line">		<span class="keyword">if</span> (LogTypeJudgeUtil.isLog4jUsable(moduleClassLoader)) &#123;</span><br><span class="line">			...</span><br><span class="line">            <span class="keyword">return</span> log4jLoggerFactory;</span><br><span class="line">		&#125;</span><br><span class="line"></span><br><span class="line">		Constants.DEFAULT_LOGGER.warn(<span class="string">"No log util is usable, Default app logger will be used."</span>);</span><br><span class="line">	&#125; <span class="keyword">catch</span> (Throwable e) &#123;</span><br><span class="line">		Constants.DEFAULT_LOGGER.error(<span class="string">"Build ILoggerFactory error! Default app logger will be used."</span>,</span><br><span class="line">				e);</span><br><span class="line">	&#125;</span><br><span class="line"></span><br><span class="line">	<span class="keyword">return</span> JVM_LOGGER_FACTORY;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
-<p>以log4j2为例，获取loggerFactory：</p>
-<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br><span class="line">54</span><br><span class="line">55</span><br><span class="line">56</span><br><span class="line">57</span><br><span class="line">58</span><br><span class="line">59</span><br><span class="line">60</span><br><span class="line">61</span><br><span class="line">62</span><br><span class="line">63</span><br><span class="line">64</span><br><span class="line">65</span><br><span class="line">66</span><br><span class="line">67</span><br><span class="line">68</span><br><span class="line">69</span><br><span class="line">70</span><br><span class="line">71</span><br><span class="line">72</span><br><span class="line">73</span><br><span class="line">74</span><br><span class="line">75</span><br><span class="line">76</span><br><span class="line">77</span><br><span class="line">78</span><br><span class="line">79</span><br><span class="line">80</span><br><span class="line">81</span><br><span class="line">82</span><br><span class="line">83</span><br><span class="line">84</span><br><span class="line">85</span><br><span class="line">86</span><br><span class="line">87</span><br><span class="line">88</span><br><span class="line">89</span><br><span class="line">90</span><br><span class="line">91</span><br><span class="line">92</span><br><span class="line">93</span><br><span class="line">94</span><br><span class="line">95</span><br><span class="line">96</span><br><span class="line">97</span><br><span class="line">98</span><br><span class="line">99</span><br><span class="line">100</span><br><span class="line">101</span><br><span class="line">102</span><br><span class="line">103</span><br><span class="line">104</span><br><span class="line">105</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">/**</span></span><br><span class="line"><span class="comment"> * confFileUrl 为根据传入的coordinate以及具体的日志实现框架，拼接出路径</span></span><br><span class="line"><span class="comment"> * 例如 coordinate 为 org.jobshen.mq.rocketmq</span></span><br><span class="line"><span class="comment"> * 则 log4j2的文件路径为：classpath*:org/jobshen/mq/rocketmq/log/log4j2/log-conf.xml</span></span><br><span class="line"><span class="comment"> */</span></span><br><span class="line"><span class="function"><span class="keyword">protected</span> AbstractLoggerModuleFactory <span class="title">doBuild</span><span class="params">(<span class="keyword">final</span> String coordinate, <span class="keyword">final</span> ClassLoader moduleClassLoader, <span class="keyword">final</span> URL confFileUrl)</span> </span>&#123;</span><br><span class="line">	<span class="keyword">try</span> &#123;</span><br><span class="line">        <span class="comment">//构建单独的loggerContext对象</span></span><br><span class="line">		<span class="keyword">final</span> LoggerContext context = <span class="keyword">new</span> LoggerContext(coordinate, <span class="keyword">null</span>, confFileUrl.toURI());</span><br><span class="line">		Configuration config = <span class="keyword">null</span>;</span><br><span class="line">		ConfigurationFactory configurationFactory = ConfigurationFactory.getInstance();</span><br><span class="line">		<span class="keyword">try</span> &#123;</span><br><span class="line">			Class[] parameterTypes = <span class="keyword">new</span> Class[<span class="number">3</span>];</span><br><span class="line">			parameterTypes[<span class="number">0</span>] = String<span class="class">.<span class="keyword">class</span></span>;</span><br><span class="line">			parameterTypes[<span class="number">1</span>] = URI<span class="class">.<span class="keyword">class</span></span>;</span><br><span class="line">			parameterTypes[<span class="number">2</span>] = ClassLoader<span class="class">.<span class="keyword">class</span></span>;</span><br><span class="line">			Method getConfigurationMethod = configurationFactory.getClass().getMethod(</span><br><span class="line">					<span class="string">"getConfiguration"</span>, parameterTypes);</span><br><span class="line">			config = (Configuration) getConfigurationMethod.invoke(configurationFactory,</span><br><span class="line">					coordinate, confFileUrl.toURI(), moduleClassLoader);</span><br><span class="line">		&#125; <span class="keyword">catch</span> (NoSuchMethodException noSuchMethodException) &#123;</span><br><span class="line">			Class[] parameterTypes = <span class="keyword">new</span> Class[<span class="number">4</span>];</span><br><span class="line">			parameterTypes[<span class="number">0</span>] = LoggerContext<span class="class">.<span class="keyword">class</span></span>;</span><br><span class="line">			parameterTypes[<span class="number">1</span>] = String<span class="class">.<span class="keyword">class</span></span>;</span><br><span class="line">			parameterTypes[<span class="number">2</span>] = URI<span class="class">.<span class="keyword">class</span></span>;</span><br><span class="line">			parameterTypes[<span class="number">3</span>] = ClassLoader<span class="class">.<span class="keyword">class</span></span>;</span><br><span class="line">			Method getConfigurationMethod = configurationFactory.getClass().getMethod(</span><br><span class="line">					<span class="string">"getConfiguration"</span>, parameterTypes);</span><br><span class="line">			config = (Configuration) getConfigurationMethod.invoke(configurationFactory,</span><br><span class="line">					context, coordinate, confFileUrl.toURI(), moduleClassLoader);</span><br><span class="line">		&#125;</span><br><span class="line">		<span class="keyword">if</span> (config == <span class="keyword">null</span>) &#123;</span><br><span class="line">			<span class="keyword">throw</span> <span class="keyword">new</span> RuntimeException(<span class="string">"No log4j2 configuration are found."</span>);</span><br><span class="line">		&#125;</span><br><span class="line">		<span class="keyword">for</span> (Map.Entry entry : getProperties().entrySet()) &#123;</span><br><span class="line">			<span class="comment">//from Map&lt;String,String&gt;</span></span><br><span class="line">			config.getProperties().put((String) entry.getKey(), (String) entry.getValue());</span><br><span class="line">		&#125;</span><br><span class="line"></span><br><span class="line">		<span class="keyword">for</span> (Map.Entry entry : System.getProperties().entrySet()) &#123;</span><br><span class="line">			<span class="comment">//from Map&lt;String,String&gt;</span></span><br><span class="line">			config.getProperties().put((String) entry.getKey(), (String) entry.getValue());</span><br><span class="line">		&#125;</span><br><span class="line"></span><br><span class="line">		context.start(config);</span><br><span class="line"></span><br><span class="line">		<span class="keyword">return</span> <span class="keyword">new</span> AbstractLoggerModuleFactory(getLoggingType()) &#123;</span><br><span class="line"></span><br><span class="line">			<span class="keyword">private</span> ConcurrentMap&lt;String, org.apache.logging.slf4j.Log4jLogger&gt; loggerMap =</span><br><span class="line">					<span class="keyword">new</span> ConcurrentHashMap&lt;&gt;();</span><br><span class="line"></span><br><span class="line">			<span class="meta">@Override</span></span><br><span class="line">			<span class="function"><span class="keyword">public</span> Logger <span class="title">setLevel</span><span class="params">(String loggerName, ModuleLogLevel logLevel)</span> </span>&#123;</span><br><span class="line">				org.apache.logging.slf4j.Log4jLogger log4jLoggerAdapter = (org.apache.logging.slf4j.Log4jLogger) <span class="keyword">this</span></span><br><span class="line">						.getLogger(loggerName);</span><br><span class="line">				<span class="keyword">final</span> String key = Logger.ROOT_LOGGER_NAME.equals(loggerName) ? LogManager.ROOT_LOGGER_NAME</span><br><span class="line">						: loggerName;</span><br><span class="line">				org.apache.logging.log4j.core.Logger log4j2Logger = context.getLogger(key);</span><br><span class="line">				<span class="comment">//level</span></span><br><span class="line">				org.apache.logging.log4j.Level log4j2Level = <span class="keyword">this</span>.toLog4j2Level(logLevel);</span><br><span class="line">				log4j2Logger.setLevel(log4j2Level);</span><br><span class="line">				<span class="keyword">return</span> log4jLoggerAdapter;</span><br><span class="line">			&#125;</span><br><span class="line"></span><br><span class="line">			<span class="meta">@Override</span></span><br><span class="line">            <span class="comment">//使用门面框架 slf4j 返回logger对象</span></span><br><span class="line">			<span class="keyword">public</span> org.slf4j.<span class="function">Logger <span class="title">getLogger</span><span class="params">(String name)</span> </span>&#123;</span><br><span class="line">				<span class="keyword">final</span> String key = Logger.ROOT_LOGGER_NAME.equals(name) ? LogManager.ROOT_LOGGER_NAME</span><br><span class="line">						: name;</span><br><span class="line">				org.apache.logging.log4j.core.Logger log4jLogger = context.getLogger(key);</span><br><span class="line">				Log4jLogger oldInst = <span class="keyword">this</span>.loggerMap.get(key);</span><br><span class="line">				<span class="keyword">if</span> (oldInst != <span class="keyword">null</span>) &#123;</span><br><span class="line">					<span class="keyword">return</span> oldInst;</span><br><span class="line">				&#125;</span><br><span class="line">				Log4jLogger newInst = <span class="keyword">new</span> Log4jLogger(log4jLogger, key);</span><br><span class="line">				oldInst = <span class="keyword">this</span>.loggerMap.putIfAbsent(key, newInst);</span><br><span class="line">				<span class="keyword">return</span> oldInst == <span class="keyword">null</span> ? newInst : oldInst;</span><br><span class="line">			&#125;</span><br><span class="line"></span><br><span class="line">			<span class="keyword">private</span> org.apache.logging.log4j.<span class="function">Level <span class="title">toLog4j2Level</span><span class="params">(ModuleLogLevel logLevel)</span> </span>&#123;</span><br><span class="line">				<span class="keyword">if</span> (logLevel == <span class="keyword">null</span>) &#123;</span><br><span class="line">					<span class="keyword">throw</span> <span class="keyword">new</span> IllegalStateException(</span><br><span class="line">							<span class="string">"ModuleLogLevel is NULL when adapter to log4j2."</span>);</span><br><span class="line">				&#125;</span><br><span class="line">				<span class="keyword">switch</span> (logLevel) &#123;</span><br><span class="line">				<span class="keyword">case</span> TRACE:</span><br><span class="line">					<span class="keyword">return</span> Level.TRACE;</span><br><span class="line">				<span class="keyword">case</span> DEBUG:</span><br><span class="line">					<span class="keyword">return</span> Level.DEBUG;</span><br><span class="line">				<span class="keyword">case</span> INFO:</span><br><span class="line">					<span class="keyword">return</span> Level.INFO;</span><br><span class="line">				<span class="keyword">case</span> WARN:</span><br><span class="line">					<span class="keyword">return</span> Level.WARN;</span><br><span class="line">				<span class="keyword">case</span> ERROR:</span><br><span class="line">					<span class="keyword">return</span> Level.ERROR;</span><br><span class="line">				<span class="keyword">default</span>:</span><br><span class="line">					<span class="keyword">throw</span> <span class="keyword">new</span> IllegalStateException(logLevel</span><br><span class="line">							+ <span class="string">" is unknown when adapter to log4j2."</span>);</span><br><span class="line">				&#125;</span><br><span class="line">			&#125;</span><br><span class="line">		&#125;;</span><br><span class="line">	&#125; <span class="keyword">catch</span> (Throwable e) &#123;</span><br><span class="line">		<span class="keyword">throw</span> <span class="keyword">new</span> IllegalStateException(<span class="string">"Log4j2 loggerModuleFactory build error!"</span>, e);</span><br><span class="line">	&#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
-<p>当然这个方案也有其缺陷，loggerContext对象增加了对应的内存消耗也就增加了。简单统计了下，每增加一个采用日志隔离框架的模块，内存使用增加<code>5~10kb</code>。</p>
-
-    </div>
-
-    
-    
-    
         
-
-<div>
-<ul class="post-copyright">
-  <li class="post-copyright-author">
-    <strong>本文作者： </strong>Job Shen
-  </li>
-  <li class="post-copyright-link">
-    <strong>本文链接：</strong>
-    <a href="http://blog.jobshen.com/posts/be21c8ca.html" title="关于Java日志隔离功能的闲谈">http://blog.jobshen.com/posts/be21c8ca.html</a>
-  </li>
-  <li class="post-copyright-license">
-    <strong>版权声明： </strong>本博客所有文章除特别声明外，均采用 <a href="https://creativecommons.org/licenses/by-nc-sa/4.0/deed.zh" rel="noopener" target="_blank"><i class="fab fa-fw fa-creative-commons"></i>BY-NC-SA</a> 许可协议。转载请注明出处！
-  </li>
-</ul>
-</div>
-
-
-      <footer class="post-footer">
-          <div class="post-tags">
-              <a href="/tags/log/" rel="tag"># log</a>
-              <a href="/tags/%E9%9A%94%E7%A6%BB/" rel="tag"># 隔离</a>
-          </div>
-
-        
-
-
-        
-    <div class="post-nav">
-      <div class="post-nav-item">
-    <a href="/posts/eee2bd13.html" rel="prev" title="关于k8s下使用Ingress保持长连接的异常情况排查">
-      <i class="fa fa-chevron-left"></i> 关于k8s下使用Ingress保持长连接的异常情况排查
-    </a></div>
-      <div class="post-nav-item"></div>
-    </div>
-      </footer>
-    
-  </article>
-  
-  
-  
-
-
-
-          </div>
-          
-    <div class="comments" id="gitalk-container"></div>
-
-<script>
-  window.addEventListener('tabs:register', () => {
-    let { activeClass } = CONFIG.comments;
-    if (CONFIG.comments.storage) {
-      activeClass = localStorage.getItem('comments_active') || activeClass;
-    }
-    if (activeClass) {
-      let activeTab = document.querySelector(`a[href="#comment-${activeClass}"]`);
-      if (activeTab) {
-        activeTab.click();
-      }
-    }
-  });
-  if (CONFIG.comments.storage) {
-    window.addEventListener('tabs:click', event => {
-      if (!event.target.matches('.tabs-comment .tab-content .tab-pane')) return;
-      let commentClass = event.target.classList[1];
-      localStorage.setItem('comments_active', commentClass);
-    });
-  }
-</script>
-
-        </div>
-          
   
   <div class="toggle sidebar-toggle">
-    <span class="toggle-line toggle-line-first"></span>
-    <span class="toggle-line toggle-line-middle"></span>
-    <span class="toggle-line toggle-line-last"></span>
+    <span class="toggle-line"></span>
+    <span class="toggle-line"></span>
+    <span class="toggle-line"></span>
   </div>
 
   <aside class="sidebar">
-    <div class="sidebar-inner">
 
-      <ul class="sidebar-nav motion-element">
+    <div class="sidebar-inner sidebar-nav-active sidebar-toc-active">
+      <ul class="sidebar-nav">
         <li class="sidebar-nav-toc">
           文章目录
         </li>
@@ -413,20 +226,21 @@
         </li>
       </ul>
 
-      <!--noindex-->
-      <div class="post-toc-wrap sidebar-panel">
-          <div class="post-toc motion-element"><ol class="nav"><li class="nav-item nav-level-2"><a class="nav-link" href="#背景"><span class="nav-number">1.</span> <span class="nav-text">背景</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#实现方法一"><span class="nav-number">2.</span> <span class="nav-text">实现方法一</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#实现方法二"><span class="nav-number">3.</span> <span class="nav-text">实现方法二</span></a></li></ol></div>
-      </div>
-      <!--/noindex-->
+      <div class="sidebar-panel-container">
+        <!--noindex-->
+        <section class="post-toc-wrap sidebar-panel">
+            <div class="post-toc animated"><ol class="nav"><li class="nav-item nav-level-2"><a class="nav-link" href="#%E8%83%8C%E6%99%AF"><span class="nav-number">1.</span> <span class="nav-text">背景</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E5%AE%9E%E7%8E%B0%E6%96%B9%E6%B3%95%E4%B8%80"><span class="nav-number">2.</span> <span class="nav-text">实现方法一</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E5%AE%9E%E7%8E%B0%E6%96%B9%E6%B3%95%E4%BA%8C"><span class="nav-number">3.</span> <span class="nav-text">实现方法二</span></a></li></ol></div>
+        </section>
+        <!--/noindex-->
 
-      <div class="site-overview-wrap sidebar-panel">
-        <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
+        <section class="site-overview-wrap sidebar-panel">
+          <div class="site-author site-overview-item animated" itemprop="author" itemscope itemtype="http://schema.org/Person">
     <img class="site-author-image" itemprop="image" alt="Job Shen"
       src="/images/Avatar.png">
   <p class="site-author-name" itemprop="name">Job Shen</p>
   <div class="site-description" itemprop="description"></div>
 </div>
-<div class="site-state-wrap motion-element">
+<div class="site-state-wrap site-overview-item animated">
   <nav class="site-state">
       <div class="site-state-item site-state-posts">
           <a href="/archives/">
@@ -449,32 +263,459 @@
       </div>
   </nav>
 </div>
-  <div class="links-of-author motion-element">
+  <div class="links-of-author site-overview-item animated">
       <span class="links-of-author-item">
         <a href="https://github.com/kitdine" title="GitHub → https:&#x2F;&#x2F;github.com&#x2F;kitdine" rel="noopener" target="_blank"><i class="fab fa-github fa-fw"></i>GitHub</a>
       </span>
   </div>
-  <div class="cc-license motion-element" itemprop="license">
+  <div class="cc-license site-overview-item animated" itemprop="license">
     <a href="https://creativecommons.org/licenses/by-nc-sa/4.0/deed.zh" class="cc-opacity" rel="noopener" target="_blank"><img src="/images/cc-by-nc-sa.svg" alt="Creative Commons"></a>
   </div>
 
 
 
+        </section>
       </div>
-
     </div>
   </aside>
-  <div id="sidebar-dimmer"></div>
+  <div class="sidebar-dimmer"></div>
 
 
+    </header>
+
+    
+  <div class="back-to-top">
+    <i class="fa fa-arrow-up"></i>
+    <span>0%</span>
+  </div>
+  <div class="reading-progress-bar"></div>
+  <a role="button" class="book-mark-link book-mark-link-fixed"></a>
+
+<noscript>
+  <div class="noscript-warning">Theme NexT works best with JavaScript enabled</div>
+</noscript>
+
+
+    <div class="main-inner post posts-expand">
+      
+
+      
+
+  
+
+
+<div class="post-block">
+  
+  
+
+  <article itemscope itemtype="http://schema.org/Article" class="post-content" lang="zh-CN">
+    <link itemprop="mainEntityOfPage" href="http://blog.jobshen.com/posts/be21c8ca.html">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="/images/Avatar.png">
+      <meta itemprop="name" content="Job Shen">
+      <meta itemprop="description" content="">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="一杯咖啡的时间">
+    </span>
+      <header class="post-header">
+        <h1 class="post-title" itemprop="name headline">
+          关于Java日志隔离功能的闲谈
+        </h1>
+
+        <div class="post-meta-container">
+          <div class="post-meta">
+    <span class="post-meta-item">
+      <span class="post-meta-item-icon">
+        <i class="far fa-calendar"></i>
+      </span>
+      <span class="post-meta-item-text">发表于</span>
+
+      <time title="创建时间：2019-01-21 22:20:16" itemprop="dateCreated datePublished" datetime="2019-01-21T22:20:16+08:00">2019-01-21</time>
+    </span>
+    <span class="post-meta-item">
+      <span class="post-meta-item-icon">
+        <i class="far fa-folder"></i>
+      </span>
+      <span class="post-meta-item-text">分类于</span>
+        <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+          <a href="/categories/Java/" itemprop="url" rel="index"><span itemprop="name">Java</span></a>
+        </span>
+    </span>
+
+  
+    <span id="/posts/be21c8ca.html" class="post-meta-item leancloud_visitors" data-flag-title="关于Java日志隔离功能的闲谈" title="阅读次数">
+      <span class="post-meta-item-icon">
+        <i class="far fa-eye"></i>
+      </span>
+      <span class="post-meta-item-text">阅读次数：</span>
+      <span class="leancloud-visitors-count"></span>
+    </span>
       </div>
-    </main>
+      <div class="post-meta">
+    <span class="post-meta-item" title="本文字数">
+      <span class="post-meta-item-icon">
+        <i class="far fa-file-word"></i>
+      </span>
+      <span class="post-meta-item-text">本文字数：</span>
+      <span>8.4k</span>
+    </span>
+    <span class="post-meta-item" title="阅读时长">
+      <span class="post-meta-item-icon">
+        <i class="far fa-clock"></i>
+      </span>
+      <span class="post-meta-item-text">阅读时长 &asymp;</span>
+      <span>14 分钟</span>
+    </span>
+</div>
 
-    <footer class="footer">
-      <div class="footer-inner">
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+        <h2 id="背景"><a href="#背景" class="headerlink" title="背景"></a>背景</h2><p>​    我们都知道日志至于任何系统、软件都是十分重要的组成部分，通过日志我们可以方便地了解到现在系统运行是否正常、是否有异常情况。但有时候日志太多了也会有幸福地烦恼，发生异常想通过日志进行排查，可是满屏地日志都是不那么重要地内容，像心跳日志、debug日志等等。</p>
+<p>​    这在java应用尤为严重，你每引入地一个jar都有可能引入一堆打印的日志，这样一来要从日志中找到你所需要的内容将是一件极其困难的事情。当然，你会说，java拥有这么多优秀的日志框架系统，可以简单地通过相应地配置文件将这些内容根据不同的输出级别输出到不同的目录文件，可是如果将这件事情都交给终端用户去处理，那将会是一件极其复杂的工程，他得明白哪些是他需要的、哪些是他不需要的，而这些信息应该是对应的开发人员最清楚不过的，因此让开发人员提前将这些日志进行归类，输出到指定的文件，那对应使用者来说将会变得很简单。</p>
+<a id="more"></a>
+
+<h2 id="实现方法一"><a href="#实现方法一" class="headerlink" title="实现方法一"></a>实现方法一</h2><p>​    首先想到的应该就是通过日志的配置文件，添加不同的<code>appender</code>和<code>logger</code>。可是这些配置文件应该是存在与用户的应用中的，作为一个被引入的module该如何去修改这份文件呢？而且用户最终采用的是哪个日志框架我同样不能左右，我该根据哪个实现呢？</p>
+<p>​    第一个问题，很好解决，现在大部分的日志框架都提供了基于java 代码的方式来添加<code>appender</code>和<code>logger</code>的配置，因此我们只需要在应用启动时，获取<code>LoggerContext</code>对象，然后添加自定义的<code>appender</code>和<code>logger</code>即可，例如阿里的TDDL中就有相关的实现：</p>
+<pre class="line-numbers language-java" data-language="java"><code class="language-java"><span class="token comment">// slf4j只是一个代理工程，需要判断一下具体的实现类</span>
+<span class="token keyword">if</span> <span class="token punctuation">(</span><span class="token function">checkLogger</span><span class="token punctuation">(</span>logger<span class="token punctuation">,</span> LOGBACK<span class="token punctuation">)</span><span class="token punctuation">)</span> <span class="token punctuation">&#123;</span>
+    <span class="token keyword">if</span> <span class="token punctuation">(</span>canUseEncoder<span class="token punctuation">)</span> <span class="token punctuation">&#123;</span>
+        dynamic <span class="token operator">=</span> <span class="token keyword">new</span> <span class="token class-name">DynamicLogbackLogger</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+    <span class="token punctuation">&#125;</span> <span class="token keyword">else</span> <span class="token punctuation">&#123;</span>
+        dynamic <span class="token operator">=</span> <span class="token keyword">new</span> <span class="token class-name">DynamicLogback918Logger</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+    <span class="token punctuation">&#125;</span>
+<span class="token punctuation">&#125;</span> <span class="token keyword">else</span> <span class="token keyword">if</span> <span class="token punctuation">(</span><span class="token function">checkLogger</span><span class="token punctuation">(</span>logger<span class="token punctuation">,</span> <span class="token class-name">LOG4J_Adapter</span><span class="token punctuation">)</span><span class="token punctuation">)</span> <span class="token punctuation">&#123;</span>
+    dynamic <span class="token operator">=</span> <span class="token keyword">new</span> <span class="token class-name">DynamicLog4jAdapterLogger</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+<span class="token punctuation">&#125;</span> <span class="token keyword">else</span> <span class="token keyword">if</span> <span class="token punctuation">(</span><span class="token function">checkLogger</span><span class="token punctuation">(</span>logger<span class="token punctuation">,</span> LOG4J<span class="token punctuation">)</span><span class="token punctuation">)</span> <span class="token punctuation">&#123;</span>
+    dynamic <span class="token operator">=</span> <span class="token keyword">new</span> <span class="token class-name">DynamicLog4jLogger</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+<span class="token punctuation">&#125;</span>  <span class="token keyword">else</span> <span class="token punctuation">&#123;</span>
+    logger<span class="token punctuation">.</span><span class="token function">warn</span><span class="token punctuation">(</span><span class="token string">"logger is not a log4j/logback instance, dynamic logger is disabled"</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+<span class="token punctuation">&#125;</span><span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span></span></code></pre>
+
+<p>先判断具体地实现框架是哪个，然后再获得对应实现框架的<code>loggerContext</code>，例如<code>logback</code>：</p>
+<pre class="line-numbers language-java" data-language="java"><code class="language-java"><span class="token keyword">if</span> <span class="token punctuation">(</span>loggerContext <span class="token operator">==</span> <span class="token keyword">null</span><span class="token punctuation">)</span> <span class="token punctuation">&#123;</span>
+    <span class="token class-name">ILoggerFactory</span> lcObject <span class="token operator">=</span> <span class="token class-name">LoggerFactory</span><span class="token punctuation">.</span><span class="token function">getILoggerFactory</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+    <span class="token keyword">if</span> <span class="token punctuation">(</span><span class="token operator">!</span><span class="token punctuation">(</span>lcObject <span class="token keyword">instanceof</span> <span class="token class-name">LoggerContext</span><span class="token punctuation">)</span><span class="token punctuation">)</span> <span class="token punctuation">&#123;</span>
+        <span class="token keyword">throw</span> <span class="token keyword">new</span> <span class="token class-name">LogbackException</span><span class="token punctuation">(</span><span class="token string">"Expected LOGBACK binding with SLF4J, but another log system has taken the place: "</span> <span class="token operator">+</span> lcObject<span class="token punctuation">.</span><span class="token function">getClass</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">.</span><span class="token function">getSimpleName</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+    <span class="token punctuation">&#125;</span>
+    loggerContext <span class="token operator">=</span> <span class="token punctuation">(</span><span class="token class-name">LoggerContext</span><span class="token punctuation">)</span> lcObject<span class="token punctuation">;</span>
+    <span class="token keyword">if</span> <span class="token punctuation">(</span>props <span class="token operator">!=</span> <span class="token keyword">null</span><span class="token punctuation">)</span> <span class="token punctuation">&#123;</span>
+        <span class="token keyword">for</span> <span class="token punctuation">(</span><span class="token class-name">Map</span><span class="token punctuation">.</span><span class="token class-name">Entry</span><span class="token generics"><span class="token punctuation">&lt;</span><span class="token class-name">String</span><span class="token punctuation">,</span> <span class="token class-name">String</span><span class="token punctuation">></span></span> entry <span class="token operator">:</span> props<span class="token punctuation">.</span><span class="token function">entrySet</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">)</span> <span class="token punctuation">&#123;</span>
+            loggerContext<span class="token punctuation">.</span><span class="token function">putProperty</span><span class="token punctuation">(</span>entry<span class="token punctuation">.</span><span class="token function">getKey</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">,</span> entry<span class="token punctuation">.</span><span class="token function">getValue</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+        <span class="token punctuation">&#125;</span>
+    <span class="token punctuation">&#125;</span>
+<span class="token punctuation">&#125;</span><span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span></span></code></pre>
+
+<p>接着再添加自身所需的<code>appender</code>和<code>logger</code>：</p>
+<pre class="line-numbers language-java" data-language="java"><code class="language-java"><span class="token keyword">protected</span> <span class="token class-name">Appender</span> <span class="token function">buildAppender</span><span class="token punctuation">(</span><span class="token class-name">String</span> name<span class="token punctuation">,</span> <span class="token class-name">String</span> fileName<span class="token punctuation">,</span> <span class="token class-name">String</span> pattern<span class="token punctuation">)</span> <span class="token punctuation">&#123;</span>
+	<span class="token class-name">RollingFileAppender</span> appender <span class="token operator">=</span> <span class="token keyword">new</span> <span class="token class-name">RollingFileAppender</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+	appender<span class="token punctuation">.</span><span class="token function">setContext</span><span class="token punctuation">(</span>loggerContext<span class="token punctuation">)</span><span class="token punctuation">;</span>
+	appender<span class="token punctuation">.</span><span class="token function">setName</span><span class="token punctuation">(</span>name<span class="token punctuation">)</span><span class="token punctuation">;</span>
+	appender<span class="token punctuation">.</span><span class="token function">setAppend</span><span class="token punctuation">(</span><span class="token boolean">true</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+	appender<span class="token punctuation">.</span><span class="token function">setFile</span><span class="token punctuation">(</span><span class="token keyword">new</span> <span class="token class-name">File</span><span class="token punctuation">(</span><span class="token function">getLogPath</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">,</span> fileName<span class="token punctuation">)</span><span class="token punctuation">.</span><span class="token function">getAbsolutePath</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+
+	<span class="token class-name">TimeBasedRollingPolicy</span> rolling <span class="token operator">=</span> <span class="token keyword">new</span> <span class="token class-name">TimeBasedRollingPolicy</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+	rolling<span class="token punctuation">.</span><span class="token function">setContext</span><span class="token punctuation">(</span>loggerContext<span class="token punctuation">)</span><span class="token punctuation">;</span>
+	rolling<span class="token punctuation">.</span><span class="token function">setParent</span><span class="token punctuation">(</span>appender<span class="token punctuation">)</span><span class="token punctuation">;</span>
+	rolling<span class="token punctuation">.</span><span class="token function">setFileNamePattern</span><span class="token punctuation">(</span><span class="token keyword">new</span> <span class="token class-name">File</span><span class="token punctuation">(</span><span class="token function">getLogPath</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">,</span> fileName<span class="token punctuation">)</span><span class="token punctuation">.</span><span class="token function">getAbsolutePath</span><span class="token punctuation">(</span><span class="token punctuation">)</span> <span class="token operator">+</span> <span class="token string">".%d&#123;yyyy-MM-dd&#125;"</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+	rolling<span class="token punctuation">.</span><span class="token function">start</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+	appender<span class="token punctuation">.</span><span class="token function">setRollingPolicy</span><span class="token punctuation">(</span>rolling<span class="token punctuation">)</span><span class="token punctuation">;</span>
+
+	<span class="token class-name">PatternLayoutEncoder</span> layout <span class="token operator">=</span> <span class="token keyword">new</span> <span class="token class-name">PatternLayoutEncoder</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+	layout<span class="token punctuation">.</span><span class="token function">setContext</span><span class="token punctuation">(</span>loggerContext<span class="token punctuation">)</span><span class="token punctuation">;</span>
+	layout<span class="token punctuation">.</span><span class="token function">setPattern</span><span class="token punctuation">(</span>pattern<span class="token punctuation">)</span><span class="token punctuation">;</span>
+	layout<span class="token punctuation">.</span><span class="token function">setCharset</span><span class="token punctuation">(</span><span class="token class-name">Charset</span><span class="token punctuation">.</span><span class="token function">forName</span><span class="token punctuation">(</span><span class="token function">getEncoding</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">)</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+	layout<span class="token punctuation">.</span><span class="token function">start</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+	appender<span class="token punctuation">.</span><span class="token function">setEncoder</span><span class="token punctuation">(</span>layout<span class="token punctuation">)</span><span class="token punctuation">;</span>
+	<span class="token comment">// 启动</span>
+	appender<span class="token punctuation">.</span><span class="token function">start</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+	<span class="token keyword">return</span> appender<span class="token punctuation">;</span>
+<span class="token punctuation">&#125;</span><span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span></span></code></pre>
+
+<p>可是这样做，存在的问题也是很明显的：</p>
+<ul>
+<li>需自己判断应用采用的实现框架，但可以通过抽取的方式构建一个公共jar，例如common包</li>
+<li>该实现框架需要能够支持通过动态的形式添加<code>appender</code></li>
+<li>仍然与应用的<code>Log</code>耦合在一起</li>
+</ul>
+<p>那除此之外，还有其他的方式能够实现同样的功能吗？答案当时是**<em>有**</em>。</p>
+<h2 id="实现方法二"><a href="#实现方法二" class="headerlink" title="实现方法二"></a>实现方法二</h2><p>默认情况下一个应用启动后，只会存在一个<code>loggerContext</code>，因为日志框架都是单例模式的，也是为了减少开销。那如果我们有多个<code>loggerContext</code>呢，是不是可以每个需要的<code>modeule</code>都拥有一份单独的<code>loggerContext</code>，那不就可以通过加载配置文件的形式更轻量级地来实现需要动态添加<code>appender</code>的功能呢。</p>
+<p>大致的实现逻辑应该是这样：</p>
+<ul>
+<li>需要一个<code>map</code>来管理所有的这些<code>loggerContext</code>，以每个<code>module</code>的<code>groupId</code>+<code>artifactId</code>（现在90%以上的工程都提供maven坐标）为唯一标识 – <code>key</code></li>
+<li>每个module自身需要有一份配置文件，当然由于日志实现很多你可能需要多份文件，同样你可以定义自己的格式，然后通过java code的形式去转化为最终的各个不同实现</li>
+<li>需要能通过唯一的Id，例如<code>groupId</code>+<code>artifactId</code>定位到你的配置文件</li>
+</ul>
+<p>这样大致的一个可以做到日志隔离的简单框架就搭建起来了，使用配置文件还有一个好处就是，一些日志框架可以动态刷新配置文件，这就使得你可以在运行时动态改变日志参数，例如日志级别。</p>
+<p>获取一个单独的logger对象：</p>
+<pre class="line-numbers language-java" data-language="java"><code class="language-java"><span class="token class-name">ModuleLoggerManager</span><span class="token punctuation">.</span><span class="token function">getLoggerByCoordinate</span><span class="token punctuation">(</span>name<span class="token punctuation">,</span> <span class="token string">"coordinate"</span><span class="token punctuation">)</span><span class="token punctuation">;</span><span aria-hidden="true" class="line-numbers-rows"><span></span></span></code></pre>
+
+<p>维护<code>logger</code>相关对象：</p>
+<pre class="line-numbers language-java" data-language="java"><code class="language-java"><span class="token keyword">final</span> <span class="token class-name">ConcurrentHashMap</span><span class="token generics"><span class="token punctuation">&lt;</span><span class="token class-name">ModuleLogId</span><span class="token punctuation">,</span> <span class="token class-name">ModuleLogInfo</span><span class="token punctuation">></span></span> MODULE_LOGGER_MAP <span class="token operator">=</span>
+            <span class="token keyword">new</span> <span class="token class-name">ConcurrentHashMap</span><span class="token generics"><span class="token punctuation">&lt;</span><span class="token punctuation">></span></span><span class="token punctuation">(</span><span class="token number">8</span><span class="token punctuation">)</span><span aria-hidden="true" class="line-numbers-rows"><span></span><span></span></span></code></pre>
+
+<pre class="line-numbers language-java" data-language="java"><code class="language-java"><span class="token annotation punctuation">@Data</span>
+<span class="token keyword">public</span> <span class="token keyword">class</span> <span class="token class-name">ModuleLogId</span> <span class="token punctuation">&#123;</span>
+
+    <span class="token comment">// 一些可修改的日志配置信息，可通过$&#123;key&#125;的形式传递</span>
+    <span class="token keyword">private</span> <span class="token keyword">final</span> <span class="token class-name">Map</span><span class="token generics"><span class="token punctuation">&lt;</span><span class="token class-name">String</span><span class="token punctuation">,</span> <span class="token class-name">String</span><span class="token punctuation">></span></span> tags <span class="token operator">=</span> <span class="token keyword">new</span> <span class="token class-name">HashMap</span><span class="token generics"><span class="token punctuation">&lt;</span><span class="token punctuation">></span></span><span class="token punctuation">(</span><span class="token number">8</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+
+    <span class="token keyword">private</span> <span class="token keyword">final</span> <span class="token class-name">String</span>              coordinate<span class="token punctuation">;</span>
+
+    <span class="token keyword">public</span> <span class="token class-name">ModuleLogId</span> <span class="token function">addTag</span><span class="token punctuation">(</span><span class="token class-name">String</span> key<span class="token punctuation">,</span> <span class="token class-name">String</span> value<span class="token punctuation">)</span> <span class="token punctuation">&#123;</span>
+        tags<span class="token punctuation">.</span><span class="token function">put</span><span class="token punctuation">(</span>key<span class="token punctuation">,</span> value<span class="token punctuation">)</span><span class="token punctuation">;</span>
+        <span class="token keyword">return</span> <span class="token keyword">this</span><span class="token punctuation">;</span>
+    <span class="token punctuation">&#125;</span>
+<span class="token punctuation">&#125;</span><span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span></span></code></pre>
+
+<pre class="line-numbers language-java" data-language="java"><code class="language-java"><span class="token annotation punctuation">@NoArgsConstructor</span>
+<span class="token keyword">public</span> <span class="token keyword">class</span> <span class="token class-name">ModuleLogInfo</span> <span class="token punctuation">&#123;</span>
+    <span class="token annotation punctuation">@Getter</span>
+    <span class="token annotation punctuation">@Setter</span>
+    <span class="token comment">// 根据具体实现会创建不同的loggerFactory对象，然后不同的logFactory对象会创建不同的loggerContext对象</span>
+    <span class="token keyword">private</span> <span class="token class-name">AbstractLoggerModuleFactory</span> abstractLoggerModuleFactory<span class="token punctuation">;</span>
+    <span class="token annotation punctuation">@Getter</span>
+    <span class="token keyword">private</span> <span class="token class-name">Properties</span> properties <span class="token operator">=</span> <span class="token keyword">new</span> <span class="token class-name">Properties</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+<span class="token punctuation">&#125;</span><span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span></span></code></pre>
+
+<p>创建factory过程：</p>
+<pre class="line-numbers language-java" data-language="java"><code class="language-java"><span class="token keyword">private</span> <span class="token keyword">static</span> <span class="token class-name">AbstractLoggerModuleFactory</span> <span class="token function">createILoggerFactory</span><span class="token punctuation">(</span><span class="token class-name">ModuleLogId</span> moduleLogId<span class="token punctuation">,</span> <span class="token class-name">ClassLoader</span> moduleClassLoader<span class="token punctuation">)</span> <span class="token punctuation">&#123;</span>
+	<span class="token keyword">if</span> <span class="token punctuation">(</span><span class="token class-name">System</span><span class="token punctuation">.</span><span class="token function">getProperty</span><span class="token punctuation">(</span><span class="token class-name">Constants</span><span class="token punctuation">.</span><span class="token class-name">Module_LOGGER_DISABLE_PROP_KEY</span><span class="token punctuation">)</span> <span class="token operator">!=</span> <span class="token keyword">null</span>
+			<span class="token operator">&amp;&amp;</span> <span class="token class-name">Boolean</span><span class="token punctuation">.</span>TRUE<span class="token punctuation">.</span><span class="token function">toString</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">.</span><span class="token function">equalsIgnoreCase</span><span class="token punctuation">(</span>
+			<span class="token class-name">System</span><span class="token punctuation">.</span><span class="token function">getProperty</span><span class="token punctuation">(</span><span class="token class-name">Constants</span><span class="token punctuation">.</span><span class="token class-name">Module_LOGGER_DISABLE_PROP_KEY</span><span class="token punctuation">)</span><span class="token punctuation">)</span><span class="token punctuation">)</span> <span class="token punctuation">&#123;</span>
+		<span class="token class-name">Constants</span><span class="token punctuation">.</span>DEFAULT_LOGGER<span class="token punctuation">.</span><span class="token function">warn</span><span class="token punctuation">(</span><span class="token string">"Module Logger is disabled!  -D&#123;&#125;=true"</span><span class="token punctuation">,</span> <span class="token class-name">Constants</span><span class="token punctuation">.</span><span class="token class-name">Module_LOGGER_DISABLE_PROP_KEY</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+		<span class="token keyword">return</span> JVM_LOGGER_FACTORY<span class="token punctuation">;</span>
+	<span class="token punctuation">&#125;</span>
+	<span class="token comment">// set log props</span>
+	<span class="token class-name">LogTypeJudgeUtil</span><span class="token punctuation">.</span><span class="token function">processGlobalSystemLogProperties</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+
+	<span class="token comment">// do create</span>
+	<span class="token keyword">try</span> <span class="token punctuation">&#123;</span>
+		<span class="token comment">// first log4j2</span>
+		<span class="token keyword">if</span> <span class="token punctuation">(</span><span class="token class-name">LogTypeJudgeUtil</span><span class="token punctuation">.</span><span class="token function">isLog4j2Usable</span><span class="token punctuation">(</span>moduleClassLoader<span class="token punctuation">)</span><span class="token punctuation">)</span> <span class="token punctuation">&#123;</span>
+            <span class="token punctuation">.</span><span class="token punctuation">.</span><span class="token punctuation">.</span>
+			<span class="token keyword">return</span> log4j2LoggerFactory<span class="token punctuation">;</span>
+		<span class="token punctuation">&#125;</span>
+
+		<span class="token comment">//second logback</span>
+		<span class="token keyword">if</span> <span class="token punctuation">(</span><span class="token class-name">LogTypeJudgeUtil</span><span class="token punctuation">.</span><span class="token function">isLogbackUsable</span><span class="token punctuation">(</span>moduleClassLoader<span class="token punctuation">)</span><span class="token punctuation">)</span> <span class="token punctuation">&#123;</span>
+			<span class="token punctuation">.</span><span class="token punctuation">.</span><span class="token punctuation">.</span>
+            <span class="token keyword">return</span> logbackLoggerFactory<span class="token punctuation">;</span>
+		<span class="token punctuation">&#125;</span>
+
+		<span class="token comment">// third log4j</span>
+		<span class="token keyword">if</span> <span class="token punctuation">(</span><span class="token class-name">LogTypeJudgeUtil</span><span class="token punctuation">.</span><span class="token function">isLog4jUsable</span><span class="token punctuation">(</span>moduleClassLoader<span class="token punctuation">)</span><span class="token punctuation">)</span> <span class="token punctuation">&#123;</span>
+			<span class="token punctuation">.</span><span class="token punctuation">.</span><span class="token punctuation">.</span>
+            <span class="token keyword">return</span> log4jLoggerFactory<span class="token punctuation">;</span>
+		<span class="token punctuation">&#125;</span>
+
+		<span class="token class-name">Constants</span><span class="token punctuation">.</span>DEFAULT_LOGGER<span class="token punctuation">.</span><span class="token function">warn</span><span class="token punctuation">(</span><span class="token string">"No log util is usable, Default app logger will be used."</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+	<span class="token punctuation">&#125;</span> <span class="token keyword">catch</span> <span class="token punctuation">(</span><span class="token class-name">Throwable</span> e<span class="token punctuation">)</span> <span class="token punctuation">&#123;</span>
+		<span class="token class-name">Constants</span><span class="token punctuation">.</span>DEFAULT_LOGGER<span class="token punctuation">.</span><span class="token function">error</span><span class="token punctuation">(</span><span class="token string">"Build ILoggerFactory error! Default app logger will be used."</span><span class="token punctuation">,</span>
+				e<span class="token punctuation">)</span><span class="token punctuation">;</span>
+	<span class="token punctuation">&#125;</span>
+
+	<span class="token keyword">return</span> JVM_LOGGER_FACTORY<span class="token punctuation">;</span>
+<span class="token punctuation">&#125;</span><span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span></span></code></pre>
+
+<p>以log4j2为例，获取loggerFactory：</p>
+<pre class="line-numbers language-java" data-language="java"><code class="language-java"><span class="token comment">/**
+ * confFileUrl 为根据传入的coordinate以及具体的日志实现框架，拼接出路径
+ * 例如 coordinate 为 org.jobshen.mq.rocketmq
+ * 则 log4j2的文件路径为：classpath*:org/jobshen/mq/rocketmq/log/log4j2/log-conf.xml
+ */</span>
+<span class="token keyword">protected</span> <span class="token class-name">AbstractLoggerModuleFactory</span> <span class="token function">doBuild</span><span class="token punctuation">(</span><span class="token keyword">final</span> <span class="token class-name">String</span> coordinate<span class="token punctuation">,</span> <span class="token keyword">final</span> <span class="token class-name">ClassLoader</span> moduleClassLoader<span class="token punctuation">,</span> <span class="token keyword">final</span> <span class="token class-name">URL</span> confFileUrl<span class="token punctuation">)</span> <span class="token punctuation">&#123;</span>
+	<span class="token keyword">try</span> <span class="token punctuation">&#123;</span>
+        <span class="token comment">//构建单独的loggerContext对象</span>
+		<span class="token keyword">final</span> <span class="token class-name">LoggerContext</span> context <span class="token operator">=</span> <span class="token keyword">new</span> <span class="token class-name">LoggerContext</span><span class="token punctuation">(</span>coordinate<span class="token punctuation">,</span> <span class="token keyword">null</span><span class="token punctuation">,</span> confFileUrl<span class="token punctuation">.</span><span class="token function">toURI</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+		<span class="token class-name">Configuration</span> config <span class="token operator">=</span> <span class="token keyword">null</span><span class="token punctuation">;</span>
+		<span class="token class-name">ConfigurationFactory</span> configurationFactory <span class="token operator">=</span> <span class="token class-name">ConfigurationFactory</span><span class="token punctuation">.</span><span class="token function">getInstance</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+		<span class="token keyword">try</span> <span class="token punctuation">&#123;</span>
+			<span class="token class-name">Class</span><span class="token punctuation">[</span><span class="token punctuation">]</span> parameterTypes <span class="token operator">=</span> <span class="token keyword">new</span> <span class="token class-name">Class</span><span class="token punctuation">[</span><span class="token number">3</span><span class="token punctuation">]</span><span class="token punctuation">;</span>
+			parameterTypes<span class="token punctuation">[</span><span class="token number">0</span><span class="token punctuation">]</span> <span class="token operator">=</span> <span class="token class-name">String</span><span class="token punctuation">.</span><span class="token keyword">class</span><span class="token punctuation">;</span>
+			parameterTypes<span class="token punctuation">[</span><span class="token number">1</span><span class="token punctuation">]</span> <span class="token operator">=</span> URI<span class="token punctuation">.</span><span class="token keyword">class</span><span class="token punctuation">;</span>
+			parameterTypes<span class="token punctuation">[</span><span class="token number">2</span><span class="token punctuation">]</span> <span class="token operator">=</span> <span class="token class-name">ClassLoader</span><span class="token punctuation">.</span><span class="token keyword">class</span><span class="token punctuation">;</span>
+			<span class="token class-name">Method</span> getConfigurationMethod <span class="token operator">=</span> configurationFactory<span class="token punctuation">.</span><span class="token function">getClass</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">.</span><span class="token function">getMethod</span><span class="token punctuation">(</span>
+					<span class="token string">"getConfiguration"</span><span class="token punctuation">,</span> parameterTypes<span class="token punctuation">)</span><span class="token punctuation">;</span>
+			config <span class="token operator">=</span> <span class="token punctuation">(</span><span class="token class-name">Configuration</span><span class="token punctuation">)</span> getConfigurationMethod<span class="token punctuation">.</span><span class="token function">invoke</span><span class="token punctuation">(</span>configurationFactory<span class="token punctuation">,</span>
+					coordinate<span class="token punctuation">,</span> confFileUrl<span class="token punctuation">.</span><span class="token function">toURI</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">,</span> moduleClassLoader<span class="token punctuation">)</span><span class="token punctuation">;</span>
+		<span class="token punctuation">&#125;</span> <span class="token keyword">catch</span> <span class="token punctuation">(</span><span class="token class-name">NoSuchMethodException</span> noSuchMethodException<span class="token punctuation">)</span> <span class="token punctuation">&#123;</span>
+			<span class="token class-name">Class</span><span class="token punctuation">[</span><span class="token punctuation">]</span> parameterTypes <span class="token operator">=</span> <span class="token keyword">new</span> <span class="token class-name">Class</span><span class="token punctuation">[</span><span class="token number">4</span><span class="token punctuation">]</span><span class="token punctuation">;</span>
+			parameterTypes<span class="token punctuation">[</span><span class="token number">0</span><span class="token punctuation">]</span> <span class="token operator">=</span> <span class="token class-name">LoggerContext</span><span class="token punctuation">.</span><span class="token keyword">class</span><span class="token punctuation">;</span>
+			parameterTypes<span class="token punctuation">[</span><span class="token number">1</span><span class="token punctuation">]</span> <span class="token operator">=</span> <span class="token class-name">String</span><span class="token punctuation">.</span><span class="token keyword">class</span><span class="token punctuation">;</span>
+			parameterTypes<span class="token punctuation">[</span><span class="token number">2</span><span class="token punctuation">]</span> <span class="token operator">=</span> URI<span class="token punctuation">.</span><span class="token keyword">class</span><span class="token punctuation">;</span>
+			parameterTypes<span class="token punctuation">[</span><span class="token number">3</span><span class="token punctuation">]</span> <span class="token operator">=</span> <span class="token class-name">ClassLoader</span><span class="token punctuation">.</span><span class="token keyword">class</span><span class="token punctuation">;</span>
+			<span class="token class-name">Method</span> getConfigurationMethod <span class="token operator">=</span> configurationFactory<span class="token punctuation">.</span><span class="token function">getClass</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">.</span><span class="token function">getMethod</span><span class="token punctuation">(</span>
+					<span class="token string">"getConfiguration"</span><span class="token punctuation">,</span> parameterTypes<span class="token punctuation">)</span><span class="token punctuation">;</span>
+			config <span class="token operator">=</span> <span class="token punctuation">(</span><span class="token class-name">Configuration</span><span class="token punctuation">)</span> getConfigurationMethod<span class="token punctuation">.</span><span class="token function">invoke</span><span class="token punctuation">(</span>configurationFactory<span class="token punctuation">,</span>
+					context<span class="token punctuation">,</span> coordinate<span class="token punctuation">,</span> confFileUrl<span class="token punctuation">.</span><span class="token function">toURI</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">,</span> moduleClassLoader<span class="token punctuation">)</span><span class="token punctuation">;</span>
+		<span class="token punctuation">&#125;</span>
+		<span class="token keyword">if</span> <span class="token punctuation">(</span>config <span class="token operator">==</span> <span class="token keyword">null</span><span class="token punctuation">)</span> <span class="token punctuation">&#123;</span>
+			<span class="token keyword">throw</span> <span class="token keyword">new</span> <span class="token class-name">RuntimeException</span><span class="token punctuation">(</span><span class="token string">"No log4j2 configuration are found."</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+		<span class="token punctuation">&#125;</span>
+		<span class="token keyword">for</span> <span class="token punctuation">(</span><span class="token class-name">Map</span><span class="token punctuation">.</span><span class="token class-name">Entry</span> entry <span class="token operator">:</span> <span class="token function">getProperties</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">.</span><span class="token function">entrySet</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">)</span> <span class="token punctuation">&#123;</span>
+			<span class="token comment">//from Map&lt;String,String></span>
+			config<span class="token punctuation">.</span><span class="token function">getProperties</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">.</span><span class="token function">put</span><span class="token punctuation">(</span><span class="token punctuation">(</span><span class="token class-name">String</span><span class="token punctuation">)</span> entry<span class="token punctuation">.</span><span class="token function">getKey</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">,</span> <span class="token punctuation">(</span><span class="token class-name">String</span><span class="token punctuation">)</span> entry<span class="token punctuation">.</span><span class="token function">getValue</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+		<span class="token punctuation">&#125;</span>
+
+		<span class="token keyword">for</span> <span class="token punctuation">(</span><span class="token class-name">Map</span><span class="token punctuation">.</span><span class="token class-name">Entry</span> entry <span class="token operator">:</span> <span class="token class-name">System</span><span class="token punctuation">.</span><span class="token function">getProperties</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">.</span><span class="token function">entrySet</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">)</span> <span class="token punctuation">&#123;</span>
+			<span class="token comment">//from Map&lt;String,String></span>
+			config<span class="token punctuation">.</span><span class="token function">getProperties</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">.</span><span class="token function">put</span><span class="token punctuation">(</span><span class="token punctuation">(</span><span class="token class-name">String</span><span class="token punctuation">)</span> entry<span class="token punctuation">.</span><span class="token function">getKey</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">,</span> <span class="token punctuation">(</span><span class="token class-name">String</span><span class="token punctuation">)</span> entry<span class="token punctuation">.</span><span class="token function">getValue</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+		<span class="token punctuation">&#125;</span>
+
+		context<span class="token punctuation">.</span><span class="token function">start</span><span class="token punctuation">(</span>config<span class="token punctuation">)</span><span class="token punctuation">;</span>
+
+		<span class="token keyword">return</span> <span class="token keyword">new</span> <span class="token class-name">AbstractLoggerModuleFactory</span><span class="token punctuation">(</span><span class="token function">getLoggingType</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">)</span> <span class="token punctuation">&#123;</span>
+
+			<span class="token keyword">private</span> <span class="token class-name">ConcurrentMap</span><span class="token generics"><span class="token punctuation">&lt;</span><span class="token class-name">String</span><span class="token punctuation">,</span> org<span class="token punctuation">.</span>apache<span class="token punctuation">.</span>logging<span class="token punctuation">.</span>slf4j<span class="token punctuation">.</span><span class="token class-name">Log4jLogger</span><span class="token punctuation">></span></span> loggerMap <span class="token operator">=</span>
+					<span class="token keyword">new</span> <span class="token class-name">ConcurrentHashMap</span><span class="token generics"><span class="token punctuation">&lt;</span><span class="token punctuation">></span></span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+
+			<span class="token annotation punctuation">@Override</span>
+			<span class="token keyword">public</span> <span class="token class-name">Logger</span> <span class="token function">setLevel</span><span class="token punctuation">(</span><span class="token class-name">String</span> loggerName<span class="token punctuation">,</span> <span class="token class-name">ModuleLogLevel</span> logLevel<span class="token punctuation">)</span> <span class="token punctuation">&#123;</span>
+				org<span class="token punctuation">.</span>apache<span class="token punctuation">.</span>logging<span class="token punctuation">.</span>slf4j<span class="token punctuation">.</span><span class="token class-name">Log4jLogger</span> log4jLoggerAdapter <span class="token operator">=</span> <span class="token punctuation">(</span>org<span class="token punctuation">.</span>apache<span class="token punctuation">.</span>logging<span class="token punctuation">.</span>slf4j<span class="token punctuation">.</span><span class="token class-name">Log4jLogger</span><span class="token punctuation">)</span> <span class="token keyword">this</span>
+						<span class="token punctuation">.</span><span class="token function">getLogger</span><span class="token punctuation">(</span>loggerName<span class="token punctuation">)</span><span class="token punctuation">;</span>
+				<span class="token keyword">final</span> <span class="token class-name">String</span> key <span class="token operator">=</span> <span class="token class-name">Logger</span><span class="token punctuation">.</span>ROOT_LOGGER_NAME<span class="token punctuation">.</span><span class="token function">equals</span><span class="token punctuation">(</span>loggerName<span class="token punctuation">)</span> <span class="token operator">?</span> <span class="token class-name">LogManager</span><span class="token punctuation">.</span>ROOT_LOGGER_NAME
+						<span class="token operator">:</span> loggerName<span class="token punctuation">;</span>
+				org<span class="token punctuation">.</span>apache<span class="token punctuation">.</span>logging<span class="token punctuation">.</span>log4j<span class="token punctuation">.</span>core<span class="token punctuation">.</span><span class="token class-name">Logger</span> log4j2Logger <span class="token operator">=</span> context<span class="token punctuation">.</span><span class="token function">getLogger</span><span class="token punctuation">(</span>key<span class="token punctuation">)</span><span class="token punctuation">;</span>
+				<span class="token comment">//level</span>
+				org<span class="token punctuation">.</span>apache<span class="token punctuation">.</span>logging<span class="token punctuation">.</span>log4j<span class="token punctuation">.</span><span class="token class-name">Level</span> log4j2Level <span class="token operator">=</span> <span class="token keyword">this</span><span class="token punctuation">.</span><span class="token function">toLog4j2Level</span><span class="token punctuation">(</span>logLevel<span class="token punctuation">)</span><span class="token punctuation">;</span>
+				log4j2Logger<span class="token punctuation">.</span><span class="token function">setLevel</span><span class="token punctuation">(</span>log4j2Level<span class="token punctuation">)</span><span class="token punctuation">;</span>
+				<span class="token keyword">return</span> log4jLoggerAdapter<span class="token punctuation">;</span>
+			<span class="token punctuation">&#125;</span>
+
+			<span class="token annotation punctuation">@Override</span>
+            <span class="token comment">//使用门面框架 slf4j 返回logger对象</span>
+			<span class="token keyword">public</span> org<span class="token punctuation">.</span>slf4j<span class="token punctuation">.</span><span class="token class-name">Logger</span> <span class="token function">getLogger</span><span class="token punctuation">(</span><span class="token class-name">String</span> name<span class="token punctuation">)</span> <span class="token punctuation">&#123;</span>
+				<span class="token keyword">final</span> <span class="token class-name">String</span> key <span class="token operator">=</span> <span class="token class-name">Logger</span><span class="token punctuation">.</span>ROOT_LOGGER_NAME<span class="token punctuation">.</span><span class="token function">equals</span><span class="token punctuation">(</span>name<span class="token punctuation">)</span> <span class="token operator">?</span> <span class="token class-name">LogManager</span><span class="token punctuation">.</span>ROOT_LOGGER_NAME
+						<span class="token operator">:</span> name<span class="token punctuation">;</span>
+				org<span class="token punctuation">.</span>apache<span class="token punctuation">.</span>logging<span class="token punctuation">.</span>log4j<span class="token punctuation">.</span>core<span class="token punctuation">.</span><span class="token class-name">Logger</span> log4jLogger <span class="token operator">=</span> context<span class="token punctuation">.</span><span class="token function">getLogger</span><span class="token punctuation">(</span>key<span class="token punctuation">)</span><span class="token punctuation">;</span>
+				<span class="token class-name">Log4jLogger</span> oldInst <span class="token operator">=</span> <span class="token keyword">this</span><span class="token punctuation">.</span>loggerMap<span class="token punctuation">.</span><span class="token function">get</span><span class="token punctuation">(</span>key<span class="token punctuation">)</span><span class="token punctuation">;</span>
+				<span class="token keyword">if</span> <span class="token punctuation">(</span>oldInst <span class="token operator">!=</span> <span class="token keyword">null</span><span class="token punctuation">)</span> <span class="token punctuation">&#123;</span>
+					<span class="token keyword">return</span> oldInst<span class="token punctuation">;</span>
+				<span class="token punctuation">&#125;</span>
+				<span class="token class-name">Log4jLogger</span> newInst <span class="token operator">=</span> <span class="token keyword">new</span> <span class="token class-name">Log4jLogger</span><span class="token punctuation">(</span>log4jLogger<span class="token punctuation">,</span> key<span class="token punctuation">)</span><span class="token punctuation">;</span>
+				oldInst <span class="token operator">=</span> <span class="token keyword">this</span><span class="token punctuation">.</span>loggerMap<span class="token punctuation">.</span><span class="token function">putIfAbsent</span><span class="token punctuation">(</span>key<span class="token punctuation">,</span> newInst<span class="token punctuation">)</span><span class="token punctuation">;</span>
+				<span class="token keyword">return</span> oldInst <span class="token operator">==</span> <span class="token keyword">null</span> <span class="token operator">?</span> newInst <span class="token operator">:</span> oldInst<span class="token punctuation">;</span>
+			<span class="token punctuation">&#125;</span>
+
+			<span class="token keyword">private</span> org<span class="token punctuation">.</span>apache<span class="token punctuation">.</span>logging<span class="token punctuation">.</span>log4j<span class="token punctuation">.</span><span class="token class-name">Level</span> <span class="token function">toLog4j2Level</span><span class="token punctuation">(</span><span class="token class-name">ModuleLogLevel</span> logLevel<span class="token punctuation">)</span> <span class="token punctuation">&#123;</span>
+				<span class="token keyword">if</span> <span class="token punctuation">(</span>logLevel <span class="token operator">==</span> <span class="token keyword">null</span><span class="token punctuation">)</span> <span class="token punctuation">&#123;</span>
+					<span class="token keyword">throw</span> <span class="token keyword">new</span> <span class="token class-name">IllegalStateException</span><span class="token punctuation">(</span>
+							<span class="token string">"ModuleLogLevel is NULL when adapter to log4j2."</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+				<span class="token punctuation">&#125;</span>
+				<span class="token keyword">switch</span> <span class="token punctuation">(</span>logLevel<span class="token punctuation">)</span> <span class="token punctuation">&#123;</span>
+				<span class="token keyword">case</span> TRACE<span class="token operator">:</span>
+					<span class="token keyword">return</span> <span class="token class-name">Level</span><span class="token punctuation">.</span>TRACE<span class="token punctuation">;</span>
+				<span class="token keyword">case</span> DEBUG<span class="token operator">:</span>
+					<span class="token keyword">return</span> <span class="token class-name">Level</span><span class="token punctuation">.</span>DEBUG<span class="token punctuation">;</span>
+				<span class="token keyword">case</span> INFO<span class="token operator">:</span>
+					<span class="token keyword">return</span> <span class="token class-name">Level</span><span class="token punctuation">.</span>INFO<span class="token punctuation">;</span>
+				<span class="token keyword">case</span> WARN<span class="token operator">:</span>
+					<span class="token keyword">return</span> <span class="token class-name">Level</span><span class="token punctuation">.</span>WARN<span class="token punctuation">;</span>
+				<span class="token keyword">case</span> ERROR<span class="token operator">:</span>
+					<span class="token keyword">return</span> <span class="token class-name">Level</span><span class="token punctuation">.</span>ERROR<span class="token punctuation">;</span>
+				<span class="token keyword">default</span><span class="token operator">:</span>
+					<span class="token keyword">throw</span> <span class="token keyword">new</span> <span class="token class-name">IllegalStateException</span><span class="token punctuation">(</span>logLevel
+							<span class="token operator">+</span> <span class="token string">" is unknown when adapter to log4j2."</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+				<span class="token punctuation">&#125;</span>
+			<span class="token punctuation">&#125;</span>
+		<span class="token punctuation">&#125;</span><span class="token punctuation">;</span>
+	<span class="token punctuation">&#125;</span> <span class="token keyword">catch</span> <span class="token punctuation">(</span><span class="token class-name">Throwable</span> e<span class="token punctuation">)</span> <span class="token punctuation">&#123;</span>
+		<span class="token keyword">throw</span> <span class="token keyword">new</span> <span class="token class-name">IllegalStateException</span><span class="token punctuation">(</span><span class="token string">"Log4j2 loggerModuleFactory build error!"</span><span class="token punctuation">,</span> e<span class="token punctuation">)</span><span class="token punctuation">;</span>
+	<span class="token punctuation">&#125;</span>
+<span class="token punctuation">&#125;</span><span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span></span></code></pre>
+
+<p>当然这个方案也有其缺陷，loggerContext对象增加了对应的内存消耗也就增加了。简单统计了下，每增加一个采用日志隔离框架的模块，内存使用增加<code>5~10kb</code>。</p>
+
+    </div>
+
+    
+    
+    
+
+    <footer class="post-footer">
+          
+
+<div class="post-copyright">
+<ul>
+  <li class="post-copyright-author">
+      <strong>本文作者： </strong>Job Shen
+  </li>
+  <li class="post-copyright-link">
+      <strong>本文链接：</strong>
+      <a href="http://blog.jobshen.com/posts/be21c8ca.html" title="关于Java日志隔离功能的闲谈">http://blog.jobshen.com/posts/be21c8ca.html</a>
+  </li>
+  <li class="post-copyright-license">
+    <strong>版权声明： </strong>本博客所有文章除特别声明外，均采用 <a href="https://creativecommons.org/licenses/by-nc-sa/4.0/deed.zh" rel="noopener" target="_blank"><i class="fab fa-fw fa-creative-commons"></i>BY-NC-SA</a> 许可协议。转载请注明出处！
+  </li>
+</ul>
+</div>
+
+          <div class="post-tags">
+              <a href="/tags/log/" rel="tag"># log</a>
+              <a href="/tags/%E9%9A%94%E7%A6%BB/" rel="tag"># 隔离</a>
+          </div>
+
         
 
-        
+          <div class="post-nav">
+            <div class="post-nav-item">
+                <a href="/posts/eee2bd13.html" rel="prev" title="关于k8s下使用Ingress保持长连接的异常情况排查">
+                  <i class="fa fa-chevron-left"></i> 关于k8s下使用Ingress保持长连接的异常情况排查
+                </a>
+            </div>
+            <div class="post-nav-item">
+            </div>
+          </div>
+    </footer>
+  </article>
+</div>
+
+
+
+
+
+
+      
+    <div class="comments" id="gitalk-container"></div>
+
+<script>
+  window.addEventListener('tabs:register', () => {
+    let { activeClass } = CONFIG.comments;
+    if (CONFIG.comments.storage) {
+      activeClass = localStorage.getItem('comments_active') || activeClass;
+    }
+    if (activeClass) {
+      const activeTab = document.querySelector(`a[href="#comment-${activeClass}"]`);
+      if (activeTab) {
+        activeTab.click();
+      }
+    }
+  });
+  if (CONFIG.comments.storage) {
+    window.addEventListener('tabs:click', event => {
+      if (!event.target.matches('.tabs-comment .tab-content .tab-pane')) return;
+      const commentClass = event.target.classList[1];
+      localStorage.setItem('comments_active', commentClass);
+    });
+  }
+</script>
+
+    </div>
+  </main>
+
+  <footer class="footer">
+    <div class="footer-inner">
+      
+
+      
 
 <div class="copyright">
   
@@ -484,21 +725,54 @@
     <i class="fa fa-heart"></i>
   </span>
   <span class="author" itemprop="copyrightHolder">Job Shen</span>
-    <span class="post-meta-divider">|</span>
+</div>
+<div class="wordcount">
+  <span class="post-meta-item">
     <span class="post-meta-item-icon">
-      <i class="fa fa-chart-area"></i>
+      <i class="fa fa-chart-line"></i>
     </span>
-    <span title="站点总字数">45k</span>
-    <span class="post-meta-divider">|</span>
+    <span title="站点总字数">53k</span>
+  </span>
+  <span class="post-meta-item">
     <span class="post-meta-item-icon">
       <i class="fa fa-coffee"></i>
     </span>
-    <span title="站点阅读时长">1:15</span>
+    <span title="站点阅读时长">1:28</span>
+  </span>
 </div>
-  <div class="powered-by">由 <a href="https://hexo.io/" class="theme-link" rel="noopener" target="_blank">Hexo</a> & <a href="https://theme-next.org/" class="theme-link" rel="noopener" target="_blank">NexT.Gemini</a> 强力驱动
+  <div class="powered-by">由 <a href="https://hexo.io/" class="theme-link" rel="noopener" target="_blank">Hexo</a> & <a href="https://theme-next.js.org/" class="theme-link" rel="noopener" target="_blank">NexT.Gemini</a> 强力驱动
   </div>
 
-        
+    </div>
+  </footer>
+
+  
+  <script src="//cdn.jsdelivr.net/npm/animejs@3.2.1/lib/anime.min.js"></script>
+  <script src="//cdn.jsdelivr.net/npm/lozad@1.16.0/dist/lozad.min.js"></script>
+<script src="/js/utils.js"></script><script src="/js/motion.js"></script><script src="/js/next-boot.js"></script><script src="/js/bookmark.js"></script>
+
+  
+
+
+
+
+  <script src="/js/local-search.js"></script>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
 
 
 
@@ -513,15 +787,15 @@
     }
 
     function addCount(Counter) {
-      var visitors = document.querySelector('.leancloud_visitors');
-      var url = decodeURI(visitors.id);
-      var title = visitors.dataset.flagTitle;
+      const visitors = document.querySelector('.leancloud_visitors');
+      const url = decodeURI(visitors.id);
+      const title = visitors.dataset.flagTitle;
 
       Counter('get', '/classes/Counter?where=' + encodeURIComponent(JSON.stringify({ url })))
         .then(response => response.json())
         .then(({ results }) => {
           if (results.length > 0) {
-            var counter = results[0];
+            const counter = results[0];
             leancloudSelector(url).innerText = counter.time + 1;
             Counter('put', '/classes/Counter/' + counter.objectId, { time: { '__op': 'Increment', 'amount': 1 } })
               .catch(error => {
@@ -544,8 +818,8 @@
     }
 
     function showTime(Counter) {
-      var visitors = document.querySelectorAll('.leancloud_visitors');
-      var entries = [...visitors].map(element => {
+      const visitors = document.querySelectorAll('.leancloud_visitors');
+      const entries = [...visitors].map(element => {
         return decodeURI(element.id);
       });
 
@@ -553,7 +827,7 @@
         .then(response => response.json())
         .then(({ results }) => {
           for (let url of entries) {
-            let target = results.find(item => item.url === url);
+            const target = results.find(item => item.url === url);
             leancloudSelector(url).innerText = target ? target.time : 0;
           }
         })
@@ -562,9 +836,9 @@
         });
     }
 
-    let { app_id, app_key, server_url } = {"enable":true,"app_id":"XtypLwqMgeOwaXKki3a4bC6B-gzGzoHsz","app_key":"a8kiSiniEd0HlNvj4gTSdfsi","server_url":null,"security":false};
+    const { app_id, app_key, server_url } = {"enable":true,"app_id":"XtypLwqMgeOwaXKki3a4bC6B-gzGzoHsz","app_key":"a8kiSiniEd0HlNvj4gTSdfsi","server_url":null,"security":false};
     function fetchData(api_server) {
-      var Counter = (method, url, data) => {
+      const Counter = (method, url, data) => {
         return fetch(`${api_server}/1.1${url}`, {
           method,
           headers: {
@@ -583,7 +857,7 @@
       }
     }
 
-    let api_server = app_id.slice(-9) !== '-MdYXbMMI' ? server_url : `https://${app_id.slice(0, 8).toLowerCase()}.api.lncldglobal.com`;
+    const api_server = app_id.slice(-9) === '-MdYXbMMI' ? `https://${app_id.slice(0, 8).toLowerCase()}.api.lncldglobal.com` : server_url;
 
     if (api_server) {
       fetchData(api_server);
@@ -598,60 +872,15 @@
 </script>
 
 
-      </div>
-    </footer>
-  </div>
-
-  
-  <script src="/lib/anime.min.js"></script>
-  <script src="//cdn.jsdelivr.net/npm/lozad@1/dist/lozad.min.js"></script>
-  <script src="/lib/velocity/velocity.min.js"></script>
-  <script src="/lib/velocity/velocity.ui.min.js"></script>
-
-<script src="/js/utils.js"></script>
-
-<script src="/js/motion.js"></script>
-
-
-<script src="/js/schemes/pisces.js"></script>
-
-
-<script src="/js/next-boot.js"></script>
-
-<script src="/js/bookmark.js"></script>
-
-
-
-
-  
-
-
-
-
-  
-<script src="/js/local-search.js"></script>
-
-
-
-
-
-
-
-
-
-
-
-
-
   
 
   
 
-<link rel="stylesheet" href="//cdn.jsdelivr.net/npm/gitalk@1/dist/gitalk.min.css">
+<link rel="stylesheet" href="//cdn.jsdelivr.net/npm/gitalk@1.7.0/dist/gitalk.css">
 
 <script>
-NexT.utils.loadComments(document.querySelector('#gitalk-container'), () => {
-  NexT.utils.getScript('//cdn.jsdelivr.net/npm/gitalk@1/dist/gitalk.min.js', () => {
+NexT.utils.loadComments('#gitalk-container', () => {
+  NexT.utils.getScript('//cdn.jsdelivr.net/npm/gitalk@1.7.0/dist/gitalk.min.js', () => {
     var gitalk = new Gitalk({
       clientID    : '0027cb40e78eba0adbfe',
       clientSecret: '133ffa343a0ee4b23fef6d2ea7e36244770c2df9',
