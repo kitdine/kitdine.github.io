@@ -24,12 +24,12 @@
     var CONFIG = {"hostname":"blog.jobshen.com","root":"/","scheme":"Gemini","version":"8.0.2","exturl":false,"sidebar":{"position":"left","display":"post","padding":18,"offset":12},"copycode":true,"bookmark":{"enable":true,"color":"#222","save":"auto"},"fancybox":false,"mediumzoom":false,"lazyload":true,"pangu":false,"comments":{"style":"tabs","active":null,"storage":true,"lazyload":false,"nav":null},"motion":{"enable":true,"async":false,"transition":{"post_block":"fadeIn","post_header":"fadeInDown","post_body":"fadeInDown","coll_header":"fadeInLeft","sidebar":"fadeInUp"}},"prism":false,"i18n":{"placeholder":"搜索...","empty":"没有找到任何搜索结果：${query}","hits_time":"找到 ${hits} 个搜索结果（用时 ${time} 毫秒）","hits":"找到 ${hits} 个搜索结果"},"path":"/search.xml","localsearch":{"enable":true,"trigger":"auto","top_n_per_article":1,"unescape":false,"preload":false}};
   </script>
 
-  <meta name="description" content="起因那天早上一到公司就有客服过来反应我们的App登录不了了，我赶紧试了一下登陆App，发现是可以登录的，就以为是个别现象没有在意。过了一会儿客服来反应更频繁了，这才意识到可能没有那么简单。">
+  <meta name="description" content="起因&amp;emsp;&amp;emsp;那天早上一到公司就有客服过来反应我们的App登录不了了，我赶紧试了一下登陆App，发现是可以登录的，就以为是个别现象没有在意。过了一会儿客服来反应更频繁了，这才意识到可能没有那么简单。">
 <meta property="og:type" content="article">
 <meta property="og:title" content="记一次线上Redis故障恢复和分析（一）">
 <meta property="og:url" content="http://blog.jobshen.com/posts/1728650486.html">
 <meta property="og:site_name" content="一杯咖啡的时间">
-<meta property="og:description" content="起因那天早上一到公司就有客服过来反应我们的App登录不了了，我赶紧试了一下登陆App，发现是可以登录的，就以为是个别现象没有在意。过了一会儿客服来反应更频繁了，这才意识到可能没有那么简单。">
+<meta property="og:description" content="起因&amp;emsp;&amp;emsp;那天早上一到公司就有客服过来反应我们的App登录不了了，我赶紧试了一下登陆App，发现是可以登录的，就以为是个别现象没有在意。过了一会儿客服来反应更频繁了，这才意识到可能没有那么简单。">
 <meta property="og:locale" content="zh_CN">
 <meta property="og:image" content="https://picture.jobshen.com/blog/redis/redis-01.png">
 <meta property="og:image" content="https://picture.jobshen.com/blog/redis/redis-02.png">
@@ -247,20 +247,20 @@
       <div class="site-state-item site-state-posts">
           <a href="/archives/">
         
-          <span class="site-state-item-count">8</span>
+          <span class="site-state-item-count">9</span>
           <span class="site-state-item-name">日志</span>
         </a>
       </div>
       <div class="site-state-item site-state-categories">
             <a href="/categories/">
           
-        <span class="site-state-item-count">5</span>
+        <span class="site-state-item-count">6</span>
         <span class="site-state-item-name">分类</span></a>
       </div>
       <div class="site-state-item site-state-tags">
             <a href="/tags/">
           
-        <span class="site-state-item-count">15</span>
+        <span class="site-state-item-count">18</span>
         <span class="site-state-item-name">标签</span></a>
       </div>
   </nav>
@@ -362,7 +362,7 @@
         <i class="far fa-file-word"></i>
       </span>
       <span class="post-meta-item-text">本文字数：</span>
-      <span>778</span>
+      <span>862</span>
     </span>
     <span class="post-meta-item" title="阅读时长">
       <span class="post-meta-item-icon">
@@ -380,28 +380,39 @@
     
     
     <div class="post-body" itemprop="articleBody">
-        <h2 id="起因"><a href="#起因" class="headerlink" title="起因"></a>起因</h2><p>那天早上一到公司就有客服过来反应我们的App登录不了了，我赶紧试了一下登陆App，发现是可以登录的，就以为是个别现象没有在意。过了一会儿客服来反应更频繁了，这才意识到可能没有那么简单。</p>
+        <h2 id="起因"><a href="#起因" class="headerlink" title="起因"></a>起因</h2><p>&emsp;&emsp;那天早上一到公司就有客服过来反应我们的App登录不了了，我赶紧试了一下登陆App，发现是可以登录的，就以为是个别现象没有在意。过了一会儿客服来反应更频繁了，这才意识到可能没有那么简单。</p>
 <a id="more"></a>
 
-<h2 id="分析"><a href="#分析" class="headerlink" title="分析"></a>分析</h2><p>一开始认为是服务器问题，检查了所有相关的应用服务器，应用是否正在运行，发现一切正常，cpu、内存、IO 都是正常的，没有异常；</p>
+<h2 id="分析"><a href="#分析" class="headerlink" title="分析"></a>分析</h2><p>&emsp;&emsp;一开始认为是服务器问题，检查了所有相关的应用服务器，应用是否正在运行，发现一切正常，cpu、内存、IO 都是正常的，没有异常；</p>
 <p>然后考虑是否是代码层面问题（数据库问题被排除，因为一旦数据库出问题不可能只有一部分人受影响），于是去检查日志，发现有以下错误信息：</p>
 <p><img data-src="https://picture.jobshen.com/blog/redis/redis-01.png" alt="错误信息"></p>
 <p>然后登陆redis控制台，一台一台测试，终于发现了有问题的那台机器：</p>
 <p><img data-src="https://picture.jobshen.com/blog/redis/redis-02.png" alt="发现问题"></p>
 <p>接下来要做的就很简单了，redis是集群部署，并且每个节点都有master-slave，因此直接kill该节点，问题修复，一切正常。</p>
-<h2 id="寻找根本原因"><a href="#寻找根本原因" class="headerlink" title="寻找根本原因"></a>寻找根本原因</h2><p>但是这样做并不能解决根本问题，由于之前部署redis集群时考虑不够周全，没有配置redis日志，因此决定直接修改配置文件，逐个重启redis节点。这也就导致了再次故障，因为那个故障节点又被启动加入集群并且由于所有节点都经历了重启该节点又被设为master了。</p>
+<h2 id="寻找根本原因"><a href="#寻找根本原因" class="headerlink" title="寻找根本原因"></a>寻找根本原因</h2><p>&emsp;&emsp;但是这样做并不能解决根本问题，由于之前部署redis集群时考虑不够周全，没有配置redis日志，因此决定直接修改配置文件，逐个重启redis节点。这也就导致了再次故障，因为那个故障节点又被启动加入集群并且由于所有节点都经历了重启该节点又被设为master了。</p>
 <p>这时去观察该节点redis的日志，终于发现了问题，满屏都是异常信息：</p>
 <p> <strong>Can’t save in background: fork: Cannot allocate memory</strong>  </p>
-<p>通过Google得知是由于机器内存不足导致的，遂检查机器内存，发现内存已被占用超过90%，于是赶紧增大机器内存，毕竟redis 数据都是存储在内存中，才能做到这么快的读写。</p>
-<p>基于此，对整个redis集群的内存占用情况进行了一次排查，增大了机器内存，并且增加了对机器内存使用情况的监控防止再出现此类情况。</p>
-<h2 id="又一个问题"><a href="#又一个问题" class="headerlink" title="又一个问题"></a>又一个问题</h2><p>好景不长，一个问题解决又来一个问题，对于redis操作出现了非预期结果，类似 incrBy +1 结果+2，执行expire 结果返回失败。</p>
-<p>该问题的跟踪解决将在下一篇文章中介绍。</p>
+<p>&emsp;&emsp;通过Google得知是由于机器内存不足导致的，遂检查机器内存，发现内存已被占用超过90%，于是赶紧增大机器内存，毕竟redis 数据都是存储在内存中，才能做到这么快的读写。</p>
+<p>&emsp;&emsp;基于此，对整个redis集群的内存占用情况进行了一次排查，增大了机器内存，并且增加了对机器内存使用情况的监控防止再出现此类情况。</p>
+<h2 id="又一个问题"><a href="#又一个问题" class="headerlink" title="又一个问题"></a>又一个问题</h2><p>&emsp;&emsp;好景不长，一个问题解决又来一个问题，对于redis操作出现了非预期结果，类似 incrBy +1 结果+2，执行expire 结果返回失败。</p>
+<p>&emsp;&emsp;该问题的跟踪解决将在下一篇文章中介绍。</p>
 
     </div>
 
     
     
     
+      
+  <div class="popular-posts-header">相关文章</div>
+  <ul class="popular-posts">
+    <li class="popular-posts-item">
+      <div class="popular-posts-title"><a href="\posts\3335490502.html" rel="bookmark">Centos-7下常见中间件环境的安装（三）</a></div>
+    </li>
+    <li class="popular-posts-item">
+      <div class="popular-posts-title"><a href="\posts\1461710894.html" rel="bookmark">记一次线上Redis故障恢复和分析（二）</a></div>
+    </li>
+  </ul>
+
 
     <footer class="post-footer">
           
@@ -419,6 +430,23 @@
     <strong>版权声明： </strong>本博客所有文章除特别声明外，均采用 <a href="https://creativecommons.org/licenses/by-nc-sa/4.0/deed.zh" rel="noopener" target="_blank"><i class="fab fa-fw fa-creative-commons"></i>BY-NC-SA</a> 许可协议。转载请注明出处！
   </li>
 </ul>
+</div>
+
+          <div class="followme">
+  <span>欢迎关注我的其它发布渠道</span>
+
+  <div class="social-list">
+
+      <div class="social-item">
+        <a target="_blank" class="social-link" href="/atom.xml">
+          <span class="icon">
+            <i class="fa fa-rss"></i>
+          </span>
+
+          <span class="label">RSS</span>
+        </a>
+      </div>
+  </div>
 </div>
 
           <div class="post-tags">
@@ -496,13 +524,13 @@
     <span class="post-meta-item-icon">
       <i class="fa fa-chart-line"></i>
     </span>
-    <span title="站点总字数">53k</span>
+    <span title="站点总字数">54k</span>
   </span>
   <span class="post-meta-item">
     <span class="post-meta-item-icon">
       <i class="fa fa-coffee"></i>
     </span>
-    <span title="站点阅读时长">1:28</span>
+    <span title="站点阅读时长">1:30</span>
   </span>
 </div>
   <div class="powered-by">由 <a href="https://hexo.io/" class="theme-link" rel="noopener" target="_blank">Hexo</a> & <a href="https://theme-next.js.org/" class="theme-link" rel="noopener" target="_blank">NexT.Gemini</a> 强力驱动

@@ -3,7 +3,7 @@
   <entry>
     <title>Centos 7下常见中间件环境的安装（一）</title>
     <url>/posts/3011500279.html</url>
-    <content><![CDATA[<p>​    最近由于公司要切换IDC机房，新机房的服务器集群需要重新部署生产环境，于是又趁着这次机会把一些常用的中间件又重新部署了一次，版本有更新，部署方式也会有小变动，于是就有了这一系列的文档。整个系列主要是java运行环境下的中间件部署，也含有少量其他中间件的部署，像 <strong>Redis</strong>、 <strong>TiDB</strong> 等。</p>
+    <content><![CDATA[<p>&emsp;&emsp;最近由于公司要切换IDC机房，新机房的服务器集群需要重新部署生产环境，于是又趁着这次机会把一些常用的中间件又重新部署了一次，版本有更新，部署方式也会有小变动，于是就有了这一系列的文档。整个系列主要是java运行环境下的中间件部署，也含有少量其他中间件的部署，像 <strong>Redis</strong>、 <strong>TiDB</strong> 等。</p>
 <a id="more"></a>
 
 <h2 id="JDK-安装"><a href="#JDK-安装" class="headerlink" title="JDK 安装"></a>JDK 安装</h2><p>jdk当然是必不可少的，任何java程序允许都不能脱离JVM环境，而通过jdk安装jvm是最常见的方式，由于一些原因，公司在生产环境并没有使用 <em>open-jdk</em> 而是仍然使用了 <em>oralce-jdk</em> ，因此就不能通过 <code>yum install open-jdk</code>的方式来安装了，只能通过下载 <em>rpm</em> 文件来进行安装。</p>
@@ -121,14 +121,141 @@ Mode: follower(master)<span aria-hidden="true" class="line-numbers-rows"><span><
       </tags>
   </entry>
   <entry>
-    <title>关于Java日志隔离功能的闲谈</title>
-    <url>/posts/be21c8ca.html</url>
-    <content><![CDATA[<h2 id="背景"><a href="#背景" class="headerlink" title="背景"></a>背景</h2><p>​    我们都知道日志至于任何系统、软件都是十分重要的组成部分，通过日志我们可以方便地了解到现在系统运行是否正常、是否有异常情况。但有时候日志太多了也会有幸福地烦恼，发生异常想通过日志进行排查，可是满屏地日志都是不那么重要地内容，像心跳日志、debug日志等等。</p>
-<p>​    这在java应用尤为严重，你每引入地一个jar都有可能引入一堆打印的日志，这样一来要从日志中找到你所需要的内容将是一件极其困难的事情。当然，你会说，java拥有这么多优秀的日志框架系统，可以简单地通过相应地配置文件将这些内容根据不同的输出级别输出到不同的目录文件，可是如果将这件事情都交给终端用户去处理，那将会是一件极其复杂的工程，他得明白哪些是他需要的、哪些是他不需要的，而这些信息应该是对应的开发人员最清楚不过的，因此让开发人员提前将这些日志进行归类，输出到指定的文件，那对应使用者来说将会变得很简单。</p>
+    <title>Centos-7下常见中间件环境的安装（三）</title>
+    <url>/posts/3335490502.html</url>
+    <content><![CDATA[<p>&emsp;&emsp;接着上篇文章，现在开始部署Redis集群，采用方案为四主四从，暂时不考虑搭建哨兵，因此需要八台机器，以下是部署过程中的一些记录。</p>
 <a id="more"></a>
 
-<h2 id="实现方法一"><a href="#实现方法一" class="headerlink" title="实现方法一"></a>实现方法一</h2><p>​    首先想到的应该就是通过日志的配置文件，添加不同的<code>appender</code>和<code>logger</code>。可是这些配置文件应该是存在与用户的应用中的，作为一个被引入的module该如何去修改这份文件呢？而且用户最终采用的是哪个日志框架我同样不能左右，我该根据哪个实现呢？</p>
-<p>​    第一个问题，很好解决，现在大部分的日志框架都提供了基于java 代码的方式来添加<code>appender</code>和<code>logger</code>的配置，因此我们只需要在应用启动时，获取<code>LoggerContext</code>对象，然后添加自定义的<code>appender</code>和<code>logger</code>即可，例如阿里的TDDL中就有相关的实现：</p>
+<h2 id="准备工作"><a href="#准备工作" class="headerlink" title="准备工作"></a>准备工作</h2><h3 id="集群机器信息"><a href="#集群机器信息" class="headerlink" title="集群机器信息"></a>集群机器信息</h3><table>
+<thead>
+<tr>
+<th align="center">IP</th>
+<th align="center">CPU、RAM</th>
+</tr>
+</thead>
+<tbody><tr>
+<td align="center">10.100.1.31</td>
+<td align="center">16 vcpu、64G ram</td>
+</tr>
+<tr>
+<td align="center">10.100.1.32</td>
+<td align="center">16 vcpu、64G ram</td>
+</tr>
+<tr>
+<td align="center">10.100.1.33</td>
+<td align="center">16 vcpu、64G ram</td>
+</tr>
+<tr>
+<td align="center">10.100.1.34</td>
+<td align="center">16 vcpu、64G ram</td>
+</tr>
+<tr>
+<td align="center">10.100.1.35</td>
+<td align="center">16 vcpu、64G ram</td>
+</tr>
+<tr>
+<td align="center">10.100.1.36</td>
+<td align="center">16 vcpu、64G ram</td>
+</tr>
+<tr>
+<td align="center">10.100.1.37</td>
+<td align="center">16 vcpu、64G ram</td>
+</tr>
+<tr>
+<td align="center">10.100.1.38</td>
+<td align="center">16 vcpu、64G ram</td>
+</tr>
+</tbody></table>
+<p><em>Redis 为内存数据库，因此机器内存必须较大，根据经验，Redis占用内存一般不能超过机器内存的一半，不否则Redis的性能就会开始下降</em></p>
+<h3 id="Redis编译"><a href="#Redis编译" class="headerlink" title="Redis编译"></a>Redis编译</h3><p>由于Redis并不能通过包管理工具（例如 <em>yum</em>、<em>apt-get</em>等）进行快速安装，只能下载源码进行编译安装。</p>
+<pre class="line-numbers language-shell" data-language="shell"><code class="language-shell">jobshen@JobShen-PC:&#x2F;usr&#x2F;local$ curl -O http:&#x2F;&#x2F;download.redis.io&#x2F;releases&#x2F;redis-4.0.6.tar.gz
+jobshen@JobShen-PC:&#x2F;usr&#x2F;local$ tar -zxf redis-4.0.6.tar.gz
+jobshen@JobShen-PC:&#x2F;usr&#x2F;local$ ln -s redis-4.0.6 redis
+jobshen@JobShen-PC:&#x2F;usr&#x2F;local$ cd redis
+jobshen@JobShen-PC:&#x2F;usr&#x2F;local&#x2F;redis$ make &amp;&amp; make install<span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span></span></code></pre>
+
+<h2 id="Redis-Cluster-部署"><a href="#Redis-Cluster-部署" class="headerlink" title="Redis Cluster 部署"></a>Redis Cluster 部署</h2><h3 id="Redis-conf"><a href="#Redis-conf" class="headerlink" title="Redis.conf"></a>Redis.conf</h3><p>新建*<strong>cluster**<em>文件夹，以及新建</em></strong>redis.conf***文件并添加以下内容：</p>
+<pre class="line-numbers language-shell" data-language="shell"><code class="language-shell">jobshen@JobShen-PC:&#x2F;usr&#x2F;local&#x2F;redis$ mkdir cluster
+jobshen@JobShen-PC:&#x2F;usr&#x2F;local&#x2F;redis$ vim cluster&#x2F;redis.conf<span aria-hidden="true" class="line-numbers-rows"><span></span><span></span></span></code></pre>
+
+<pre class="line-numbers language-none"><code class="language-none">bind 10.100.1.31 127.0.0.1
+protected-mode yes
+port 6379
+daemonize yes
+supervised systemd
+pidfile &#x2F;var&#x2F;run&#x2F;redis_6379.pid
+logfile &quot;&#x2F;usr&#x2F;local&#x2F;redis&#x2F;cluster&#x2F;redis.log&quot;
+databases 16
+save 900 1
+save 300 10
+save 60 10000
+stop-writes-on-bgsave-error yes
+dbfilename dump.rdb
+slave-serve-stale-data yes
+slave-read-only yes
+slave-priority 100
+maxmemory 34359738368
+appendonly yes
+cluster-enabled yes
+cluster-config-file nodes-6379.conf
+cluster-node-timeout 15000<span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span></span></code></pre>
+
+<h3 id="Redis-service"><a href="#Redis-service" class="headerlink" title="Redis.service"></a>Redis.service</h3><p>创建<em>systemd</em>服务，</p>
+<pre class="line-numbers language-shell" data-language="shell"><code class="language-shell">jobshen@JobShen-PC:&#x2F;usr&#x2F;local&#x2F;redis$ vim &#x2F;lib&#x2F;systemd&#x2F;system&#x2F;redis.service<span aria-hidden="true" class="line-numbers-rows"><span></span></span></code></pre>
+
+<pre class="line-numbers language-shell" data-language="shell"><code class="language-shell">[Unit]
+Description&#x3D;Redis
+After&#x3D;network.target
+
+[Service]
+ExecStart&#x3D;&#x2F;usr&#x2F;local&#x2F;redis&#x2F;src&#x2F;redis-server &#x2F;usr&#x2F;local&#x2F;redis&#x2F;cluster&#x2F;redis.conf --daemonize no
+ExecStop&#x3D;&#x2F;usr&#x2F;local&#x2F;redis&#x2F;src&#x2F;redis-cli -h 127.0.0.1 -p 6379 shutdown
+
+[Install]
+WantedBy&#x3D;multi-user.target<span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span></span></code></pre>
+
+<h3 id="启动Redis"><a href="#启动Redis" class="headerlink" title="启动Redis"></a>启动Redis</h3><pre class="line-numbers language-shell" data-language="shell"><code class="language-shell">jobshen@JobShen-PC:&#x2F;usr&#x2F;local&#x2F;redis$ systemctl start redis<span aria-hidden="true" class="line-numbers-rows"><span></span></span></code></pre>
+
+<h3 id="创建Redis集群"><a href="#创建Redis集群" class="headerlink" title="创建Redis集群"></a>创建Redis集群</h3><p>以下命令可以只在一台机器上执行，但为了后期维护Redis集群方便，可以在所有redis机器上都安装集群管理工具。</p>
+<pre class="line-numbers language-shell" data-language="shell"><code class="language-shell">jobshen@JobShen-PC:&#x2F;usr&#x2F;local&#x2F;redis$ gpg --keyserver hkp:&#x2F;&#x2F;keys.gnupg.net --recv-keys 409B6B1796C275462A1703113804BB82D39DC0E3 7D2BAF1CF37B13E2069D6956105BD0E739499BDB
+jobshen@JobShen-PC:&#x2F;usr&#x2F;local&#x2F;redis$ curl -sSL https:&#x2F;&#x2F;get.rvm.io | bash -s stable
+jobshen@JobShen-PC:&#x2F;usr&#x2F;local&#x2F;redis$ rvm install 2.4.3
+jobshen@JobShen-PC:&#x2F;usr&#x2F;local&#x2F;redis$ rvm use 2.4.3 --default --create
+jobshen@JobShen-PC:&#x2F;usr&#x2F;local&#x2F;redis$ gem install redis
+jobshen@JobShen-PC:&#x2F;usr&#x2F;local&#x2F;redis$ .&#x2F;src&#x2F;redis-trib.rb create --replicas 1 10.100.1.31:6379 10.100.1.32:6379 10.100.1.33:6379 10.100.1.34:6379 10.100.1.35:6379 10.100.1.36:6379 10.100.1.37:6379 10.100.1.38:6379<span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span><span></span></span></code></pre>
+
+<h3 id="验证"><a href="#验证" class="headerlink" title="验证"></a>验证</h3><p>登入任意一台redis，查看集群信息</p>
+<pre class="line-numbers language-shell" data-language="shell"><code class="language-shell">jobshen@JobShen-PC:&#x2F;usr&#x2F;local&#x2F;redis$ .&#x2F;src&#x2F;redis-cli -c -p 6369
+127.0.0.1:6379&gt; cluster nodes
+31f29a40699e44ae9b0dce5c8ded53cc92546c7f 10.100.1.31:6379@16379 master - 0 1513599855000 2 connected 4096-8191
+bd148fc244c821f0ebc502e2ef80e90e3ce8020f 10.100.1.32:6379@16379 master - 0 1513599857582 4 connected 12288-16383
+24c0c11cceb08a0a2c0f76773a1c3ecb5553fdd1 10.100.1.33:6379@16379 slave bd148fc244c821f0ebc502e2ef80e90e3ce8020f 0 1513599857000 8 connected
+b8ed99aef612d728f69015b20dae32751af5a668 10.100.1.34:6379@16379 myself,master - 0 1513599854000 1 connected 0-4095
+ee420f56a64c89c519c82adf2131724456656711 10.100.1.35:6379@16379 slave b8ed99aef612d728f69015b20dae32751af5a668 0 1513599856000 5 connected
+fa8f3b33ed93a8bb76c3f44b410436f12ca45d8c 10.100.1.36:6379@16379 slave 914483a3760cc5f7fc4422ea3326f39b0fc505b4 0 1513599854000 7 connected
+914483a3760cc5f7fc4422ea3326f39b0fc505b4 10.100.1.37:6379@16379 master - 0 1513599854000 3 connected 8192-12287
+da57f16f2f5b86cae95478157723c9b2972d460d 10.100.1.38:6379@16379 slave 31f29a40699e44ae9b0dce5c8ded53cc92546c7f 0 1513599854000 6 connected
+127.0.0.1:6379&gt; <span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span></span></code></pre>
+
+<p>到现在为止，整个<em>Redis集群</em>的搭建就完成了。</p>
+]]></content>
+      <categories>
+        <category>centos7</category>
+      </categories>
+      <tags>
+        <tag>Redis</tag>
+        <tag>Redis Cluster</tag>
+      </tags>
+  </entry>
+  <entry>
+    <title>关于Java日志隔离功能的闲谈</title>
+    <url>/posts/be21c8ca.html</url>
+    <content><![CDATA[<h2 id="背景"><a href="#背景" class="headerlink" title="背景"></a>背景</h2><p>&emsp;&emsp;我们都知道日志至于任何系统、软件都是十分重要的组成部分，通过日志我们可以方便地了解到现在系统运行是否正常、是否有异常情况。但有时候日志太多了也会有幸福地烦恼，发生异常想通过日志进行排查，可是满屏地日志都是不那么重要地内容，像心跳日志、debug日志等等。</p>
+<p>&emsp;&emsp;这在java应用尤为严重，你每引入地一个jar都有可能引入一堆打印的日志，这样一来要从日志中找到你所需要的内容将是一件极其困难的事情。当然，你会说，java拥有这么多优秀的日志框架系统，可以简单地通过相应地配置文件将这些内容根据不同的输出级别输出到不同的目录文件，可是如果将这件事情都交给终端用户去处理，那将会是一件极其复杂的工程，他得明白哪些是他需要的、哪些是他不需要的，而这些信息应该是对应的开发人员最清楚不过的，因此让开发人员提前将这些日志进行归类，输出到指定的文件，那对应使用者来说将会变得很简单。</p>
+<a id="more"></a>
+
+<h2 id="实现方法一"><a href="#实现方法一" class="headerlink" title="实现方法一"></a>实现方法一</h2><p>&emsp;&emsp;首先想到的应该就是通过日志的配置文件，添加不同的<code>appender</code>和<code>logger</code>。可是这些配置文件应该是存在与用户的应用中的，作为一个被引入的module该如何去修改这份文件呢？而且用户最终采用的是哪个日志框架我同样不能左右，我该根据哪个实现呢？</p>
+<p>&emsp;&emsp;第一个问题，很好解决，现在大部分的日志框架都提供了基于java 代码的方式来添加<code>appender</code>和<code>logger</code>的配置，因此我们只需要在应用启动时，获取<code>LoggerContext</code>对象，然后添加自定义的<code>appender</code>和<code>logger</code>即可，例如阿里的TDDL中就有相关的实现：</p>
 <pre class="line-numbers language-java" data-language="java"><code class="language-java"><span class="token comment">// slf4j只是一个代理工程，需要判断一下具体的实现类</span>
 <span class="token keyword">if</span> <span class="token punctuation">(</span><span class="token function">checkLogger</span><span class="token punctuation">(</span>logger<span class="token punctuation">,</span> LOGBACK<span class="token punctuation">)</span><span class="token punctuation">)</span> <span class="token punctuation">&#123;</span>
     <span class="token keyword">if</span> <span class="token punctuation">(</span>canUseEncoder<span class="token punctuation">)</span> <span class="token punctuation">&#123;</span>
@@ -191,7 +318,7 @@ Mode: follower(master)<span aria-hidden="true" class="line-numbers-rows"><span><
 <li>仍然与应用的<code>Log</code>耦合在一起</li>
 </ul>
 <p>那除此之外，还有其他的方式能够实现同样的功能吗？答案当时是**<em>有**</em>。</p>
-<h2 id="实现方法二"><a href="#实现方法二" class="headerlink" title="实现方法二"></a>实现方法二</h2><p>默认情况下一个应用启动后，只会存在一个<code>loggerContext</code>，因为日志框架都是单例模式的，也是为了减少开销。那如果我们有多个<code>loggerContext</code>呢，是不是可以每个需要的<code>modeule</code>都拥有一份单独的<code>loggerContext</code>，那不就可以通过加载配置文件的形式更轻量级地来实现需要动态添加<code>appender</code>的功能呢。</p>
+<h2 id="实现方法二"><a href="#实现方法二" class="headerlink" title="实现方法二"></a>实现方法二</h2><p>&emsp;&emsp;默认情况下一个应用启动后，只会存在一个<code>loggerContext</code>，因为日志框架都是单例模式的，也是为了减少开销。那如果我们有多个<code>loggerContext</code>呢，是不是可以每个需要的<code>modeule</code>都拥有一份单独的<code>loggerContext</code>，那不就可以通过加载配置文件的形式更轻量级地来实现需要动态添加<code>appender</code>的功能呢。</p>
 <p>大致的实现逻辑应该是这样：</p>
 <ul>
 <li>需要一个<code>map</code>来管理所有的这些<code>loggerContext</code>，以每个<code>module</code>的<code>groupId</code>+<code>artifactId</code>（现在90%以上的工程都提供maven坐标）为唯一标识 – <code>key</code></li>
@@ -388,133 +515,6 @@ Mode: follower(master)<span aria-hidden="true" class="line-numbers-rows"><span><
       </tags>
   </entry>
   <entry>
-    <title>Centos-7下常见中间件环境的安装（三）</title>
-    <url>/posts/3335490502.html</url>
-    <content><![CDATA[<p>接着上篇文章，现在开始部署Redis集群，采用方案为四主四从，暂时不考虑搭建哨兵，因此需要八台机器，以下是部署过程中的一些记录。</p>
-<a id="more"></a>
-
-<h2 id="准备工作"><a href="#准备工作" class="headerlink" title="准备工作"></a>准备工作</h2><h3 id="集群机器信息"><a href="#集群机器信息" class="headerlink" title="集群机器信息"></a>集群机器信息</h3><table>
-<thead>
-<tr>
-<th align="center">IP</th>
-<th align="center">CPU、RAM</th>
-</tr>
-</thead>
-<tbody><tr>
-<td align="center">10.100.1.31</td>
-<td align="center">16 vcpu、64G ram</td>
-</tr>
-<tr>
-<td align="center">10.100.1.32</td>
-<td align="center">16 vcpu、64G ram</td>
-</tr>
-<tr>
-<td align="center">10.100.1.33</td>
-<td align="center">16 vcpu、64G ram</td>
-</tr>
-<tr>
-<td align="center">10.100.1.34</td>
-<td align="center">16 vcpu、64G ram</td>
-</tr>
-<tr>
-<td align="center">10.100.1.35</td>
-<td align="center">16 vcpu、64G ram</td>
-</tr>
-<tr>
-<td align="center">10.100.1.36</td>
-<td align="center">16 vcpu、64G ram</td>
-</tr>
-<tr>
-<td align="center">10.100.1.37</td>
-<td align="center">16 vcpu、64G ram</td>
-</tr>
-<tr>
-<td align="center">10.100.1.38</td>
-<td align="center">16 vcpu、64G ram</td>
-</tr>
-</tbody></table>
-<p><em>Redis 为内存数据库，因此机器内存必须较大，根据经验，Redis占用内存一般不能超过机器内存的一半，不否则Redis的性能就会开始下降</em></p>
-<h3 id="Redis编译"><a href="#Redis编译" class="headerlink" title="Redis编译"></a>Redis编译</h3><p>由于Redis并不能通过包管理工具（例如 <em>yum</em>、<em>apt-get</em>等）进行快速安装，只能下载源码进行编译安装。</p>
-<pre class="line-numbers language-shell" data-language="shell"><code class="language-shell">jobshen@JobShen-PC:&#x2F;usr&#x2F;local$ curl -O http:&#x2F;&#x2F;download.redis.io&#x2F;releases&#x2F;redis-4.0.6.tar.gz
-jobshen@JobShen-PC:&#x2F;usr&#x2F;local$ tar -zxf redis-4.0.6.tar.gz
-jobshen@JobShen-PC:&#x2F;usr&#x2F;local$ ln -s redis-4.0.6 redis
-jobshen@JobShen-PC:&#x2F;usr&#x2F;local$ cd redis
-jobshen@JobShen-PC:&#x2F;usr&#x2F;local&#x2F;redis$ make &amp;&amp; make install<span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span></span></code></pre>
-
-<h2 id="Redis-Cluster-部署"><a href="#Redis-Cluster-部署" class="headerlink" title="Redis Cluster 部署"></a>Redis Cluster 部署</h2><h3 id="Redis-conf"><a href="#Redis-conf" class="headerlink" title="Redis.conf"></a>Redis.conf</h3><p>新建*<strong>cluster**<em>文件夹，以及新建</em></strong>redis.conf***文件并添加以下内容：</p>
-<pre class="line-numbers language-shell" data-language="shell"><code class="language-shell">jobshen@JobShen-PC:&#x2F;usr&#x2F;local&#x2F;redis$ mkdir cluster
-jobshen@JobShen-PC:&#x2F;usr&#x2F;local&#x2F;redis$ vim cluster&#x2F;redis.conf<span aria-hidden="true" class="line-numbers-rows"><span></span><span></span></span></code></pre>
-
-<pre class="line-numbers language-none"><code class="language-none">bind 10.100.1.31 127.0.0.1
-protected-mode yes
-port 6379
-daemonize yes
-supervised systemd
-pidfile &#x2F;var&#x2F;run&#x2F;redis_6379.pid
-logfile &quot;&#x2F;usr&#x2F;local&#x2F;redis&#x2F;cluster&#x2F;redis.log&quot;
-databases 16
-save 900 1
-save 300 10
-save 60 10000
-stop-writes-on-bgsave-error yes
-dbfilename dump.rdb
-slave-serve-stale-data yes
-slave-read-only yes
-slave-priority 100
-maxmemory 34359738368
-appendonly yes
-cluster-enabled yes
-cluster-config-file nodes-6379.conf
-cluster-node-timeout 15000<span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span></span></code></pre>
-
-<h3 id="Redis-service"><a href="#Redis-service" class="headerlink" title="Redis.service"></a>Redis.service</h3><p>创建<em>systemd</em>服务，</p>
-<pre class="line-numbers language-shell" data-language="shell"><code class="language-shell">jobshen@JobShen-PC:&#x2F;usr&#x2F;local&#x2F;redis$ vim &#x2F;lib&#x2F;systemd&#x2F;system&#x2F;redis.service<span aria-hidden="true" class="line-numbers-rows"><span></span></span></code></pre>
-
-<pre class="line-numbers language-shell" data-language="shell"><code class="language-shell">[Unit]
-Description&#x3D;Redis
-After&#x3D;network.target
-
-[Service]
-ExecStart&#x3D;&#x2F;usr&#x2F;local&#x2F;redis&#x2F;src&#x2F;redis-server &#x2F;usr&#x2F;local&#x2F;redis&#x2F;cluster&#x2F;redis.conf --daemonize no
-ExecStop&#x3D;&#x2F;usr&#x2F;local&#x2F;redis&#x2F;src&#x2F;redis-cli -h 127.0.0.1 -p 6379 shutdown
-
-[Install]
-WantedBy&#x3D;multi-user.target<span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span></span></code></pre>
-
-<h3 id="启动Redis"><a href="#启动Redis" class="headerlink" title="启动Redis"></a>启动Redis</h3><pre class="line-numbers language-shell" data-language="shell"><code class="language-shell">jobshen@JobShen-PC:&#x2F;usr&#x2F;local&#x2F;redis$ systemctl start redis<span aria-hidden="true" class="line-numbers-rows"><span></span></span></code></pre>
-
-<h3 id="创建Redis集群"><a href="#创建Redis集群" class="headerlink" title="创建Redis集群"></a>创建Redis集群</h3><p>以下命令可以只在一台机器上执行，但为了后期维护Redis集群方便，可以在所有redis机器上都安装集群管理工具。</p>
-<pre class="line-numbers language-shell" data-language="shell"><code class="language-shell">jobshen@JobShen-PC:&#x2F;usr&#x2F;local&#x2F;redis$ gpg --keyserver hkp:&#x2F;&#x2F;keys.gnupg.net --recv-keys 409B6B1796C275462A1703113804BB82D39DC0E3 7D2BAF1CF37B13E2069D6956105BD0E739499BDB
-jobshen@JobShen-PC:&#x2F;usr&#x2F;local&#x2F;redis$ curl -sSL https:&#x2F;&#x2F;get.rvm.io | bash -s stable
-jobshen@JobShen-PC:&#x2F;usr&#x2F;local&#x2F;redis$ rvm install 2.4.3
-jobshen@JobShen-PC:&#x2F;usr&#x2F;local&#x2F;redis$ rvm use 2.4.3 --default --create
-jobshen@JobShen-PC:&#x2F;usr&#x2F;local&#x2F;redis$ gem install redis
-jobshen@JobShen-PC:&#x2F;usr&#x2F;local&#x2F;redis$ .&#x2F;src&#x2F;redis-trib.rb create --replicas 1 10.100.1.31:6379 10.100.1.32:6379 10.100.1.33:6379 10.100.1.34:6379 10.100.1.35:6379 10.100.1.36:6379 10.100.1.37:6379 10.100.1.38:6379<span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span><span></span></span></code></pre>
-
-<h3 id="验证"><a href="#验证" class="headerlink" title="验证"></a>验证</h3><p>登入任意一台redis，查看集群信息</p>
-<pre class="line-numbers language-shell" data-language="shell"><code class="language-shell">jobshen@JobShen-PC:&#x2F;usr&#x2F;local&#x2F;redis$ .&#x2F;src&#x2F;redis-cli -c -p 6369
-127.0.0.1:6379&gt; cluster nodes
-31f29a40699e44ae9b0dce5c8ded53cc92546c7f 10.100.1.31:6379@16379 master - 0 1513599855000 2 connected 4096-8191
-bd148fc244c821f0ebc502e2ef80e90e3ce8020f 10.100.1.32:6379@16379 master - 0 1513599857582 4 connected 12288-16383
-24c0c11cceb08a0a2c0f76773a1c3ecb5553fdd1 10.100.1.33:6379@16379 slave bd148fc244c821f0ebc502e2ef80e90e3ce8020f 0 1513599857000 8 connected
-b8ed99aef612d728f69015b20dae32751af5a668 10.100.1.34:6379@16379 myself,master - 0 1513599854000 1 connected 0-4095
-ee420f56a64c89c519c82adf2131724456656711 10.100.1.35:6379@16379 slave b8ed99aef612d728f69015b20dae32751af5a668 0 1513599856000 5 connected
-fa8f3b33ed93a8bb76c3f44b410436f12ca45d8c 10.100.1.36:6379@16379 slave 914483a3760cc5f7fc4422ea3326f39b0fc505b4 0 1513599854000 7 connected
-914483a3760cc5f7fc4422ea3326f39b0fc505b4 10.100.1.37:6379@16379 master - 0 1513599854000 3 connected 8192-12287
-da57f16f2f5b86cae95478157723c9b2972d460d 10.100.1.38:6379@16379 slave 31f29a40699e44ae9b0dce5c8ded53cc92546c7f 0 1513599854000 6 connected
-127.0.0.1:6379&gt; <span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span></span></code></pre>
-
-<p>到现在为止，整个<em>Redis集群</em>的搭建就完成了。</p>
-]]></content>
-      <categories>
-        <category>centos7</category>
-      </categories>
-      <tags>
-        <tag>Redis</tag>
-        <tag>Redis Cluster</tag>
-      </tags>
-  </entry>
-  <entry>
     <title>关于k8s下使用Ingress保持长连接的异常情况排查</title>
     <url>/posts/eee2bd13.html</url>
     <content><![CDATA[<h2 id="问题描述"><a href="#问题描述" class="headerlink" title="问题描述"></a>问题描述</h2><pre class="line-numbers language-none"><code class="language-none">在我们中应用有一个使用到&#96;Http Long Poll&#96;的场景，它需要一个http请求保持最长30秒，用于即使获取到最新的数据。在k8s环境下，发现应该存在偶发的异常，表现为长连接没有正常关闭，抛出异常：<span aria-hidden="true" class="line-numbers-rows"><span></span></span></code></pre>
@@ -523,8 +523,8 @@ da57f16f2f5b86cae95478157723c9b2972d460d 10.100.1.38:6379@16379 slave 31f29a4069
 
 <a id="more"></a>
 
-<h2 id="问题排查"><a href="#问题排查" class="headerlink" title="问题排查"></a>问题排查</h2><h3 id="应用异常排查"><a href="#应用异常排查" class="headerlink" title="应用异常排查"></a>应用异常排查</h3><p>首先我们先对应用程序的代码进行了排查，并没有发现代码上的bug，可以排除是由于代码bug导致的这个问题。</p>
-<h3 id="抓包"><a href="#抓包" class="headerlink" title="抓包"></a>抓包</h3><p>接下来考虑的方式就是抓包，分别在三个节点上进行抓包：应用程序所在pod、ingress-nginx所在pod、服务端pod。</p>
+<h2 id="问题排查"><a href="#问题排查" class="headerlink" title="问题排查"></a>问题排查</h2><h3 id="应用异常排查"><a href="#应用异常排查" class="headerlink" title="应用异常排查"></a>应用异常排查</h3><p>&emsp;&emsp;首先我们先对应用程序的代码进行了排查，并没有发现代码上的bug，可以排除是由于代码bug导致的这个问题。</p>
+<h3 id="抓包"><a href="#抓包" class="headerlink" title="抓包"></a>抓包</h3><p>&emsp;&emsp;接下来考虑的方式就是抓包，分别在三个节点上进行抓包：应用程序所在pod、ingress-nginx所在pod、服务端pod。</p>
 <p>分别执行以下shell脚本：</p>
 <pre class="line-numbers language-shell" data-language="shell"><code class="language-shell">tcpdump tcp -s 0  -w .&#x2F;target.cap<span aria-hidden="true" class="line-numbers-rows"><span></span></span></code></pre>
 
@@ -536,7 +536,7 @@ da57f16f2f5b86cae95478157723c9b2972d460d 10.100.1.38:6379@16379 slave 31f29a4069
 <p>通过观察大量的抓包数据后发现这个情况发生的非常多，但并不是每次都会导致连接的异常关闭，大部分还是能够正常关闭连接并建立新的连接的。</p>
 <p>通过仔细观察发现被异常关闭的连接，都是发生在<code>Seq=1</code>的情况下，这个原因还不是很清楚。</p>
 <p>那为什么<strong>nginx</strong>会主动发起关闭连接呢？</p>
-<h3 id="Nginx-排查"><a href="#Nginx-排查" class="headerlink" title="Nginx 排查"></a>Nginx 排查</h3><p>这时候首先想到的就是nginx的日志，在翻查了nginx的<code>access.log</code>后，发现在相同的时间端，nginx都发生了<code>reload</code>现象：</p>
+<h3 id="Nginx-排查"><a href="#Nginx-排查" class="headerlink" title="Nginx 排查"></a>Nginx 排查</h3><p>&emsp;&emsp;这时候首先想到的就是nginx的日志，在翻查了nginx的<code>access.log</code>后，发现在相同的时间端，nginx都发生了<code>reload</code>现象：</p>
 <pre class="line-numbers language-none"><code class="language-none">backend reload required
 ingress backend successfully reloaded<span aria-hidden="true" class="line-numbers-rows"><span></span><span></span></span></code></pre>
 
@@ -548,10 +548,10 @@ ingress backend successfully reloaded<span aria-hidden="true" class="line-number
 <li>对于仍然存在于<code>old worker</code>进程上的<code>keep alive</code>的连接，主动发送<code>FIN ACK</code> 包，通知对方关闭当前连接</li>
 <li>当所有old worker 上的连接都关闭或者超过<code>worker-shutdown-timeout</code>所设定的时间后，会关闭old worker 进程</li>
 </ul>
-<p>通过查询k8s上ingress的默认配置发现，<code> worker-shutdown-timeout</code>被设置为了10s，这时候基本可以确定问题了，由于<code>old worker</code>关闭的窗口时间只有10s，如果在这个时间段内有连接还没有完成关闭，而此时<code>old worker</code>已经被关闭了，client端当然不能正常处理请求，因为它所连接的server端已经被提前关闭了。</p>
-<h2 id="解决"><a href="#解决" class="headerlink" title="解决"></a>解决</h2><p>找到问题原因了当然接下来就是解决了，将<code> worker-shutdown-timeout</code>该字段的值增大为：3600s，即1小时，理论上这个时间足够该worker上的连接全部完成关闭了。</p>
+<p>&emsp;&emsp;通过查询k8s上ingress的默认配置发现，<code> worker-shutdown-timeout</code>被设置为了10s，这时候基本可以确定问题了，由于<code>old worker</code>关闭的窗口时间只有10s，如果在这个时间段内有连接还没有完成关闭，而此时<code>old worker</code>已经被关闭了，client端当然不能正常处理请求，因为它所连接的server端已经被提前关闭了。</p>
+<h2 id="解决"><a href="#解决" class="headerlink" title="解决"></a>解决</h2><p>&emsp;&emsp;找到问题原因了当然接下来就是解决了，将<code> worker-shutdown-timeout</code>该字段的值增大为：3600s，即1小时，理论上这个时间足够该worker上的连接全部完成关闭了。</p>
 <p>在调整了k8s上ingress的这个参数后，又进行了反复测试，并没有再次发现同样的问题，该问题得到解决。</p>
-<h2 id="遗留"><a href="#遗留" class="headerlink" title="遗留"></a>遗留</h2><p>然后，为什么是<code>Seq=1</code>的连接会发生这个异常，还是没有完全想明白。</p>
+<h2 id="遗留"><a href="#遗留" class="headerlink" title="遗留"></a>遗留</h2><p>&emsp;&emsp;然后，为什么是<code>Seq=1</code>的连接会发生这个异常，还是没有完全想明白。</p>
 ]]></content>
       <categories>
         <category>k8s</category>
@@ -563,36 +563,9 @@ ingress backend successfully reloaded<span aria-hidden="true" class="line-number
       </tags>
   </entry>
   <entry>
-    <title>记一次线上Redis故障恢复和分析（一）</title>
-    <url>/posts/1728650486.html</url>
-    <content><![CDATA[<h2 id="起因"><a href="#起因" class="headerlink" title="起因"></a>起因</h2><p>那天早上一到公司就有客服过来反应我们的App登录不了了，我赶紧试了一下登陆App，发现是可以登录的，就以为是个别现象没有在意。过了一会儿客服来反应更频繁了，这才意识到可能没有那么简单。</p>
-<a id="more"></a>
-
-<h2 id="分析"><a href="#分析" class="headerlink" title="分析"></a>分析</h2><p>一开始认为是服务器问题，检查了所有相关的应用服务器，应用是否正在运行，发现一切正常，cpu、内存、IO 都是正常的，没有异常；</p>
-<p>然后考虑是否是代码层面问题（数据库问题被排除，因为一旦数据库出问题不可能只有一部分人受影响），于是去检查日志，发现有以下错误信息：</p>
-<p><img data-src="https://picture.jobshen.com/blog/redis/redis-01.png" alt="错误信息"></p>
-<p>然后登陆redis控制台，一台一台测试，终于发现了有问题的那台机器：</p>
-<p><img data-src="https://picture.jobshen.com/blog/redis/redis-02.png" alt="发现问题"></p>
-<p>接下来要做的就很简单了，redis是集群部署，并且每个节点都有master-slave，因此直接kill该节点，问题修复，一切正常。</p>
-<h2 id="寻找根本原因"><a href="#寻找根本原因" class="headerlink" title="寻找根本原因"></a>寻找根本原因</h2><p>但是这样做并不能解决根本问题，由于之前部署redis集群时考虑不够周全，没有配置redis日志，因此决定直接修改配置文件，逐个重启redis节点。这也就导致了再次故障，因为那个故障节点又被启动加入集群并且由于所有节点都经历了重启该节点又被设为master了。</p>
-<p>这时去观察该节点redis的日志，终于发现了问题，满屏都是异常信息：</p>
-<p> <strong>Can’t save in background: fork: Cannot allocate memory</strong>  </p>
-<p>通过Google得知是由于机器内存不足导致的，遂检查机器内存，发现内存已被占用超过90%，于是赶紧增大机器内存，毕竟redis 数据都是存储在内存中，才能做到这么快的读写。</p>
-<p>基于此，对整个redis集群的内存占用情况进行了一次排查，增大了机器内存，并且增加了对机器内存使用情况的监控防止再出现此类情况。</p>
-<h2 id="又一个问题"><a href="#又一个问题" class="headerlink" title="又一个问题"></a>又一个问题</h2><p>好景不长，一个问题解决又来一个问题，对于redis操作出现了非预期结果，类似 incrBy +1 结果+2，执行expire 结果返回失败。</p>
-<p>该问题的跟踪解决将在下一篇文章中介绍。</p>
-]]></content>
-      <categories>
-        <category>redis</category>
-      </categories>
-      <tags>
-        <tag>Redis</tag>
-      </tags>
-  </entry>
-  <entry>
     <title>利用Hexo和Github Page搭建个人Blog</title>
     <url>/posts/3873148614.html</url>
-    <content><![CDATA[<p>之前使用wordpress在AWS上搭建的博客，但国内访问速度堪忧，而且费用也不少，于是觉得切到Github上，最终觉得通过Hexo和Github Page重新搭建博客，这篇文章只是为了记录搭建的过程，以防以后忘记（记性不好啊。。。）</p>
+    <content><![CDATA[<p>&emsp;&emsp;之前使用wordpress在AWS上搭建的博客，但国内访问速度堪忧，而且费用也不少，于是觉得切到Github上，最终觉得通过Hexo和Github Page重新搭建博客，这篇文章只是为了记录搭建的过程，以防以后忘记（记性不好啊。。。）</p>
 <a id="more"></a>
 
 <h2 id="注册域名并绑定Github-Page"><a href="#注册域名并绑定Github-Page" class="headerlink" title="注册域名并绑定Github Page"></a>注册域名并绑定Github Page</h2><p>注册Github和域名就不多说了，网上一搜一大推，接着去Github新建一个仓库，名为个人ID加 <strong>github.io</strong>，例如我的就是kitdine.github.io:</p>
@@ -803,7 +776,7 @@ public_dir: path&#x2F;to&#x2F;your&#x2F;github&#x2F;resp # 指向本地仓库，
   <entry>
     <title>记一次线上Redis故障恢复和分析（二）</title>
     <url>/posts/1461710894.html</url>
-    <content><![CDATA[<h2 id="异常场景"><a href="#异常场景" class="headerlink" title="异常场景"></a>异常场景</h2><p>最近一段时间时不时就有开发人员向我反应：redis的key有点问题，帮我删个key值、怎么key没有过期，我明明设了过期时间的。一开始没有放心上，以为只是程序逻辑处理不当或者redis偶尔抽风，不用在意。可是渐渐反应的人多了，觉得可能不是这么简单了，于是就和相关的开发人员讨论了下，发现会出现异常的基本是以下两种场景：</p>
+    <content><![CDATA[<h2 id="异常场景"><a href="#异常场景" class="headerlink" title="异常场景"></a>异常场景</h2><p>&emsp;&emsp;最近一段时间时不时就有开发人员向我反应：redis的key有点问题，帮我删个key值、怎么key没有过期，我明明设了过期时间的。一开始没有放心上，以为只是程序逻辑处理不当或者redis偶尔抽风，不用在意。可是渐渐反应的人多了，觉得可能不是这么简单了，于是就和相关的开发人员讨论了下，发现会出现异常的基本是以下两种场景：</p>
 <a id="more"></a>
 
 <ul>
@@ -816,13 +789,14 @@ public_dir: path&#x2F;to&#x2F;your&#x2F;github&#x2F;resp # 指向本地仓库，
 <pre class="line-numbers language-shell" data-language="shell"><code class="language-shell">&gt; set |setnx | setex key
 &gt; expire key seconds # 设置失败<span aria-hidden="true" class="line-numbers-rows"><span></span><span></span></span></code></pre>
 
-<p>​</p>
-<p>由于系统中大量使用了第一种方式来防止重复提交，所以这个问题对业务影响还是很大的，redis具体现象为：</p>
+
+
+</li>
+</ul>
+<p>  由于系统中大量使用了第一种方式来防止重复提交，所以这个问题对业务影响还是很大的，redis具体现象为：</p>
 <ul>
 <li>设置incrby 第一次应该返回 <strong>1</strong> </li>
 <li>实际上却返回了 <strong>2</strong> ，导致业务流程无法走完，并且key没有删除也没有设置过期时间</li>
-</ul>
-</li>
 </ul>
 <h2 id="查找问题"><a href="#查找问题" class="headerlink" title="查找问题"></a>查找问题</h2><h3 id="编写测试程序"><a href="#编写测试程序" class="headerlink" title="编写测试程序"></a>编写测试程序</h3><p>为了排查问题写了一个简单的小程序：</p>
 <pre class="line-numbers language-java" data-language="java"><code class="language-java"><span class="token annotation punctuation">@Test</span>
@@ -1068,9 +1042,36 @@ public_dir: path&#x2F;to&#x2F;your&#x2F;github&#x2F;resp # 指向本地仓库，
       </tags>
   </entry>
   <entry>
+    <title>记一次线上Redis故障恢复和分析（一）</title>
+    <url>/posts/1728650486.html</url>
+    <content><![CDATA[<h2 id="起因"><a href="#起因" class="headerlink" title="起因"></a>起因</h2><p>&emsp;&emsp;那天早上一到公司就有客服过来反应我们的App登录不了了，我赶紧试了一下登陆App，发现是可以登录的，就以为是个别现象没有在意。过了一会儿客服来反应更频繁了，这才意识到可能没有那么简单。</p>
+<a id="more"></a>
+
+<h2 id="分析"><a href="#分析" class="headerlink" title="分析"></a>分析</h2><p>&emsp;&emsp;一开始认为是服务器问题，检查了所有相关的应用服务器，应用是否正在运行，发现一切正常，cpu、内存、IO 都是正常的，没有异常；</p>
+<p>然后考虑是否是代码层面问题（数据库问题被排除，因为一旦数据库出问题不可能只有一部分人受影响），于是去检查日志，发现有以下错误信息：</p>
+<p><img data-src="https://picture.jobshen.com/blog/redis/redis-01.png" alt="错误信息"></p>
+<p>然后登陆redis控制台，一台一台测试，终于发现了有问题的那台机器：</p>
+<p><img data-src="https://picture.jobshen.com/blog/redis/redis-02.png" alt="发现问题"></p>
+<p>接下来要做的就很简单了，redis是集群部署，并且每个节点都有master-slave，因此直接kill该节点，问题修复，一切正常。</p>
+<h2 id="寻找根本原因"><a href="#寻找根本原因" class="headerlink" title="寻找根本原因"></a>寻找根本原因</h2><p>&emsp;&emsp;但是这样做并不能解决根本问题，由于之前部署redis集群时考虑不够周全，没有配置redis日志，因此决定直接修改配置文件，逐个重启redis节点。这也就导致了再次故障，因为那个故障节点又被启动加入集群并且由于所有节点都经历了重启该节点又被设为master了。</p>
+<p>这时去观察该节点redis的日志，终于发现了问题，满屏都是异常信息：</p>
+<p> <strong>Can’t save in background: fork: Cannot allocate memory</strong>  </p>
+<p>&emsp;&emsp;通过Google得知是由于机器内存不足导致的，遂检查机器内存，发现内存已被占用超过90%，于是赶紧增大机器内存，毕竟redis 数据都是存储在内存中，才能做到这么快的读写。</p>
+<p>&emsp;&emsp;基于此，对整个redis集群的内存占用情况进行了一次排查，增大了机器内存，并且增加了对机器内存使用情况的监控防止再出现此类情况。</p>
+<h2 id="又一个问题"><a href="#又一个问题" class="headerlink" title="又一个问题"></a>又一个问题</h2><p>&emsp;&emsp;好景不长，一个问题解决又来一个问题，对于redis操作出现了非预期结果，类似 incrBy +1 结果+2，执行expire 结果返回失败。</p>
+<p>&emsp;&emsp;该问题的跟踪解决将在下一篇文章中介绍。</p>
+]]></content>
+      <categories>
+        <category>redis</category>
+      </categories>
+      <tags>
+        <tag>Redis</tag>
+      </tags>
+  </entry>
+  <entry>
     <title>Centos-7下常见中间件环境的安装（二）</title>
     <url>/posts/2345740436.html</url>
-    <content><![CDATA[<p>接着上篇文章，现在开始部署RocketMQ集群，采用的部署方案是阿里推荐的两主两从异步刷盘的模式，因此准备了四台服务器来进行MQ集群的部署，以下是部署过程中的一些记录，</p>
+    <content><![CDATA[<p>&emsp;&emsp;接着上篇文章，现在开始部署RocketMQ集群，采用的部署方案是阿里推荐的两主两从异步刷盘的模式，因此准备了四台服务器来进行MQ集群的部署，以下是部署过程中的一些记录，</p>
 <a id="more"></a>
 
 <h2 id="准备工作"><a href="#准备工作" class="headerlink" title="准备工作"></a>准备工作</h2><h3 id="集群机器信息"><a href="#集群机器信息" class="headerlink" title="集群机器信息"></a>集群机器信息</h3><table>
@@ -1504,6 +1505,32 @@ fi<span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><
       <tags>
         <tag>jdk</tag>
         <tag>rocketmq</tag>
+      </tags>
+  </entry>
+  <entry>
+    <title>2020年回顾</title>
+    <url>/posts/8999c837.html</url>
+    <content><![CDATA[<p>&emsp;&emsp;2020年对于我来说，真的可以说是多灾多难的一年，各种“可怕”的事情接踵而至，差点就把我给打趴下，还好现在2020终于快过完了，而我的生活也终于渐渐步入正轨了，在这里知识想对这一年中发生的一些事情做一下记录，以便可以在以后的日子里引以为戒，同时也对2021年立几个<strong>flag</strong>。</p>
+<a id="more"></a>
+
+<h2 id="疫情"><a href="#疫情" class="headerlink" title="疫情"></a>疫情</h2><p>&emsp;&emsp;年初的疫情把大伙都搞得心力交瘁，人心惶惶。我也一样，从腊月二十几开始就一直是大门不迈二门不出，死宅家里。后面稍稍好转一点了，想出个门就会迎来老婆的如同死神般的死瞪，一直到了5月份才敢正常点的出门。说起来在家里一宅就是小半年啊😂 当然为啥真的会宅这么久也不光是疫情害的。</p>
+<h2 id="工作"><a href="#工作" class="headerlink" title="工作"></a>工作</h2><p>&emsp;&emsp;虽然有想到由于疫情工作会便地艰难点，可是万万没想到会来的这么快。刚恢复远程工作没几天，就接到了HR打来的劝退视屏会议–企业想裁员但又不想给赔偿，就想着给员工洗脑让其主动离职。由于去年下半年开始就和直属领导有点小摩擦被不断地穿小鞋，所以自然而然地我是那个首当其冲地需要被“裁”的人。可是再怎么说也不能平白无故地被欺负是吧，经过了一个多星期的沟通终于还是拿到了应得的补偿，中间的过程可谓“叹为观止”、“奇事频出”。当然演技最好的还属HR。可谓是软硬兼施，十八般武艺齐上阵。先是在那自责工作失误啊，没有完成指标啊，可怜可怜我啊；再者就是恐吓，什么你不离职到时候背调你就等着吧，离职证明的材料你也等着吧，看你怎么找工作。再细的就不想多说了。</p>
+<h2 id="找工作"><a href="#找工作" class="headerlink" title="找工作"></a>找工作</h2><p>&emsp;&emsp;由于疫情影响，这段时候找工作是真的有点困难，前前后后大概面试了十七八家企业，其中4家左右是没有面上、3家职位不合适没有接offer、3家是以奇葩理由给拒的（比如你住的太远等等），剩下的是由于背调，这时候才知道啊，毕竟杭州的科技公司HR的圈子很小的。好在最后还是找到了一家满意的公司，可以继续开开心心码代码了。</p>
+<h2 id="Flag"><a href="#Flag" class="headerlink" title="Flag"></a>Flag</h2><p>马上就要进入2021年了，期望新的一年没有如此之多地磕磕绊绊，在此也是立下几个flag，也算是给自己定个小目标吧。</p>
+<ul>
+<li>搞一个opensource project （已经和小伙伴再规划了 期望新的一年真的能有始有终地去搞下去）</li>
+<li>把工作中的经验分享出来，也算是对其的一个总结吧（目前手头的几个项目都蛮有意思的）</li>
+<li>rust（一直想学习下呢）</li>
+<li>完成一件人生大事</li>
+</ul>
+]]></content>
+      <categories>
+        <category>总结</category>
+      </categories>
+      <tags>
+        <tag>感悟</tag>
+        <tag>随笔</tag>
+        <tag>总结</tag>
       </tags>
   </entry>
 </search>

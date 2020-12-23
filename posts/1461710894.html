@@ -24,12 +24,12 @@
     var CONFIG = {"hostname":"blog.jobshen.com","root":"/","scheme":"Gemini","version":"8.0.2","exturl":false,"sidebar":{"position":"left","display":"post","padding":18,"offset":12},"copycode":true,"bookmark":{"enable":true,"color":"#222","save":"auto"},"fancybox":false,"mediumzoom":false,"lazyload":true,"pangu":false,"comments":{"style":"tabs","active":null,"storage":true,"lazyload":false,"nav":null},"motion":{"enable":true,"async":false,"transition":{"post_block":"fadeIn","post_header":"fadeInDown","post_body":"fadeInDown","coll_header":"fadeInLeft","sidebar":"fadeInUp"}},"prism":false,"i18n":{"placeholder":"搜索...","empty":"没有找到任何搜索结果：${query}","hits_time":"找到 ${hits} 个搜索结果（用时 ${time} 毫秒）","hits":"找到 ${hits} 个搜索结果"},"path":"/search.xml","localsearch":{"enable":true,"trigger":"auto","top_n_per_article":1,"unescape":false,"preload":false}};
   </script>
 
-  <meta name="description" content="异常场景最近一段时间时不时就有开发人员向我反应：redis的key有点问题，帮我删个key值、怎么key没有过期，我明明设了过期时间的。一开始没有放心上，以为只是程序逻辑处理不当或者redis偶尔抽风，不用在意。可是渐渐反应的人多了，觉得可能不是这么简单了，于是就和相关的开发人员讨论了下，发现会出现异常的基本是以下两种场景：">
+  <meta name="description" content="异常场景&amp;emsp;&amp;emsp;最近一段时间时不时就有开发人员向我反应：redis的key有点问题，帮我删个key值、怎么key没有过期，我明明设了过期时间的。一开始没有放心上，以为只是程序逻辑处理不当或者redis偶尔抽风，不用在意。可是渐渐反应的人多了，觉得可能不是这么简单了，于是就和相关的开发人员讨论了下，发现会出现异常的基本是以下两种场景：">
 <meta property="og:type" content="article">
 <meta property="og:title" content="记一次线上Redis故障恢复和分析（二）">
 <meta property="og:url" content="http://blog.jobshen.com/posts/1461710894.html">
 <meta property="og:site_name" content="一杯咖啡的时间">
-<meta property="og:description" content="异常场景最近一段时间时不时就有开发人员向我反应：redis的key有点问题，帮我删个key值、怎么key没有过期，我明明设了过期时间的。一开始没有放心上，以为只是程序逻辑处理不当或者redis偶尔抽风，不用在意。可是渐渐反应的人多了，觉得可能不是这么简单了，于是就和相关的开发人员讨论了下，发现会出现异常的基本是以下两种场景：">
+<meta property="og:description" content="异常场景&amp;emsp;&amp;emsp;最近一段时间时不时就有开发人员向我反应：redis的key有点问题，帮我删个key值、怎么key没有过期，我明明设了过期时间的。一开始没有放心上，以为只是程序逻辑处理不当或者redis偶尔抽风，不用在意。可是渐渐反应的人多了，觉得可能不是这么简单了，于是就和相关的开发人员讨论了下，发现会出现异常的基本是以下两种场景：">
 <meta property="og:locale" content="zh_CN">
 <meta property="og:image" content="https://picture.jobshen.com/blog/redis/redis-03.png">
 <meta property="og:image" content="https://picture.jobshen.com/blog/redis/redis-04.png">
@@ -253,20 +253,20 @@
       <div class="site-state-item site-state-posts">
           <a href="/archives/">
         
-          <span class="site-state-item-count">8</span>
+          <span class="site-state-item-count">9</span>
           <span class="site-state-item-name">日志</span>
         </a>
       </div>
       <div class="site-state-item site-state-categories">
             <a href="/categories/">
           
-        <span class="site-state-item-count">5</span>
+        <span class="site-state-item-count">6</span>
         <span class="site-state-item-name">分类</span></a>
       </div>
       <div class="site-state-item site-state-tags">
             <a href="/tags/">
           
-        <span class="site-state-item-count">15</span>
+        <span class="site-state-item-count">18</span>
         <span class="site-state-item-name">标签</span></a>
       </div>
   </nav>
@@ -386,7 +386,7 @@
     
     
     <div class="post-body" itemprop="articleBody">
-        <h2 id="异常场景"><a href="#异常场景" class="headerlink" title="异常场景"></a>异常场景</h2><p>最近一段时间时不时就有开发人员向我反应：redis的key有点问题，帮我删个key值、怎么key没有过期，我明明设了过期时间的。一开始没有放心上，以为只是程序逻辑处理不当或者redis偶尔抽风，不用在意。可是渐渐反应的人多了，觉得可能不是这么简单了，于是就和相关的开发人员讨论了下，发现会出现异常的基本是以下两种场景：</p>
+        <h2 id="异常场景"><a href="#异常场景" class="headerlink" title="异常场景"></a>异常场景</h2><p>&emsp;&emsp;最近一段时间时不时就有开发人员向我反应：redis的key有点问题，帮我删个key值、怎么key没有过期，我明明设了过期时间的。一开始没有放心上，以为只是程序逻辑处理不当或者redis偶尔抽风，不用在意。可是渐渐反应的人多了，觉得可能不是这么简单了，于是就和相关的开发人员讨论了下，发现会出现异常的基本是以下两种场景：</p>
 <a id="more"></a>
 
 <ul>
@@ -399,13 +399,14 @@
 <pre class="line-numbers language-shell" data-language="shell"><code class="language-shell">&gt; set |setnx | setex key
 &gt; expire key seconds # 设置失败<span aria-hidden="true" class="line-numbers-rows"><span></span><span></span></span></code></pre>
 
-<p>​</p>
-<p>由于系统中大量使用了第一种方式来防止重复提交，所以这个问题对业务影响还是很大的，redis具体现象为：</p>
+
+
+</li>
+</ul>
+<p>  由于系统中大量使用了第一种方式来防止重复提交，所以这个问题对业务影响还是很大的，redis具体现象为：</p>
 <ul>
 <li>设置incrby 第一次应该返回 <strong>1</strong> </li>
 <li>实际上却返回了 <strong>2</strong> ，导致业务流程无法走完，并且key没有删除也没有设置过期时间</li>
-</ul>
-</li>
 </ul>
 <h2 id="查找问题"><a href="#查找问题" class="headerlink" title="查找问题"></a>查找问题</h2><h3 id="编写测试程序"><a href="#编写测试程序" class="headerlink" title="编写测试程序"></a>编写测试程序</h3><p>为了排查问题写了一个简单的小程序：</p>
 <pre class="line-numbers language-java" data-language="java"><code class="language-java"><span class="token annotation punctuation">@Test</span>
@@ -645,6 +646,17 @@
     
     
     
+      
+  <div class="popular-posts-header">相关文章</div>
+  <ul class="popular-posts">
+    <li class="popular-posts-item">
+      <div class="popular-posts-title"><a href="\posts\3335490502.html" rel="bookmark">Centos-7下常见中间件环境的安装（三）</a></div>
+    </li>
+    <li class="popular-posts-item">
+      <div class="popular-posts-title"><a href="\posts\1728650486.html" rel="bookmark">记一次线上Redis故障恢复和分析（一）</a></div>
+    </li>
+  </ul>
+
 
     <footer class="post-footer">
           
@@ -662,6 +674,23 @@
     <strong>版权声明： </strong>本博客所有文章除特别声明外，均采用 <a href="https://creativecommons.org/licenses/by-nc-sa/4.0/deed.zh" rel="noopener" target="_blank"><i class="fab fa-fw fa-creative-commons"></i>BY-NC-SA</a> 许可协议。转载请注明出处！
   </li>
 </ul>
+</div>
+
+          <div class="followme">
+  <span>欢迎关注我的其它发布渠道</span>
+
+  <div class="social-list">
+
+      <div class="social-item">
+        <a target="_blank" class="social-link" href="/atom.xml">
+          <span class="icon">
+            <i class="fa fa-rss"></i>
+          </span>
+
+          <span class="label">RSS</span>
+        </a>
+      </div>
+  </div>
 </div>
 
           <div class="post-tags">
@@ -742,13 +771,13 @@
     <span class="post-meta-item-icon">
       <i class="fa fa-chart-line"></i>
     </span>
-    <span title="站点总字数">53k</span>
+    <span title="站点总字数">54k</span>
   </span>
   <span class="post-meta-item">
     <span class="post-meta-item-icon">
       <i class="fa fa-coffee"></i>
     </span>
-    <span title="站点阅读时长">1:28</span>
+    <span title="站点阅读时长">1:30</span>
   </span>
 </div>
   <div class="powered-by">由 <a href="https://hexo.io/" class="theme-link" rel="noopener" target="_blank">Hexo</a> & <a href="https://theme-next.js.org/" class="theme-link" rel="noopener" target="_blank">NexT.Gemini</a> 强力驱动

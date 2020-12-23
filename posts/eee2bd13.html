@@ -250,20 +250,20 @@
       <div class="site-state-item site-state-posts">
           <a href="/archives/">
         
-          <span class="site-state-item-count">8</span>
+          <span class="site-state-item-count">9</span>
           <span class="site-state-item-name">日志</span>
         </a>
       </div>
       <div class="site-state-item site-state-categories">
             <a href="/categories/">
           
-        <span class="site-state-item-count">5</span>
+        <span class="site-state-item-count">6</span>
         <span class="site-state-item-name">分类</span></a>
       </div>
       <div class="site-state-item site-state-tags">
             <a href="/tags/">
           
-        <span class="site-state-item-count">15</span>
+        <span class="site-state-item-count">18</span>
         <span class="site-state-item-name">标签</span></a>
       </div>
   </nav>
@@ -389,8 +389,8 @@
 
 <a id="more"></a>
 
-<h2 id="问题排查"><a href="#问题排查" class="headerlink" title="问题排查"></a>问题排查</h2><h3 id="应用异常排查"><a href="#应用异常排查" class="headerlink" title="应用异常排查"></a>应用异常排查</h3><p>首先我们先对应用程序的代码进行了排查，并没有发现代码上的bug，可以排除是由于代码bug导致的这个问题。</p>
-<h3 id="抓包"><a href="#抓包" class="headerlink" title="抓包"></a>抓包</h3><p>接下来考虑的方式就是抓包，分别在三个节点上进行抓包：应用程序所在pod、ingress-nginx所在pod、服务端pod。</p>
+<h2 id="问题排查"><a href="#问题排查" class="headerlink" title="问题排查"></a>问题排查</h2><h3 id="应用异常排查"><a href="#应用异常排查" class="headerlink" title="应用异常排查"></a>应用异常排查</h3><p>&emsp;&emsp;首先我们先对应用程序的代码进行了排查，并没有发现代码上的bug，可以排除是由于代码bug导致的这个问题。</p>
+<h3 id="抓包"><a href="#抓包" class="headerlink" title="抓包"></a>抓包</h3><p>&emsp;&emsp;接下来考虑的方式就是抓包，分别在三个节点上进行抓包：应用程序所在pod、ingress-nginx所在pod、服务端pod。</p>
 <p>分别执行以下shell脚本：</p>
 <pre class="line-numbers language-shell" data-language="shell"><code class="language-shell">tcpdump tcp -s 0  -w .&#x2F;target.cap<span aria-hidden="true" class="line-numbers-rows"><span></span></span></code></pre>
 
@@ -402,7 +402,7 @@
 <p>通过观察大量的抓包数据后发现这个情况发生的非常多，但并不是每次都会导致连接的异常关闭，大部分还是能够正常关闭连接并建立新的连接的。</p>
 <p>通过仔细观察发现被异常关闭的连接，都是发生在<code>Seq=1</code>的情况下，这个原因还不是很清楚。</p>
 <p>那为什么<strong>nginx</strong>会主动发起关闭连接呢？</p>
-<h3 id="Nginx-排查"><a href="#Nginx-排查" class="headerlink" title="Nginx 排查"></a>Nginx 排查</h3><p>这时候首先想到的就是nginx的日志，在翻查了nginx的<code>access.log</code>后，发现在相同的时间端，nginx都发生了<code>reload</code>现象：</p>
+<h3 id="Nginx-排查"><a href="#Nginx-排查" class="headerlink" title="Nginx 排查"></a>Nginx 排查</h3><p>&emsp;&emsp;这时候首先想到的就是nginx的日志，在翻查了nginx的<code>access.log</code>后，发现在相同的时间端，nginx都发生了<code>reload</code>现象：</p>
 <pre class="line-numbers language-none"><code class="language-none">backend reload required
 ingress backend successfully reloaded<span aria-hidden="true" class="line-numbers-rows"><span></span><span></span></span></code></pre>
 
@@ -414,16 +414,18 @@ ingress backend successfully reloaded<span aria-hidden="true" class="line-number
 <li>对于仍然存在于<code>old worker</code>进程上的<code>keep alive</code>的连接，主动发送<code>FIN ACK</code> 包，通知对方关闭当前连接</li>
 <li>当所有old worker 上的连接都关闭或者超过<code>worker-shutdown-timeout</code>所设定的时间后，会关闭old worker 进程</li>
 </ul>
-<p>通过查询k8s上ingress的默认配置发现，<code> worker-shutdown-timeout</code>被设置为了10s，这时候基本可以确定问题了，由于<code>old worker</code>关闭的窗口时间只有10s，如果在这个时间段内有连接还没有完成关闭，而此时<code>old worker</code>已经被关闭了，client端当然不能正常处理请求，因为它所连接的server端已经被提前关闭了。</p>
-<h2 id="解决"><a href="#解决" class="headerlink" title="解决"></a>解决</h2><p>找到问题原因了当然接下来就是解决了，将<code> worker-shutdown-timeout</code>该字段的值增大为：3600s，即1小时，理论上这个时间足够该worker上的连接全部完成关闭了。</p>
+<p>&emsp;&emsp;通过查询k8s上ingress的默认配置发现，<code> worker-shutdown-timeout</code>被设置为了10s，这时候基本可以确定问题了，由于<code>old worker</code>关闭的窗口时间只有10s，如果在这个时间段内有连接还没有完成关闭，而此时<code>old worker</code>已经被关闭了，client端当然不能正常处理请求，因为它所连接的server端已经被提前关闭了。</p>
+<h2 id="解决"><a href="#解决" class="headerlink" title="解决"></a>解决</h2><p>&emsp;&emsp;找到问题原因了当然接下来就是解决了，将<code> worker-shutdown-timeout</code>该字段的值增大为：3600s，即1小时，理论上这个时间足够该worker上的连接全部完成关闭了。</p>
 <p>在调整了k8s上ingress的这个参数后，又进行了反复测试，并没有再次发现同样的问题，该问题得到解决。</p>
-<h2 id="遗留"><a href="#遗留" class="headerlink" title="遗留"></a>遗留</h2><p>然后，为什么是<code>Seq=1</code>的连接会发生这个异常，还是没有完全想明白。</p>
+<h2 id="遗留"><a href="#遗留" class="headerlink" title="遗留"></a>遗留</h2><p>&emsp;&emsp;然后，为什么是<code>Seq=1</code>的连接会发生这个异常，还是没有完全想明白。</p>
 
     </div>
 
     
     
     
+      
+
 
     <footer class="post-footer">
           
@@ -441,6 +443,23 @@ ingress backend successfully reloaded<span aria-hidden="true" class="line-number
     <strong>版权声明： </strong>本博客所有文章除特别声明外，均采用 <a href="https://creativecommons.org/licenses/by-nc-sa/4.0/deed.zh" rel="noopener" target="_blank"><i class="fab fa-fw fa-creative-commons"></i>BY-NC-SA</a> 许可协议。转载请注明出处！
   </li>
 </ul>
+</div>
+
+          <div class="followme">
+  <span>欢迎关注我的其它发布渠道</span>
+
+  <div class="social-list">
+
+      <div class="social-item">
+        <a target="_blank" class="social-link" href="/atom.xml">
+          <span class="icon">
+            <i class="fa fa-rss"></i>
+          </span>
+
+          <span class="label">RSS</span>
+        </a>
+      </div>
+  </div>
 </div>
 
           <div class="post-tags">
@@ -520,13 +539,13 @@ ingress backend successfully reloaded<span aria-hidden="true" class="line-number
     <span class="post-meta-item-icon">
       <i class="fa fa-chart-line"></i>
     </span>
-    <span title="站点总字数">53k</span>
+    <span title="站点总字数">54k</span>
   </span>
   <span class="post-meta-item">
     <span class="post-meta-item-icon">
       <i class="fa fa-coffee"></i>
     </span>
-    <span title="站点阅读时长">1:28</span>
+    <span title="站点阅读时长">1:30</span>
   </span>
 </div>
   <div class="powered-by">由 <a href="https://hexo.io/" class="theme-link" rel="noopener" target="_blank">Hexo</a> & <a href="https://theme-next.js.org/" class="theme-link" rel="noopener" target="_blank">NexT.Gemini</a> 强力驱动
