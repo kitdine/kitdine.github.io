@@ -1,0 +1,1491 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=2">
+<meta name="theme-color" content="#222">
+<meta name="generator" content="Hexo 5.2.0">
+
+
+  <link rel="apple-touch-icon" sizes="180x180" href="/images/apple-touch-icon.png">
+  <link rel="icon" type="image/png" sizes="32x32" href="/images/favicon-32x32.png">
+  <link rel="icon" type="image/png" sizes="16x16" href="/images/favicon-16x16.png">
+  <link rel="mask-icon" href="/images/safari-pinned-tab.svg" color="#222">
+
+<link rel="stylesheet" href="/css/main.css">
+
+<link rel="stylesheet" href="//fonts.googleapis.com/css?family=Noto+Sans+SC:300,300italic,400,400italic,700,700italic|Cascadia+Code:300,300italic,400,400italic,700,700italic&display=swap&subset=latin,latin-ext">
+
+<link rel="stylesheet" href="//cdn.jsdelivr.net/npm/@fortawesome/fontawesome-free@5.15.1/css/all.min.css">
+  <link rel="stylesheet" href="//cdn.jsdelivr.net/npm/animate.css@3.1.1/animate.min.css">
+
+<script class="hexo-configurations">
+    var NexT = window.NexT || {};
+    var CONFIG = {"hostname":"blog.jobshen.com","root":"/","scheme":"Gemini","version":"8.0.2","exturl":false,"sidebar":{"position":"left","display":"post","padding":18,"offset":12},"copycode":true,"bookmark":{"enable":true,"color":"#222","save":"auto"},"fancybox":false,"mediumzoom":false,"lazyload":true,"pangu":false,"comments":{"style":"tabs","active":null,"storage":true,"lazyload":false,"nav":null},"motion":{"enable":true,"async":false,"transition":{"post_block":"fadeIn","post_header":"fadeInDown","post_body":"fadeInDown","coll_header":"fadeInLeft","sidebar":"fadeInUp"}},"prism":false,"i18n":{"placeholder":"搜索...","empty":"没有找到任何搜索结果：${query}","hits_time":"找到 ${hits} 个搜索结果（用时 ${time} 毫秒）","hits":"找到 ${hits} 个搜索结果"},"path":"/search.xml","localsearch":{"enable":true,"trigger":"auto","top_n_per_article":1,"unescape":false,"preload":false}};
+  </script>
+
+  <meta name="description" content="前言说完了filebeat的基础架构和相关设计后，我们就来看下filebeat是如何来实现这些功能的。这里只对几个相对来说比较重要的几个流程进行讨论。其余的设计会在之后的文章中进行阐述。几个流程为：  启动过程 harvester 监听过程（以log为例） outputs 处理流程（以kafka为例）">
+<meta property="og:type" content="article">
+<meta property="og:title" content="Filebeat 浅析（二）">
+<meta property="og:url" content="http://blog.jobshen.com/posts/5be0aa9e.html">
+<meta property="og:site_name" content="一杯咖啡的时间">
+<meta property="og:description" content="前言说完了filebeat的基础架构和相关设计后，我们就来看下filebeat是如何来实现这些功能的。这里只对几个相对来说比较重要的几个流程进行讨论。其余的设计会在之后的文章中进行阐述。几个流程为：  启动过程 harvester 监听过程（以log为例） outputs 处理流程（以kafka为例）">
+<meta property="og:locale" content="zh_CN">
+<meta property="article:published_time" content="2021-02-17T04:24:14.000Z">
+<meta property="article:modified_time" content="2021-02-17T04:24:14.000Z">
+<meta property="article:author" content="Job Shen">
+<meta property="article:tag" content="filebeat">
+<meta name="twitter:card" content="summary">
+
+
+<link rel="canonical" href="http://blog.jobshen.com/posts/5be0aa9e.html">
+
+
+<script class="page-configurations">
+  // https://hexo.io/docs/variables.html
+  CONFIG.page = {
+    sidebar: "",
+    isHome : false,
+    isPost : true,
+    lang   : 'zh-CN'
+  };
+</script>
+
+  <title>Filebeat 浅析（二） | 一杯咖啡的时间</title>
+  
+    <script async src="https://www.googletagmanager.com/gtag/js?id=UA-105338633-1"></script>
+    <script>
+      if (CONFIG.hostname === location.hostname) {
+        window.dataLayer = window.dataLayer || [];
+        function gtag(){dataLayer.push(arguments);}
+        gtag('js', new Date());
+        gtag('config', 'UA-105338633-1');
+      }
+    </script>
+
+
+
+
+
+
+  <noscript>
+  <style>
+  body { margin-top: 2rem; }
+
+  .use-motion .menu-item,
+  .use-motion .sidebar,
+  .use-motion .post-block,
+  .use-motion .pagination,
+  .use-motion .comments,
+  .use-motion .post-header,
+  .use-motion .post-body,
+  .use-motion .collection-header {
+    visibility: visible;
+  }
+
+  .use-motion .header,
+  .use-motion .site-brand-container .toggle,
+  .use-motion .footer { opacity: initial; }
+
+  .use-motion .site-title,
+  .use-motion .site-subtitle,
+  .use-motion .custom-logo-image {
+    opacity: initial;
+    top: initial;
+  }
+
+  .use-motion .logo-line {
+    transform: scaleX(1);
+  }
+
+  .search-pop-overlay, .sidebar-nav { display: none; }
+  .sidebar-panel { display: block; }
+  </style>
+</noscript>
+
+<link rel="alternate" href="/atom.xml" title="一杯咖啡的时间" type="application/atom+xml">
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage" class="use-motion">
+  <div class="headband"></div>
+
+  <main class="main">
+    <header class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-container">
+  <div class="site-nav-toggle">
+    <div class="toggle" aria-label="切换导航栏">
+        <span class="toggle-line"></span>
+        <span class="toggle-line"></span>
+        <span class="toggle-line"></span>
+    </div>
+  </div>
+
+  <div class="site-meta">
+
+    <a href="/" class="brand" rel="start">
+      <i class="logo-line"></i>
+      <h1 class="site-title">一杯咖啡的时间</h1>
+      <i class="logo-line"></i>
+    </a>
+      <p class="site-subtitle" itemprop="description">苦中作乐</p>
+  </div>
+
+  <div class="site-nav-right">
+    <div class="toggle popup-trigger">
+        <i class="fa fa-search fa-fw fa-lg"></i>
+    </div>
+  </div>
+</div>
+
+
+
+<nav class="site-nav">
+  <ul class="main-menu menu">
+        <li class="menu-item menu-item-home">
+
+    <a href="/" rel="section"><i class="fa fa-home fa-fw"></i>首页</a>
+
+  </li>
+        <li class="menu-item menu-item-about">
+
+    <a href="/about/" rel="section"><i class="fa fa-user fa-fw"></i>关于</a>
+
+  </li>
+        <li class="menu-item menu-item-tags">
+
+    <a href="/tags/" rel="section"><i class="fa fa-tags fa-fw"></i>标签</a>
+
+  </li>
+        <li class="menu-item menu-item-categories">
+
+    <a href="/categories/" rel="section"><i class="fa fa-th fa-fw"></i>分类</a>
+
+  </li>
+        <li class="menu-item menu-item-archives">
+
+    <a href="/archives/" rel="section"><i class="fa fa-archive fa-fw"></i>归档</a>
+
+  </li>
+        <li class="menu-item menu-item-commonweal">
+
+    <a href="/404/" rel="section"><i class="fa fa-heartbeat fa-fw"></i>公益 404</a>
+
+  </li>
+      <li class="menu-item menu-item-search">
+        <a role="button" class="popup-trigger"><i class="fa fa-search fa-fw"></i>搜索
+        </a>
+      </li>
+  </ul>
+</nav>
+
+
+
+  <div class="search-pop-overlay">
+    <div class="popup search-popup">
+        <div class="search-header">
+  <span class="search-icon">
+    <i class="fa fa-search"></i>
+  </span>
+  <div class="search-input-container">
+    <input autocomplete="off" autocapitalize="off" maxlength="80"
+           placeholder="搜索..." spellcheck="false"
+           type="search" class="search-input">
+  </div>
+  <span class="popup-btn-close">
+    <i class="fa fa-times-circle"></i>
+  </span>
+</div>
+<div class="search-result-container no-result">
+  <div class="search-result-icon">
+    <i class="fa fa-spinner fa-pulse fa-5x"></i>
+  </div>
+</div>
+
+    </div>
+  </div>
+
+</div>
+        
+  
+  <div class="toggle sidebar-toggle">
+    <span class="toggle-line"></span>
+    <span class="toggle-line"></span>
+    <span class="toggle-line"></span>
+  </div>
+
+  <aside class="sidebar">
+
+    <div class="sidebar-inner sidebar-nav-active sidebar-toc-active">
+      <ul class="sidebar-nav">
+        <li class="sidebar-nav-toc">
+          文章目录
+        </li>
+        <li class="sidebar-nav-overview">
+          站点概览
+        </li>
+      </ul>
+
+      <div class="sidebar-panel-container">
+        <!--noindex-->
+        <section class="post-toc-wrap sidebar-panel">
+            <div class="post-toc animated"><ol class="nav"><li class="nav-item nav-level-1"><a class="nav-link" href="#%E5%89%8D%E8%A8%80"><span class="nav-number">1.</span> <span class="nav-text">前言</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#%E5%88%86%E6%9E%90"><span class="nav-number">2.</span> <span class="nav-text">分析</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#%E5%90%AF%E5%8A%A8%E8%BF%87%E7%A8%8B"><span class="nav-number">2.1.</span> <span class="nav-text">启动过程</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E9%87%87%E9%9B%86"><span class="nav-number">2.2.</span> <span class="nav-text">采集</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#%E6%84%9F%E6%85%A8"><span class="nav-number">2.2.1.</span> <span class="nav-text">感慨</span></a></li></ol></li></ol></li></ol></div>
+        </section>
+        <!--/noindex-->
+
+        <section class="site-overview-wrap sidebar-panel">
+          <div class="site-author site-overview-item animated" itemprop="author" itemscope itemtype="http://schema.org/Person">
+    <img class="site-author-image" itemprop="image" alt="Job Shen"
+      src="/images/Avatar.png">
+  <p class="site-author-name" itemprop="name">Job Shen</p>
+  <div class="site-description" itemprop="description"></div>
+</div>
+<div class="site-state-wrap site-overview-item animated">
+  <nav class="site-state">
+      <div class="site-state-item site-state-posts">
+          <a href="/archives/">
+        
+          <span class="site-state-item-count">11</span>
+          <span class="site-state-item-name">日志</span>
+        </a>
+      </div>
+      <div class="site-state-item site-state-categories">
+            <a href="/categories/">
+          
+        <span class="site-state-item-count">7</span>
+        <span class="site-state-item-name">分类</span></a>
+      </div>
+      <div class="site-state-item site-state-tags">
+            <a href="/tags/">
+          
+        <span class="site-state-item-count">19</span>
+        <span class="site-state-item-name">标签</span></a>
+      </div>
+  </nav>
+</div>
+  <div class="links-of-author site-overview-item animated">
+      <span class="links-of-author-item">
+        <a href="https://github.com/kitdine" title="GitHub → https:&#x2F;&#x2F;github.com&#x2F;kitdine" rel="noopener" target="_blank"><i class="fab fa-github fa-fw"></i>GitHub</a>
+      </span>
+  </div>
+  <div class="cc-license site-overview-item animated" itemprop="license">
+    <a href="https://creativecommons.org/licenses/by-nc-sa/4.0/deed.zh" class="cc-opacity" rel="noopener" target="_blank"><img src="/images/cc-by-nc-sa.svg" alt="Creative Commons"></a>
+  </div>
+
+
+
+        </section>
+      </div>
+    </div>
+  </aside>
+  <div class="sidebar-dimmer"></div>
+
+
+    </header>
+
+    
+  <div class="back-to-top">
+    <i class="fa fa-arrow-up"></i>
+    <span>0%</span>
+  </div>
+  <div class="reading-progress-bar"></div>
+  <a role="button" class="book-mark-link book-mark-link-fixed"></a>
+
+<noscript>
+  <div class="noscript-warning">Theme NexT works best with JavaScript enabled</div>
+</noscript>
+
+
+    <div class="main-inner post posts-expand">
+      
+
+      
+
+  
+
+
+<div class="post-block">
+  
+  
+
+  <article itemscope itemtype="http://schema.org/Article" class="post-content" lang="zh-CN">
+    <link itemprop="mainEntityOfPage" href="http://blog.jobshen.com/posts/5be0aa9e.html">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="/images/Avatar.png">
+      <meta itemprop="name" content="Job Shen">
+      <meta itemprop="description" content="">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="一杯咖啡的时间">
+    </span>
+      <header class="post-header">
+        <h1 class="post-title" itemprop="name headline">
+          Filebeat 浅析（二）
+        </h1>
+
+        <div class="post-meta-container">
+          <div class="post-meta">
+    <span class="post-meta-item">
+      <span class="post-meta-item-icon">
+        <i class="far fa-calendar"></i>
+      </span>
+      <span class="post-meta-item-text">发表于</span>
+
+      <time title="创建时间：2021-02-17 12:24:14" itemprop="dateCreated datePublished" datetime="2021-02-17T12:24:14+08:00">2021-02-17</time>
+    </span>
+    <span class="post-meta-item">
+      <span class="post-meta-item-icon">
+        <i class="far fa-folder"></i>
+      </span>
+      <span class="post-meta-item-text">分类于</span>
+        <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+          <a href="/categories/Filebeat/" itemprop="url" rel="index"><span itemprop="name">Filebeat</span></a>
+        </span>
+    </span>
+
+  
+    <span id="/posts/5be0aa9e.html" class="post-meta-item leancloud_visitors" data-flag-title="Filebeat 浅析（二）" title="阅读次数">
+      <span class="post-meta-item-icon">
+        <i class="far fa-eye"></i>
+      </span>
+      <span class="post-meta-item-text">阅读次数：</span>
+      <span class="leancloud-visitors-count"></span>
+    </span>
+      </div>
+      <div class="post-meta">
+    <span class="post-meta-item" title="本文字数">
+      <span class="post-meta-item-icon">
+        <i class="far fa-file-word"></i>
+      </span>
+      <span class="post-meta-item-text">本文字数：</span>
+      <span>22k</span>
+    </span>
+    <span class="post-meta-item" title="阅读时长">
+      <span class="post-meta-item-icon">
+        <i class="far fa-clock"></i>
+      </span>
+      <span class="post-meta-item-text">阅读时长 &asymp;</span>
+      <span>37 分钟</span>
+    </span>
+</div>
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+        <h1 id="前言"><a href="#前言" class="headerlink" title="前言"></a>前言</h1><p>说完了<code>filebeat</code>的基础架构和相关设计后，我们就来看下<code>filebeat</code>是如何来实现这些功能的。这里只对几个相对来说比较重要的几个流程进行讨论。其余的设计会在之后的文章中进行阐述。几个流程为：</p>
+<ul>
+<li>启动过程</li>
+<li>harvester 监听过程（以log为例）</li>
+<li>outputs 处理流程（以kafka为例）</li>
+</ul>
+<a id="more"></a>
+
+<h1 id="分析"><a href="#分析" class="headerlink" title="分析"></a>分析</h1><h2 id="启动过程"><a href="#启动过程" class="headerlink" title="启动过程"></a>启动过程</h2><p>首先当然是找到入口函数，对于<code>go</code>应用来说很简单，直接找<code>main()</code>就可以了。因此我们可以看到：<code>beats/filebeat/main.go</code>的</p>
+<pre class="line-numbers language-go" data-language="go"><code class="language-go"><span class="token keyword">package</span> main
+
+<span class="token keyword">import</span> <span class="token punctuation">(</span>
+	<span class="token string">"os"</span>
+
+	<span class="token string">"github.com/elastic/beats/v7/filebeat/cmd"</span>
+	inputs <span class="token string">"github.com/elastic/beats/v7/filebeat/input/default-inputs"</span>
+<span class="token punctuation">)</span>
+
+<span class="token comment">// The basic model of execution:</span>
+<span class="token comment">// - input: finds files in paths/globs to harvest, starts harvesters</span>
+<span class="token comment">// - harvester: reads a file, sends events to the spooler</span>
+<span class="token comment">// - spooler: buffers events until ready to flush to the publisher</span>
+<span class="token comment">// - publisher: writes to the network, notifies registrar</span>
+<span class="token comment">// - registrar: records positions of files read</span>
+<span class="token comment">// Finally, input uses the registrar information, on restart, to</span>
+<span class="token comment">// determine where in each file to restart a harvester.</span>
+<span class="token keyword">func</span> <span class="token function">main</span><span class="token punctuation">(</span><span class="token punctuation">)</span> <span class="token punctuation">&#123;</span>
+	<span class="token keyword">if</span> err <span class="token operator">:=</span> cmd<span class="token punctuation">.</span><span class="token function">Filebeat</span><span class="token punctuation">(</span>inputs<span class="token punctuation">.</span>Init<span class="token punctuation">)</span><span class="token punctuation">.</span><span class="token function">Execute</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">;</span> err <span class="token operator">!=</span> <span class="token boolean">nil</span> <span class="token punctuation">&#123;</span>
+		os<span class="token punctuation">.</span><span class="token function">Exit</span><span class="token punctuation">(</span><span class="token number">1</span><span class="token punctuation">)</span>
+	<span class="token punctuation">&#125;</span>
+<span class="token punctuation">&#125;</span><span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span></span></code></pre>
+
+<p>其中<code>ipnuts.Init</code>是用来获取该<code>filebeat</code>在之前的一些状态信息或者初始化一份状态信息，主要是用来记录目前<code>harvester</code>已监听到、采集到的<code>offset</code>相关信息。<code>cmd.Filebeat</code>用来初始化一个<code>Filebeat</code>对象。<code>cmd.root.Filebeat()</code>，加载&amp;初始化相关的配置，以及构建<code>filebeat</code>对象。下面代码里的<code>beater.New</code>方法会构建了<code>filebeat</code>对象。<code>GenRootCmdWithSettings</code>方法内会构建启动<code>filebeat</code>相关命令。</p>
+<pre class="line-numbers language-go" data-language="go"><code class="language-go"><span class="token comment">// Filebeat build the beat root command for executing filebeat and it's subcommands.</span>
+<span class="token keyword">func</span> <span class="token function">Filebeat</span><span class="token punctuation">(</span>inputs beater<span class="token punctuation">.</span>PluginFactory<span class="token punctuation">)</span> <span class="token operator">*</span>cmd<span class="token punctuation">.</span>BeatsRootCmd <span class="token punctuation">&#123;</span>
+	<span class="token keyword">var</span> runFlags <span class="token operator">=</span> pflag<span class="token punctuation">.</span><span class="token function">NewFlagSet</span><span class="token punctuation">(</span>Name<span class="token punctuation">,</span> pflag<span class="token punctuation">.</span>ExitOnError<span class="token punctuation">)</span>
+	runFlags<span class="token punctuation">.</span><span class="token function">AddGoFlag</span><span class="token punctuation">(</span>flag<span class="token punctuation">.</span>CommandLine<span class="token punctuation">.</span><span class="token function">Lookup</span><span class="token punctuation">(</span><span class="token string">"once"</span><span class="token punctuation">)</span><span class="token punctuation">)</span>
+	runFlags<span class="token punctuation">.</span><span class="token function">AddGoFlag</span><span class="token punctuation">(</span>flag<span class="token punctuation">.</span>CommandLine<span class="token punctuation">.</span><span class="token function">Lookup</span><span class="token punctuation">(</span><span class="token string">"modules"</span><span class="token punctuation">)</span><span class="token punctuation">)</span>
+	settings <span class="token operator">:=</span> instance<span class="token punctuation">.</span>Settings<span class="token punctuation">&#123;</span>
+		RunFlags<span class="token punctuation">:</span>      runFlags<span class="token punctuation">,</span>
+		Name<span class="token punctuation">:</span>          Name<span class="token punctuation">,</span>
+		HasDashboards<span class="token punctuation">:</span> <span class="token boolean">true</span><span class="token punctuation">,</span>
+	<span class="token punctuation">&#125;</span>
+
+  <span class="token comment">// 主要是这行代码</span>
+	command <span class="token operator">:=</span> cmd<span class="token punctuation">.</span><span class="token function">GenRootCmdWithSettings</span><span class="token punctuation">(</span>beater<span class="token punctuation">.</span><span class="token function">New</span><span class="token punctuation">(</span>inputs<span class="token punctuation">)</span><span class="token punctuation">,</span> settings<span class="token punctuation">)</span>
+  
+	command<span class="token punctuation">.</span><span class="token function">PersistentFlags</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">.</span><span class="token function">AddGoFlag</span><span class="token punctuation">(</span>flag<span class="token punctuation">.</span>CommandLine<span class="token punctuation">.</span><span class="token function">Lookup</span><span class="token punctuation">(</span><span class="token string">"M"</span><span class="token punctuation">)</span><span class="token punctuation">)</span>
+	command<span class="token punctuation">.</span>TestCmd<span class="token punctuation">.</span><span class="token function">Flags</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">.</span><span class="token function">AddGoFlag</span><span class="token punctuation">(</span>flag<span class="token punctuation">.</span>CommandLine<span class="token punctuation">.</span><span class="token function">Lookup</span><span class="token punctuation">(</span><span class="token string">"modules"</span><span class="token punctuation">)</span><span class="token punctuation">)</span>
+	command<span class="token punctuation">.</span>SetupCmd<span class="token punctuation">.</span><span class="token function">Flags</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">.</span><span class="token function">AddGoFlag</span><span class="token punctuation">(</span>flag<span class="token punctuation">.</span>CommandLine<span class="token punctuation">.</span><span class="token function">Lookup</span><span class="token punctuation">(</span><span class="token string">"modules"</span><span class="token punctuation">)</span><span class="token punctuation">)</span>
+	command<span class="token punctuation">.</span><span class="token function">AddCommand</span><span class="token punctuation">(</span>cmd<span class="token punctuation">.</span><span class="token function">GenModulesCmd</span><span class="token punctuation">(</span>Name<span class="token punctuation">,</span> <span class="token string">""</span><span class="token punctuation">,</span> buildModulesManager<span class="token punctuation">)</span><span class="token punctuation">)</span>
+	command<span class="token punctuation">.</span><span class="token function">AddCommand</span><span class="token punctuation">(</span><span class="token function">genGenerateCmd</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">)</span>
+	<span class="token keyword">return</span> command
+<span class="token punctuation">&#125;</span><span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span></span></code></pre>
+
+<p><code>GenRootCmdWithSettings</code>函数在<code>filebeat/libbeat/cmd/root.go</code>文件内。</p>
+<pre class="line-numbers language-go" data-language="go"><code class="language-go"><span class="token keyword">func</span> <span class="token function">GenRootCmdWithSettings</span><span class="token punctuation">(</span>beatCreator beat<span class="token punctuation">.</span>Creator<span class="token punctuation">,</span> settings instance<span class="token punctuation">.</span>Settings<span class="token punctuation">)</span> <span class="token operator">*</span>BeatsRootCmd <span class="token punctuation">&#123;</span>
+  <span class="token operator">...</span>
+  
+	rootCmd<span class="token punctuation">.</span>RunCmd <span class="token operator">=</span> <span class="token function">genRunCmd</span><span class="token punctuation">(</span>settings<span class="token punctuation">,</span> beatCreator<span class="token punctuation">)</span>
+	<span class="token operator">...</span>
+	<span class="token keyword">return</span> rootCmd
+<span class="token punctuation">&#125;</span>
+<span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span><span></span><span></span></span></code></pre>
+
+<p>此函数内会调用<code>filebeat/libbeat/cmd/run.go</code>文件内的<code>func genRunCmd(settings instance.Settings, beatCreator beat.Creator) *cobra.Command</code>方法。</p>
+<pre class="line-numbers language-go" data-language="go"><code class="language-go"><span class="token keyword">func</span> <span class="token function">genRunCmd</span><span class="token punctuation">(</span>settings instance<span class="token punctuation">.</span>Settings<span class="token punctuation">,</span> beatCreator beat<span class="token punctuation">.</span>Creator<span class="token punctuation">)</span> <span class="token operator">*</span>cobra<span class="token punctuation">.</span>Command <span class="token punctuation">&#123;</span>
+	name <span class="token operator">:=</span> settings<span class="token punctuation">.</span>Name
+	runCmd <span class="token operator">:=</span> cobra<span class="token punctuation">.</span>Command<span class="token punctuation">&#123;</span>
+		Use<span class="token punctuation">:</span>   <span class="token string">"run"</span><span class="token punctuation">,</span>
+		Short<span class="token punctuation">:</span> <span class="token string">"Run "</span> <span class="token operator">+</span> name<span class="token punctuation">,</span>
+		Run<span class="token punctuation">:</span> <span class="token keyword">func</span><span class="token punctuation">(</span>cmd <span class="token operator">*</span>cobra<span class="token punctuation">.</span>Command<span class="token punctuation">,</span> args <span class="token punctuation">[</span><span class="token punctuation">]</span><span class="token builtin">string</span><span class="token punctuation">)</span> <span class="token punctuation">&#123;</span>
+			err <span class="token operator">:=</span> instance<span class="token punctuation">.</span><span class="token function">Run</span><span class="token punctuation">(</span>settings<span class="token punctuation">,</span> beatCreator<span class="token punctuation">)</span>
+			<span class="token keyword">if</span> err <span class="token operator">!=</span> <span class="token boolean">nil</span> <span class="token punctuation">&#123;</span>
+				os<span class="token punctuation">.</span><span class="token function">Exit</span><span class="token punctuation">(</span><span class="token number">1</span><span class="token punctuation">)</span>
+			<span class="token punctuation">&#125;</span>
+		<span class="token punctuation">&#125;</span><span class="token punctuation">,</span>
+	<span class="token punctuation">&#125;</span>
+	<span class="token operator">...</span>
+<span class="token punctuation">&#125;</span><span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span></span></code></pre>
+
+<p>根据方法名字就能关注到重点</p>
+<pre class="line-numbers language-go" data-language="go"><code class="language-go">instance<span class="token punctuation">.</span><span class="token function">Run</span><span class="token punctuation">(</span>settings<span class="token punctuation">,</span> beatCreator<span class="token punctuation">)</span><span aria-hidden="true" class="line-numbers-rows"><span></span></span></code></pre>
+
+<p><code>Run</code>方法内会构建<code>Beat</code>对象，并调用<code>launch</code>方法。</p>
+<pre class="line-numbers language-go" data-language="go"><code class="language-go"><span class="token comment">// Run initializes and runs a Beater implementation. name is the name of the</span>
+<span class="token comment">// Beat (e.g. packetbeat or metricbeat). version is version number of the Beater</span>
+<span class="token comment">// implementation. bt is the `Creator` callback for creating a new beater</span>
+<span class="token comment">// instance.</span>
+<span class="token comment">// XXX Move this as a *Beat method?</span>
+<span class="token keyword">func</span> <span class="token function">Run</span><span class="token punctuation">(</span>settings Settings<span class="token punctuation">,</span> bt beat<span class="token punctuation">.</span>Creator<span class="token punctuation">)</span> <span class="token builtin">error</span> <span class="token punctuation">&#123;</span>
+  <span class="token operator">...</span>
+  <span class="token keyword">return</span> <span class="token function">handleError</span><span class="token punctuation">(</span><span class="token keyword">func</span><span class="token punctuation">(</span><span class="token punctuation">)</span> <span class="token builtin">error</span> <span class="token punctuation">&#123;</span>
+    <span class="token operator">...</span>
+    b<span class="token punctuation">,</span> err <span class="token operator">:=</span> <span class="token function">NewBeat</span><span class="token punctuation">(</span>name<span class="token punctuation">,</span> idxPrefix<span class="token punctuation">,</span> version<span class="token punctuation">)</span>
+    <span class="token operator">...</span>
+    <span class="token keyword">return</span> b<span class="token punctuation">.</span><span class="token function">launch</span><span class="token punctuation">(</span>settings<span class="token punctuation">,</span> bt<span class="token punctuation">)</span>
+  <span class="token punctuation">&#125;</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">)</span>
+<span class="token punctuation">&#125;</span><span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span></span></code></pre>
+
+<p><code>launch</code>方法内又构建了<code>Beater</code>对象(<code>Beater</code>是个接口)，并且在最后调用了<code>Beater</code>接口的<code>Run</code>方法启动。</p>
+<pre class="line-numbers language-go" data-language="go"><code class="language-go"><span class="token keyword">func</span> <span class="token punctuation">(</span>b <span class="token operator">*</span>Beat<span class="token punctuation">)</span> <span class="token function">launch</span><span class="token punctuation">(</span>settings Settings<span class="token punctuation">,</span> bt beat<span class="token punctuation">.</span>Creator<span class="token punctuation">)</span> <span class="token builtin">error</span> <span class="token punctuation">&#123;</span>
+
+	<span class="token operator">...</span>
+	
+	beater<span class="token punctuation">,</span> err <span class="token operator">:=</span> b<span class="token punctuation">.</span><span class="token function">createBeater</span><span class="token punctuation">(</span>bt<span class="token punctuation">)</span>
+	
+	<span class="token operator">...</span>
+	
+	<span class="token keyword">return</span> beater<span class="token punctuation">.</span><span class="token function">Run</span><span class="token punctuation">(</span><span class="token operator">&amp;</span>b<span class="token punctuation">.</span>Beat<span class="token punctuation">)</span>
+<span class="token punctuation">&#125;</span><span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span></span></code></pre>
+
+<p>这个接口有多个实现，但是我们这里只需要关注一个，文件<code>filebeat/beater/filebeat.go</code>文件内的<code>Run</code>方法，这里就是启动<code>filebeat</code>的实现。</p>
+<p>在<code>Run</code>方法内，会构建一个<code>crawler</code>对象，此对象用来采集数据，工作原理其实是对<code>Inputs</code>的包装，<code>Inputs</code>就是<code>filebeat</code>官网介绍的核心组件之一。</p>
+<pre class="line-numbers language-go" data-language="go"><code class="language-go"><span class="token comment">// Run allows the beater to be run as a beat.</span>
+<span class="token keyword">func</span> <span class="token punctuation">(</span>fb <span class="token operator">*</span>Filebeat<span class="token punctuation">)</span> <span class="token function">Run</span><span class="token punctuation">(</span>b <span class="token operator">*</span>beat<span class="token punctuation">.</span>Beat<span class="token punctuation">)</span> <span class="token builtin">error</span> <span class="token punctuation">&#123;</span>
+	<span class="token keyword">var</span> err <span class="token builtin">error</span>
+	config <span class="token operator">:=</span> fb<span class="token punctuation">.</span>config
+
+	<span class="token keyword">if</span> <span class="token operator">!</span>fb<span class="token punctuation">.</span>moduleRegistry<span class="token punctuation">.</span><span class="token function">Empty</span><span class="token punctuation">(</span><span class="token punctuation">)</span> <span class="token punctuation">&#123;</span>
+		err <span class="token operator">=</span> fb<span class="token punctuation">.</span><span class="token function">loadModulesPipelines</span><span class="token punctuation">(</span>b<span class="token punctuation">)</span>
+		<span class="token keyword">if</span> err <span class="token operator">!=</span> <span class="token boolean">nil</span> <span class="token punctuation">&#123;</span>
+			<span class="token keyword">return</span> err
+		<span class="token punctuation">&#125;</span>
+	<span class="token punctuation">&#125;</span>
+
+  <span class="token comment">// 构建相关统计信息的chan</span>
+	waitFinished <span class="token operator">:=</span> <span class="token function">newSignalWait</span><span class="token punctuation">(</span><span class="token punctuation">)</span>
+	waitEvents <span class="token operator">:=</span> <span class="token function">newSignalWait</span><span class="token punctuation">(</span><span class="token punctuation">)</span>
+
+	<span class="token comment">// count active events for waiting on shutdown</span>
+	wgEvents <span class="token operator">:=</span> <span class="token operator">&amp;</span>eventCounter<span class="token punctuation">&#123;</span>
+		count<span class="token punctuation">:</span> monitoring<span class="token punctuation">.</span><span class="token function">NewInt</span><span class="token punctuation">(</span><span class="token boolean">nil</span><span class="token punctuation">,</span> <span class="token string">"filebeat.events.active"</span><span class="token punctuation">)</span><span class="token punctuation">,</span>
+		added<span class="token punctuation">:</span> monitoring<span class="token punctuation">.</span><span class="token function">NewUint</span><span class="token punctuation">(</span><span class="token boolean">nil</span><span class="token punctuation">,</span> <span class="token string">"filebeat.events.added"</span><span class="token punctuation">)</span><span class="token punctuation">,</span>
+		done<span class="token punctuation">:</span>  monitoring<span class="token punctuation">.</span><span class="token function">NewUint</span><span class="token punctuation">(</span><span class="token boolean">nil</span><span class="token punctuation">,</span> <span class="token string">"filebeat.events.done"</span><span class="token punctuation">)</span><span class="token punctuation">,</span>
+	<span class="token punctuation">&#125;</span>
+	finishedLogger <span class="token operator">:=</span> <span class="token function">newFinishedLogger</span><span class="token punctuation">(</span>wgEvents<span class="token punctuation">)</span>
+
+	registryMigrator <span class="token operator">:=</span> registrar<span class="token punctuation">.</span><span class="token function">NewMigrator</span><span class="token punctuation">(</span>config<span class="token punctuation">.</span>Registry<span class="token punctuation">)</span>
+	<span class="token keyword">if</span> err <span class="token operator">:=</span> registryMigrator<span class="token punctuation">.</span><span class="token function">Run</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">;</span> err <span class="token operator">!=</span> <span class="token boolean">nil</span> <span class="token punctuation">&#123;</span>
+		logp<span class="token punctuation">.</span><span class="token function">Err</span><span class="token punctuation">(</span><span class="token string">"Failed to migrate registry file: %+v"</span><span class="token punctuation">,</span> err<span class="token punctuation">)</span>
+		<span class="token keyword">return</span> err
+	<span class="token punctuation">&#125;</span>
+
+  <span class="token comment">// input 对于file的 相关进度信息，offset等</span>
+	stateStore<span class="token punctuation">,</span> err <span class="token operator">:=</span> <span class="token function">openStateStore</span><span class="token punctuation">(</span>b<span class="token punctuation">.</span>Info<span class="token punctuation">,</span> logp<span class="token punctuation">.</span><span class="token function">NewLogger</span><span class="token punctuation">(</span><span class="token string">"filebeat"</span><span class="token punctuation">)</span><span class="token punctuation">,</span> config<span class="token punctuation">.</span>Registry<span class="token punctuation">)</span>
+	<span class="token keyword">if</span> err <span class="token operator">!=</span> <span class="token boolean">nil</span> <span class="token punctuation">&#123;</span>
+		logp<span class="token punctuation">.</span><span class="token function">Err</span><span class="token punctuation">(</span><span class="token string">"Failed to open state store: %+v"</span><span class="token punctuation">,</span> err<span class="token punctuation">)</span>
+		<span class="token keyword">return</span> err
+	<span class="token punctuation">&#125;</span>
+	<span class="token keyword">defer</span> stateStore<span class="token punctuation">.</span><span class="token function">Close</span><span class="token punctuation">(</span><span class="token punctuation">)</span>
+
+  <span class="token comment">// 构建一个register 用以保存相关数据</span>
+	<span class="token comment">// Setup registrar to persist state</span>
+	registrar<span class="token punctuation">,</span> err <span class="token operator">:=</span> registrar<span class="token punctuation">.</span><span class="token function">New</span><span class="token punctuation">(</span>stateStore<span class="token punctuation">,</span> finishedLogger<span class="token punctuation">,</span> config<span class="token punctuation">.</span>Registry<span class="token punctuation">.</span>FlushTimeout<span class="token punctuation">)</span>
+	<span class="token keyword">if</span> err <span class="token operator">!=</span> <span class="token boolean">nil</span> <span class="token punctuation">&#123;</span>
+		logp<span class="token punctuation">.</span><span class="token function">Err</span><span class="token punctuation">(</span><span class="token string">"Could not init registrar: %v"</span><span class="token punctuation">,</span> err<span class="token punctuation">)</span>
+		<span class="token keyword">return</span> err
+	<span class="token punctuation">&#125;</span>
+
+	<span class="token comment">// Make sure all events that were published in</span>
+	registrarChannel <span class="token operator">:=</span> <span class="token function">newRegistrarLogger</span><span class="token punctuation">(</span>registrar<span class="token punctuation">)</span>
+
+  <span class="token comment">// 构建相关pipeline，internal queu，将上下游形成一个闭环</span>
+  <span class="token comment">// input --> harvester --> event --> processors --> queue --> publisher --> outputs</span>
+	<span class="token comment">// setup event counting for startup and a global common ACKer, such that all events will be</span>
+	<span class="token comment">// routed to the reigstrar after they've been ACKed.</span>
+	<span class="token comment">// Events with Private==nil or the type of private != file.State are directly</span>
+	<span class="token comment">// forwarded to `finishedLogger`. Events from the `logs` input will first be forwarded</span>
+	<span class="token comment">// to the registrar via `registrarChannel`, which finally forwards the events to finishedLogger as well.</span>
+	<span class="token comment">// The finishedLogger decrements the counters in wgEvents after all events have been securely processed</span>
+	<span class="token comment">// by the registry.</span>
+	fb<span class="token punctuation">.</span>pipeline <span class="token operator">=</span> <span class="token function">withPipelineEventCounter</span><span class="token punctuation">(</span>b<span class="token punctuation">.</span>Publisher<span class="token punctuation">,</span> wgEvents<span class="token punctuation">)</span>
+	fb<span class="token punctuation">.</span>pipeline <span class="token operator">=</span> pipetool<span class="token punctuation">.</span><span class="token function">WithACKer</span><span class="token punctuation">(</span>fb<span class="token punctuation">.</span>pipeline<span class="token punctuation">,</span> <span class="token function">eventACKer</span><span class="token punctuation">(</span>finishedLogger<span class="token punctuation">,</span> registrarChannel<span class="token punctuation">)</span><span class="token punctuation">)</span>
+
+	<span class="token comment">// Filebeat by default required infinite retry. Let's configure this for all</span>
+	<span class="token comment">// inputs by default.  Inputs (and InputController) can overwrite the sending</span>
+	<span class="token comment">// guarantees explicitly when connecting with the pipeline.</span>
+	fb<span class="token punctuation">.</span>pipeline <span class="token operator">=</span> pipetool<span class="token punctuation">.</span><span class="token function">WithDefaultGuarantees</span><span class="token punctuation">(</span>fb<span class="token punctuation">.</span>pipeline<span class="token punctuation">,</span> beat<span class="token punctuation">.</span>GuaranteedSend<span class="token punctuation">)</span>
+
+	outDone <span class="token operator">:=</span> <span class="token function">make</span><span class="token punctuation">(</span><span class="token keyword">chan</span> <span class="token keyword">struct</span><span class="token punctuation">&#123;</span><span class="token punctuation">&#125;</span><span class="token punctuation">)</span> <span class="token comment">// outDone closes down all active pipeline connections</span>
+	pipelineConnector <span class="token operator">:=</span> channel<span class="token punctuation">.</span><span class="token function">NewOutletFactory</span><span class="token punctuation">(</span>outDone<span class="token punctuation">)</span><span class="token punctuation">.</span>Create
+
+	<span class="token comment">// Create a ES connection factory for dynamic modules pipeline loading</span>
+	<span class="token keyword">var</span> pipelineLoaderFactory fileset<span class="token punctuation">.</span>PipelineLoaderFactory
+	<span class="token keyword">if</span> b<span class="token punctuation">.</span>Config<span class="token punctuation">.</span>Output<span class="token punctuation">.</span><span class="token function">Name</span><span class="token punctuation">(</span><span class="token punctuation">)</span> <span class="token operator">==</span> <span class="token string">"elasticsearch"</span> <span class="token punctuation">&#123;</span>
+		pipelineLoaderFactory <span class="token operator">=</span> <span class="token function">newPipelineLoaderFactory</span><span class="token punctuation">(</span>b<span class="token punctuation">.</span>Config<span class="token punctuation">.</span>Output<span class="token punctuation">.</span><span class="token function">Config</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">)</span>
+	<span class="token punctuation">&#125;</span> <span class="token keyword">else</span> <span class="token punctuation">&#123;</span>
+		logp<span class="token punctuation">.</span><span class="token function">Warn</span><span class="token punctuation">(</span>pipelinesWarning<span class="token punctuation">)</span>
+	<span class="token punctuation">&#125;</span>
+
+	inputsLogger <span class="token operator">:=</span> logp<span class="token punctuation">.</span><span class="token function">NewLogger</span><span class="token punctuation">(</span><span class="token string">"input"</span><span class="token punctuation">)</span>
+	v2Inputs <span class="token operator">:=</span> fb<span class="token punctuation">.</span><span class="token function">pluginFactory</span><span class="token punctuation">(</span>b<span class="token punctuation">.</span>Info<span class="token punctuation">,</span> inputsLogger<span class="token punctuation">,</span> stateStore<span class="token punctuation">)</span>
+	v2InputLoader<span class="token punctuation">,</span> err <span class="token operator">:=</span> v2<span class="token punctuation">.</span><span class="token function">NewLoader</span><span class="token punctuation">(</span>inputsLogger<span class="token punctuation">,</span> v2Inputs<span class="token punctuation">,</span> <span class="token string">"type"</span><span class="token punctuation">,</span> cfg<span class="token punctuation">.</span>DefaultType<span class="token punctuation">)</span>
+	<span class="token keyword">if</span> err <span class="token operator">!=</span> <span class="token boolean">nil</span> <span class="token punctuation">&#123;</span>
+		<span class="token function">panic</span><span class="token punctuation">(</span>err<span class="token punctuation">)</span> <span class="token comment">// loader detected invalid state.</span>
+	<span class="token punctuation">&#125;</span>
+
+	<span class="token keyword">var</span> inputTaskGroup unison<span class="token punctuation">.</span>TaskGroup
+	<span class="token keyword">defer</span> inputTaskGroup<span class="token punctuation">.</span><span class="token function">Stop</span><span class="token punctuation">(</span><span class="token punctuation">)</span>
+	<span class="token keyword">if</span> err <span class="token operator">:=</span> v2InputLoader<span class="token punctuation">.</span><span class="token function">Init</span><span class="token punctuation">(</span><span class="token operator">&amp;</span>inputTaskGroup<span class="token punctuation">,</span> v2<span class="token punctuation">.</span>ModeRun<span class="token punctuation">)</span><span class="token punctuation">;</span> err <span class="token operator">!=</span> <span class="token boolean">nil</span> <span class="token punctuation">&#123;</span>
+		logp<span class="token punctuation">.</span><span class="token function">Err</span><span class="token punctuation">(</span><span class="token string">"Failed to initialize the input managers: %v"</span><span class="token punctuation">,</span> err<span class="token punctuation">)</span>
+		<span class="token keyword">return</span> err
+	<span class="token punctuation">&#125;</span>
+
+	inputLoader <span class="token operator">:=</span> channel<span class="token punctuation">.</span><span class="token function">RunnerFactoryWithCommonInputSettings</span><span class="token punctuation">(</span>b<span class="token punctuation">.</span>Info<span class="token punctuation">,</span> compat<span class="token punctuation">.</span><span class="token function">Combine</span><span class="token punctuation">(</span>
+		compat<span class="token punctuation">.</span><span class="token function">RunnerFactory</span><span class="token punctuation">(</span>inputsLogger<span class="token punctuation">,</span> b<span class="token punctuation">.</span>Info<span class="token punctuation">,</span> v2InputLoader<span class="token punctuation">)</span><span class="token punctuation">,</span>
+		input<span class="token punctuation">.</span><span class="token function">NewRunnerFactory</span><span class="token punctuation">(</span>pipelineConnector<span class="token punctuation">,</span> registrar<span class="token punctuation">,</span> fb<span class="token punctuation">.</span>done<span class="token punctuation">)</span><span class="token punctuation">,</span>
+	<span class="token punctuation">)</span><span class="token punctuation">)</span>
+	moduleLoader <span class="token operator">:=</span> fileset<span class="token punctuation">.</span><span class="token function">NewFactory</span><span class="token punctuation">(</span>inputLoader<span class="token punctuation">,</span> b<span class="token punctuation">.</span>Info<span class="token punctuation">,</span> pipelineLoaderFactory<span class="token punctuation">,</span> config<span class="token punctuation">.</span>OverwritePipelines<span class="token punctuation">)</span>
+
+  <span class="token comment">// input 相关</span>
+	crawler<span class="token punctuation">,</span> err <span class="token operator">:=</span> <span class="token function">newCrawler</span><span class="token punctuation">(</span>inputLoader<span class="token punctuation">,</span> moduleLoader<span class="token punctuation">,</span> config<span class="token punctuation">.</span>Inputs<span class="token punctuation">,</span> fb<span class="token punctuation">.</span>done<span class="token punctuation">,</span> <span class="token operator">*</span>once<span class="token punctuation">)</span>
+	<span class="token keyword">if</span> err <span class="token operator">!=</span> <span class="token boolean">nil</span> <span class="token punctuation">&#123;</span>
+		logp<span class="token punctuation">.</span><span class="token function">Err</span><span class="token punctuation">(</span><span class="token string">"Could not init crawler: %v"</span><span class="token punctuation">,</span> err<span class="token punctuation">)</span>
+		<span class="token keyword">return</span> err
+	<span class="token punctuation">&#125;</span>
+
+	<span class="token comment">// The order of starting and stopping is important. Stopping is inverted to the starting order.</span>
+	<span class="token comment">// The current order is: registrar, publisher, spooler, crawler</span>
+	<span class="token comment">// That means, crawler is stopped first.</span>
+
+	<span class="token comment">// Start the registrar</span>
+	err <span class="token operator">=</span> registrar<span class="token punctuation">.</span><span class="token function">Start</span><span class="token punctuation">(</span><span class="token punctuation">)</span>
+	<span class="token keyword">if</span> err <span class="token operator">!=</span> <span class="token boolean">nil</span> <span class="token punctuation">&#123;</span>
+		<span class="token keyword">return</span> fmt<span class="token punctuation">.</span><span class="token function">Errorf</span><span class="token punctuation">(</span><span class="token string">"Could not start registrar: %v"</span><span class="token punctuation">,</span> err<span class="token punctuation">)</span>
+	<span class="token punctuation">&#125;</span>
+
+	<span class="token comment">// Stopping registrar will write last state</span>
+	<span class="token keyword">defer</span> registrar<span class="token punctuation">.</span><span class="token function">Stop</span><span class="token punctuation">(</span><span class="token punctuation">)</span>
+
+	<span class="token comment">// Stopping publisher (might potentially drop items)</span>
+	<span class="token keyword">defer</span> <span class="token keyword">func</span><span class="token punctuation">(</span><span class="token punctuation">)</span> <span class="token punctuation">&#123;</span>
+		<span class="token comment">// Closes first the registrar logger to make sure not more events arrive at the registrar</span>
+		<span class="token comment">// registrarChannel must be closed first to potentially unblock (pretty unlikely) the publisher</span>
+		registrarChannel<span class="token punctuation">.</span><span class="token function">Close</span><span class="token punctuation">(</span><span class="token punctuation">)</span>
+		<span class="token function">close</span><span class="token punctuation">(</span>outDone<span class="token punctuation">)</span> <span class="token comment">// finally close all active connections to publisher pipeline</span>
+	<span class="token punctuation">&#125;</span><span class="token punctuation">(</span><span class="token punctuation">)</span>
+
+	<span class="token comment">// Wait for all events to be processed or timeout</span>
+	<span class="token keyword">defer</span> waitEvents<span class="token punctuation">.</span><span class="token function">Wait</span><span class="token punctuation">(</span><span class="token punctuation">)</span>
+
+	<span class="token keyword">if</span> config<span class="token punctuation">.</span>OverwritePipelines <span class="token punctuation">&#123;</span>
+		logp<span class="token punctuation">.</span><span class="token function">Debug</span><span class="token punctuation">(</span><span class="token string">"modules"</span><span class="token punctuation">,</span> <span class="token string">"Existing Ingest pipelines will be updated"</span><span class="token punctuation">)</span>
+	<span class="token punctuation">&#125;</span>
+
+	err <span class="token operator">=</span> crawler<span class="token punctuation">.</span><span class="token function">Start</span><span class="token punctuation">(</span>fb<span class="token punctuation">.</span>pipeline<span class="token punctuation">,</span> config<span class="token punctuation">.</span>ConfigInput<span class="token punctuation">,</span> config<span class="token punctuation">.</span>ConfigModules<span class="token punctuation">)</span>
+	<span class="token keyword">if</span> err <span class="token operator">!=</span> <span class="token boolean">nil</span> <span class="token punctuation">&#123;</span>
+		crawler<span class="token punctuation">.</span><span class="token function">Stop</span><span class="token punctuation">(</span><span class="token punctuation">)</span>
+		<span class="token keyword">return</span> fmt<span class="token punctuation">.</span><span class="token function">Errorf</span><span class="token punctuation">(</span><span class="token string">"Failed to start crawler: %+v"</span><span class="token punctuation">,</span> err<span class="token punctuation">)</span>
+	<span class="token punctuation">&#125;</span>
+
+	<span class="token comment">// If run once, add crawler completion check as alternative to done signal</span>
+	<span class="token keyword">if</span> <span class="token operator">*</span>once <span class="token punctuation">&#123;</span>
+		runOnce <span class="token operator">:=</span> <span class="token keyword">func</span><span class="token punctuation">(</span><span class="token punctuation">)</span> <span class="token punctuation">&#123;</span>
+			logp<span class="token punctuation">.</span><span class="token function">Info</span><span class="token punctuation">(</span><span class="token string">"Running filebeat once. Waiting for completion ..."</span><span class="token punctuation">)</span>
+			crawler<span class="token punctuation">.</span><span class="token function">WaitForCompletion</span><span class="token punctuation">(</span><span class="token punctuation">)</span>
+			logp<span class="token punctuation">.</span><span class="token function">Info</span><span class="token punctuation">(</span><span class="token string">"All data collection completed. Shutting down."</span><span class="token punctuation">)</span>
+		<span class="token punctuation">&#125;</span>
+		waitFinished<span class="token punctuation">.</span><span class="token function">Add</span><span class="token punctuation">(</span>runOnce<span class="token punctuation">)</span>
+	<span class="token punctuation">&#125;</span>
+
+	<span class="token comment">// Register reloadable list of inputs and modules</span>
+	inputs <span class="token operator">:=</span> cfgfile<span class="token punctuation">.</span><span class="token function">NewRunnerList</span><span class="token punctuation">(</span>management<span class="token punctuation">.</span>DebugK<span class="token punctuation">,</span> inputLoader<span class="token punctuation">,</span> fb<span class="token punctuation">.</span>pipeline<span class="token punctuation">)</span>
+	reload<span class="token punctuation">.</span>Register<span class="token punctuation">.</span><span class="token function">MustRegisterList</span><span class="token punctuation">(</span><span class="token string">"filebeat.inputs"</span><span class="token punctuation">,</span> inputs<span class="token punctuation">)</span>
+	<span class="token comment">// modules 载入</span>
+	modules <span class="token operator">:=</span> cfgfile<span class="token punctuation">.</span><span class="token function">NewRunnerList</span><span class="token punctuation">(</span>management<span class="token punctuation">.</span>DebugK<span class="token punctuation">,</span> moduleLoader<span class="token punctuation">,</span> fb<span class="token punctuation">.</span>pipeline<span class="token punctuation">)</span>
+	reload<span class="token punctuation">.</span>Register<span class="token punctuation">.</span><span class="token function">MustRegisterList</span><span class="token punctuation">(</span><span class="token string">"filebeat.modules"</span><span class="token punctuation">,</span> modules<span class="token punctuation">)</span>
+
+	<span class="token keyword">var</span> adiscover <span class="token operator">*</span>autodiscover<span class="token punctuation">.</span>Autodiscover
+	<span class="token keyword">if</span> fb<span class="token punctuation">.</span>config<span class="token punctuation">.</span>Autodiscover <span class="token operator">!=</span> <span class="token boolean">nil</span> <span class="token punctuation">&#123;</span>
+		adiscover<span class="token punctuation">,</span> err <span class="token operator">=</span> autodiscover<span class="token punctuation">.</span><span class="token function">NewAutodiscover</span><span class="token punctuation">(</span>
+			<span class="token string">"filebeat"</span><span class="token punctuation">,</span>
+			fb<span class="token punctuation">.</span>pipeline<span class="token punctuation">,</span>
+			cfgfile<span class="token punctuation">.</span><span class="token function">MultiplexedRunnerFactory</span><span class="token punctuation">(</span>
+				cfgfile<span class="token punctuation">.</span><span class="token function">MatchHasField</span><span class="token punctuation">(</span><span class="token string">"module"</span><span class="token punctuation">,</span> moduleLoader<span class="token punctuation">)</span><span class="token punctuation">,</span>
+				cfgfile<span class="token punctuation">.</span><span class="token function">MatchDefault</span><span class="token punctuation">(</span>inputLoader<span class="token punctuation">)</span><span class="token punctuation">,</span>
+			<span class="token punctuation">)</span><span class="token punctuation">,</span>
+			autodiscover<span class="token punctuation">.</span><span class="token function">QueryConfig</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">,</span>
+			config<span class="token punctuation">.</span>Autodiscover<span class="token punctuation">,</span>
+			b<span class="token punctuation">.</span>Keystore<span class="token punctuation">,</span>
+		<span class="token punctuation">)</span>
+		<span class="token keyword">if</span> err <span class="token operator">!=</span> <span class="token boolean">nil</span> <span class="token punctuation">&#123;</span>
+			<span class="token keyword">return</span> err
+		<span class="token punctuation">&#125;</span>
+	<span class="token punctuation">&#125;</span>
+	adiscover<span class="token punctuation">.</span><span class="token function">Start</span><span class="token punctuation">(</span><span class="token punctuation">)</span>
+
+	<span class="token comment">// Add done channel to wait for shutdown signal</span>
+	waitFinished<span class="token punctuation">.</span><span class="token function">AddChan</span><span class="token punctuation">(</span>fb<span class="token punctuation">.</span>done<span class="token punctuation">)</span>
+	waitFinished<span class="token punctuation">.</span><span class="token function">Wait</span><span class="token punctuation">(</span><span class="token punctuation">)</span>
+
+	<span class="token comment">// Stop reloadable lists, autodiscover -> Stop crawler -> stop inputs -> stop harvesters</span>
+	<span class="token comment">// Note: waiting for crawlers to stop here in order to install wgEvents.Wait</span>
+	<span class="token comment">//       after all events have been enqueued for publishing. Otherwise wgEvents.Wait</span>
+	<span class="token comment">//       or publisher might panic due to concurrent updates.</span>
+	inputs<span class="token punctuation">.</span><span class="token function">Stop</span><span class="token punctuation">(</span><span class="token punctuation">)</span>
+	modules<span class="token punctuation">.</span><span class="token function">Stop</span><span class="token punctuation">(</span><span class="token punctuation">)</span>
+	adiscover<span class="token punctuation">.</span><span class="token function">Stop</span><span class="token punctuation">(</span><span class="token punctuation">)</span>
+	crawler<span class="token punctuation">.</span><span class="token function">Stop</span><span class="token punctuation">(</span><span class="token punctuation">)</span>
+
+	timeout <span class="token operator">:=</span> fb<span class="token punctuation">.</span>config<span class="token punctuation">.</span>ShutdownTimeout
+	<span class="token comment">// Checks if on shutdown it should wait for all events to be published</span>
+	waitPublished <span class="token operator">:=</span> fb<span class="token punctuation">.</span>config<span class="token punctuation">.</span>ShutdownTimeout <span class="token operator">></span> <span class="token number">0</span> <span class="token operator">||</span> <span class="token operator">*</span>once
+	<span class="token keyword">if</span> waitPublished <span class="token punctuation">&#123;</span>
+		<span class="token comment">// Wait for registrar to finish writing registry</span>
+		waitEvents<span class="token punctuation">.</span><span class="token function">Add</span><span class="token punctuation">(</span><span class="token function">withLog</span><span class="token punctuation">(</span>wgEvents<span class="token punctuation">.</span>Wait<span class="token punctuation">,</span>
+			<span class="token string">"Continue shutdown: All enqueued events being published."</span><span class="token punctuation">)</span><span class="token punctuation">)</span>
+		<span class="token comment">// Wait for either timeout or all events having been ACKed by outputs.</span>
+		<span class="token keyword">if</span> fb<span class="token punctuation">.</span>config<span class="token punctuation">.</span>ShutdownTimeout <span class="token operator">></span> <span class="token number">0</span> <span class="token punctuation">&#123;</span>
+			logp<span class="token punctuation">.</span><span class="token function">Info</span><span class="token punctuation">(</span><span class="token string">"Shutdown output timer started. Waiting for max %v."</span><span class="token punctuation">,</span> timeout<span class="token punctuation">)</span>
+			waitEvents<span class="token punctuation">.</span><span class="token function">Add</span><span class="token punctuation">(</span><span class="token function">withLog</span><span class="token punctuation">(</span><span class="token function">waitDuration</span><span class="token punctuation">(</span>timeout<span class="token punctuation">)</span><span class="token punctuation">,</span>
+				<span class="token string">"Continue shutdown: Time out waiting for events being published."</span><span class="token punctuation">)</span><span class="token punctuation">)</span>
+		<span class="token punctuation">&#125;</span> <span class="token keyword">else</span> <span class="token punctuation">&#123;</span>
+			waitEvents<span class="token punctuation">.</span><span class="token function">AddChan</span><span class="token punctuation">(</span>fb<span class="token punctuation">.</span>done<span class="token punctuation">)</span>
+		<span class="token punctuation">&#125;</span>
+	<span class="token punctuation">&#125;</span>
+
+	<span class="token keyword">return</span> <span class="token boolean">nil</span>
+<span class="token punctuation">&#125;</span><span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span></span></code></pre>
+
+<p>至此整个<code>filebeat</code>启动流程基本清晰了。</p>
+<h2 id="采集"><a href="#采集" class="headerlink" title="采集"></a>采集</h2><p>数据采集其实就是由<code>crawler</code>来完成的，他的主要组件就是<code>harvester</code>。那我们现在就来先看<code>crawler</code>的创建过程，入口函数在<code>filebeat/beater/filebeat.go</code>文件内的<code>Run</code>方法中的<code>crawler, err := newCrawler(inputLoader, moduleLoader, config.Inputs, fb.done, *once)</code>，具体在<code>filebeat/beater/crawler.go</code>中，然后就是启动err = crawler.Start(fb.pipeline, config.ConfigInput, config.ConfigModules)`，具体看这个方法：</p>
+<pre class="line-numbers language-go" data-language="go"><code class="language-go"><span class="token comment">// Start starts the crawler with all inputs</span>
+<span class="token keyword">func</span> <span class="token punctuation">(</span>c <span class="token operator">*</span>crawler<span class="token punctuation">)</span> <span class="token function">Start</span><span class="token punctuation">(</span>
+	pipeline beat<span class="token punctuation">.</span>PipelineConnector<span class="token punctuation">,</span>
+	configInputs <span class="token operator">*</span>common<span class="token punctuation">.</span>Config<span class="token punctuation">,</span>
+	configModules <span class="token operator">*</span>common<span class="token punctuation">.</span>Config<span class="token punctuation">,</span>
+<span class="token punctuation">)</span> <span class="token builtin">error</span> <span class="token punctuation">&#123;</span>
+	log <span class="token operator">:=</span> c<span class="token punctuation">.</span>log
+
+	log<span class="token punctuation">.</span><span class="token function">Infof</span><span class="token punctuation">(</span><span class="token string">"Loading Inputs: %v"</span><span class="token punctuation">,</span> <span class="token function">len</span><span class="token punctuation">(</span>c<span class="token punctuation">.</span>inputConfigs<span class="token punctuation">)</span><span class="token punctuation">)</span>
+
+	<span class="token comment">// Prospect the globs/paths given on the command line and launch harvesters</span>
+	<span class="token keyword">for</span> <span class="token boolean">_</span><span class="token punctuation">,</span> inputConfig <span class="token operator">:=</span> <span class="token keyword">range</span> c<span class="token punctuation">.</span>inputConfigs <span class="token punctuation">&#123;</span>
+    <span class="token comment">// 1、构建input对象并运行</span>
+		err <span class="token operator">:=</span> c<span class="token punctuation">.</span><span class="token function">startInput</span><span class="token punctuation">(</span>pipeline<span class="token punctuation">,</span> inputConfig<span class="token punctuation">)</span>
+		<span class="token keyword">if</span> err <span class="token operator">!=</span> <span class="token boolean">nil</span> <span class="token punctuation">&#123;</span>
+			<span class="token keyword">return</span> fmt<span class="token punctuation">.</span><span class="token function">Errorf</span><span class="token punctuation">(</span><span class="token string">"starting input failed: %+v"</span><span class="token punctuation">,</span> err<span class="token punctuation">)</span>
+		<span class="token punctuation">&#125;</span>
+	<span class="token punctuation">&#125;</span>
+
+	<span class="token keyword">if</span> configInputs<span class="token punctuation">.</span><span class="token function">Enabled</span><span class="token punctuation">(</span><span class="token punctuation">)</span> <span class="token punctuation">&#123;</span>
+    <span class="token comment">// 构建reloader，动态监听配置文件更新，非主流程，这里不累赘</span>
+		c<span class="token punctuation">.</span>inputReloader <span class="token operator">=</span> cfgfile<span class="token punctuation">.</span><span class="token function">NewReloader</span><span class="token punctuation">(</span>pipeline<span class="token punctuation">,</span> configInputs<span class="token punctuation">)</span>
+		<span class="token keyword">if</span> err <span class="token operator">:=</span> c<span class="token punctuation">.</span>inputReloader<span class="token punctuation">.</span><span class="token function">Check</span><span class="token punctuation">(</span>c<span class="token punctuation">.</span>inputsFactory<span class="token punctuation">)</span><span class="token punctuation">;</span> err <span class="token operator">!=</span> <span class="token boolean">nil</span> <span class="token punctuation">&#123;</span>
+			<span class="token keyword">return</span> fmt<span class="token punctuation">.</span><span class="token function">Errorf</span><span class="token punctuation">(</span><span class="token string">"creating input reloader failed: %+v"</span><span class="token punctuation">,</span> err<span class="token punctuation">)</span>
+		<span class="token punctuation">&#125;</span>
+	<span class="token punctuation">&#125;</span>
+
+	<span class="token keyword">if</span> configModules<span class="token punctuation">.</span><span class="token function">Enabled</span><span class="token punctuation">(</span><span class="token punctuation">)</span> <span class="token punctuation">&#123;</span>
+    <span class="token comment">// 同上</span>
+		c<span class="token punctuation">.</span>modulesReloader <span class="token operator">=</span> cfgfile<span class="token punctuation">.</span><span class="token function">NewReloader</span><span class="token punctuation">(</span>pipeline<span class="token punctuation">,</span> configModules<span class="token punctuation">)</span>
+		<span class="token keyword">if</span> err <span class="token operator">:=</span> c<span class="token punctuation">.</span>modulesReloader<span class="token punctuation">.</span><span class="token function">Check</span><span class="token punctuation">(</span>c<span class="token punctuation">.</span>modulesFactory<span class="token punctuation">)</span><span class="token punctuation">;</span> err <span class="token operator">!=</span> <span class="token boolean">nil</span> <span class="token punctuation">&#123;</span>
+			<span class="token keyword">return</span> fmt<span class="token punctuation">.</span><span class="token function">Errorf</span><span class="token punctuation">(</span><span class="token string">"creating module reloader failed: %+v"</span><span class="token punctuation">,</span> err<span class="token punctuation">)</span>
+		<span class="token punctuation">&#125;</span>
+	<span class="token punctuation">&#125;</span>
+
+	<span class="token keyword">if</span> c<span class="token punctuation">.</span>inputReloader <span class="token operator">!=</span> <span class="token boolean">nil</span> <span class="token punctuation">&#123;</span>
+		<span class="token keyword">go</span> <span class="token keyword">func</span><span class="token punctuation">(</span><span class="token punctuation">)</span> <span class="token punctuation">&#123;</span>
+			c<span class="token punctuation">.</span>inputReloader<span class="token punctuation">.</span><span class="token function">Run</span><span class="token punctuation">(</span>c<span class="token punctuation">.</span>inputsFactory<span class="token punctuation">)</span>
+		<span class="token punctuation">&#125;</span><span class="token punctuation">(</span><span class="token punctuation">)</span>
+	<span class="token punctuation">&#125;</span>
+	<span class="token keyword">if</span> c<span class="token punctuation">.</span>modulesReloader <span class="token operator">!=</span> <span class="token boolean">nil</span> <span class="token punctuation">&#123;</span>
+		<span class="token keyword">go</span> <span class="token keyword">func</span><span class="token punctuation">(</span><span class="token punctuation">)</span> <span class="token punctuation">&#123;</span>
+			c<span class="token punctuation">.</span>modulesReloader<span class="token punctuation">.</span><span class="token function">Run</span><span class="token punctuation">(</span>c<span class="token punctuation">.</span>modulesFactory<span class="token punctuation">)</span>
+		<span class="token punctuation">&#125;</span><span class="token punctuation">(</span><span class="token punctuation">)</span>
+	<span class="token punctuation">&#125;</span>
+
+	log<span class="token punctuation">.</span><span class="token function">Infof</span><span class="token punctuation">(</span><span class="token string">"Loading and starting Inputs completed. Enabled inputs: %v"</span><span class="token punctuation">,</span> <span class="token function">len</span><span class="token punctuation">(</span>c<span class="token punctuation">.</span>inputs<span class="token punctuation">)</span><span class="token punctuation">)</span>
+
+	<span class="token keyword">return</span> <span class="token boolean">nil</span>
+<span class="token punctuation">&#125;</span><span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span></span></code></pre>
+
+<p>整个代码主要就是启动input对象，我们继续看<code>startInput</code>这个方法，</p>
+<pre class="line-numbers language-go" data-language="go"><code class="language-go"><span class="token keyword">func</span> <span class="token punctuation">(</span>c <span class="token operator">*</span>crawler<span class="token punctuation">)</span> <span class="token function">startInput</span><span class="token punctuation">(</span>
+	pipeline beat<span class="token punctuation">.</span>PipelineConnector<span class="token punctuation">,</span>
+	config <span class="token operator">*</span>common<span class="token punctuation">.</span>Config<span class="token punctuation">,</span>
+<span class="token punctuation">)</span> <span class="token builtin">error</span> <span class="token punctuation">&#123;</span>
+	<span class="token keyword">if</span> <span class="token operator">!</span>config<span class="token punctuation">.</span><span class="token function">Enabled</span><span class="token punctuation">(</span><span class="token punctuation">)</span> <span class="token punctuation">&#123;</span>
+		<span class="token keyword">return</span> <span class="token boolean">nil</span>
+	<span class="token punctuation">&#125;</span>
+
+	<span class="token keyword">var</span> h <span class="token keyword">map</span><span class="token punctuation">[</span><span class="token builtin">string</span><span class="token punctuation">]</span><span class="token keyword">interface</span><span class="token punctuation">&#123;</span><span class="token punctuation">&#125;</span>
+	config<span class="token punctuation">.</span><span class="token function">Unpack</span><span class="token punctuation">(</span><span class="token operator">&amp;</span>h<span class="token punctuation">)</span>
+	id<span class="token punctuation">,</span> err <span class="token operator">:=</span> hashstructure<span class="token punctuation">.</span><span class="token function">Hash</span><span class="token punctuation">(</span>h<span class="token punctuation">,</span> <span class="token boolean">nil</span><span class="token punctuation">)</span>
+	<span class="token keyword">if</span> err <span class="token operator">!=</span> <span class="token boolean">nil</span> <span class="token punctuation">&#123;</span>
+		<span class="token keyword">return</span> fmt<span class="token punctuation">.</span><span class="token function">Errorf</span><span class="token punctuation">(</span><span class="token string">"can not compute id from configuration: %v"</span><span class="token punctuation">,</span> err<span class="token punctuation">)</span>
+	<span class="token punctuation">&#125;</span>
+	<span class="token keyword">if</span> <span class="token boolean">_</span><span class="token punctuation">,</span> ok <span class="token operator">:=</span> c<span class="token punctuation">.</span>inputs<span class="token punctuation">[</span>id<span class="token punctuation">]</span><span class="token punctuation">;</span> ok <span class="token punctuation">&#123;</span>
+		<span class="token keyword">return</span> fmt<span class="token punctuation">.</span><span class="token function">Errorf</span><span class="token punctuation">(</span><span class="token string">"input with same ID already exists: %v"</span><span class="token punctuation">,</span> id<span class="token punctuation">)</span>
+	<span class="token punctuation">&#125;</span>
+
+	runner<span class="token punctuation">,</span> err <span class="token operator">:=</span> c<span class="token punctuation">.</span>inputsFactory<span class="token punctuation">.</span><span class="token function">Create</span><span class="token punctuation">(</span>pipeline<span class="token punctuation">,</span> config<span class="token punctuation">)</span>
+	<span class="token keyword">if</span> err <span class="token operator">!=</span> <span class="token boolean">nil</span> <span class="token punctuation">&#123;</span>
+		<span class="token keyword">return</span> fmt<span class="token punctuation">.</span><span class="token function">Errorf</span><span class="token punctuation">(</span><span class="token string">"Error while initializing input: %+v"</span><span class="token punctuation">,</span> err<span class="token punctuation">)</span>
+	<span class="token punctuation">&#125;</span>
+	<span class="token keyword">if</span> inputRunner<span class="token punctuation">,</span> ok <span class="token operator">:=</span> runner<span class="token punctuation">.</span><span class="token punctuation">(</span><span class="token operator">*</span>input<span class="token punctuation">.</span>Runner<span class="token punctuation">)</span><span class="token punctuation">;</span> ok <span class="token punctuation">&#123;</span>
+		inputRunner<span class="token punctuation">.</span>Once <span class="token operator">=</span> c<span class="token punctuation">.</span>once
+	<span class="token punctuation">&#125;</span>
+
+	c<span class="token punctuation">.</span>inputs<span class="token punctuation">[</span>id<span class="token punctuation">]</span> <span class="token operator">=</span> runner
+
+	c<span class="token punctuation">.</span>log<span class="token punctuation">.</span><span class="token function">Infof</span><span class="token punctuation">(</span><span class="token string">"Starting input (ID: %d)"</span><span class="token punctuation">,</span> id<span class="token punctuation">)</span>
+	runner<span class="token punctuation">.</span><span class="token function">Start</span><span class="token punctuation">(</span><span class="token punctuation">)</span>
+
+	<span class="token keyword">return</span> <span class="token boolean">nil</span>
+<span class="token punctuation">&#125;</span><span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span></span></code></pre>
+
+<p>注意方法最后的<code>runner.Start()</code>，就是在启动<code>input</code>。这里的<code>Runner</code>是对<code>input</code>的一个封装，用于管理<code>input</code>的生命周期，而<code>Start</code>方法就是通过<code>goroutine</code>调用其的<code>Run</code>方法，而<code>Run</code>的本质就是调用对于<code>input</code>的<code>Run</code>方法。</p>
+<pre class="line-numbers language-go" data-language="go"><code class="language-go"><span class="token keyword">type</span> Input <span class="token keyword">interface</span> <span class="token punctuation">&#123;</span>
+	<span class="token function">Run</span><span class="token punctuation">(</span><span class="token punctuation">)</span>
+	<span class="token function">Stop</span><span class="token punctuation">(</span><span class="token punctuation">)</span>
+	<span class="token function">Wait</span><span class="token punctuation">(</span><span class="token punctuation">)</span>
+<span class="token punctuation">&#125;</span>
+<span class="token keyword">type</span> Runner <span class="token keyword">struct</span> <span class="token punctuation">&#123;</span>
+	config   inputConfig
+	input    Input
+	done     <span class="token keyword">chan</span> <span class="token keyword">struct</span><span class="token punctuation">&#123;</span><span class="token punctuation">&#125;</span>
+	wg       <span class="token operator">*</span>sync<span class="token punctuation">.</span>WaitGroup
+	Once     <span class="token builtin">bool</span>
+	beatDone <span class="token keyword">chan</span> <span class="token keyword">struct</span><span class="token punctuation">&#123;</span><span class="token punctuation">&#125;</span>
+<span class="token punctuation">&#125;</span><span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span></span></code></pre>
+
+<pre class="line-numbers language-go" data-language="go"><code class="language-go"><span class="token comment">// Start starts the input</span>
+<span class="token keyword">func</span> <span class="token punctuation">(</span>p <span class="token operator">*</span>Runner<span class="token punctuation">)</span> <span class="token function">Start</span><span class="token punctuation">(</span><span class="token punctuation">)</span> <span class="token punctuation">&#123;</span>
+	p<span class="token punctuation">.</span>wg<span class="token punctuation">.</span><span class="token function">Add</span><span class="token punctuation">(</span><span class="token number">1</span><span class="token punctuation">)</span>
+
+	onceWg <span class="token operator">:=</span> sync<span class="token punctuation">.</span>WaitGroup<span class="token punctuation">&#123;</span><span class="token punctuation">&#125;</span>
+	<span class="token keyword">if</span> p<span class="token punctuation">.</span>Once <span class="token punctuation">&#123;</span>
+		<span class="token comment">// Make sure start is only completed when Run did a complete first scan</span>
+		<span class="token keyword">defer</span> onceWg<span class="token punctuation">.</span><span class="token function">Wait</span><span class="token punctuation">(</span><span class="token punctuation">)</span>
+	<span class="token punctuation">&#125;</span>
+
+	onceWg<span class="token punctuation">.</span><span class="token function">Add</span><span class="token punctuation">(</span><span class="token number">1</span><span class="token punctuation">)</span>
+	inputList<span class="token punctuation">.</span><span class="token function">Add</span><span class="token punctuation">(</span>p<span class="token punctuation">.</span>config<span class="token punctuation">.</span>Type<span class="token punctuation">)</span>
+	<span class="token comment">// Add waitgroup to make sure input is finished</span>
+	<span class="token keyword">go</span> <span class="token keyword">func</span><span class="token punctuation">(</span><span class="token punctuation">)</span> <span class="token punctuation">&#123;</span>
+		<span class="token keyword">defer</span> <span class="token keyword">func</span><span class="token punctuation">(</span><span class="token punctuation">)</span> <span class="token punctuation">&#123;</span>
+			onceWg<span class="token punctuation">.</span><span class="token function">Done</span><span class="token punctuation">(</span><span class="token punctuation">)</span>
+			p<span class="token punctuation">.</span><span class="token function">stop</span><span class="token punctuation">(</span><span class="token punctuation">)</span>
+			p<span class="token punctuation">.</span>wg<span class="token punctuation">.</span><span class="token function">Done</span><span class="token punctuation">(</span><span class="token punctuation">)</span>
+		<span class="token punctuation">&#125;</span><span class="token punctuation">(</span><span class="token punctuation">)</span>
+
+		p<span class="token punctuation">.</span><span class="token function">Run</span><span class="token punctuation">(</span><span class="token punctuation">)</span>
+	<span class="token punctuation">&#125;</span><span class="token punctuation">(</span><span class="token punctuation">)</span>
+<span class="token punctuation">&#125;</span>
+
+<span class="token comment">// Run starts scanning through all the file paths and fetch the related files. Start a harvester for each file</span>
+<span class="token keyword">func</span> <span class="token punctuation">(</span>p <span class="token operator">*</span>Runner<span class="token punctuation">)</span> <span class="token function">Run</span><span class="token punctuation">(</span><span class="token punctuation">)</span> <span class="token punctuation">&#123;</span>
+	<span class="token comment">// Initial input run</span>
+	p<span class="token punctuation">.</span>input<span class="token punctuation">.</span><span class="token function">Run</span><span class="token punctuation">(</span><span class="token punctuation">)</span>
+
+	<span class="token comment">// Shuts down after the first complete run of all input</span>
+	<span class="token keyword">if</span> p<span class="token punctuation">.</span>Once <span class="token punctuation">&#123;</span>
+		<span class="token keyword">return</span>
+	<span class="token punctuation">&#125;</span>
+
+	<span class="token keyword">for</span> <span class="token punctuation">&#123;</span>
+		<span class="token keyword">select</span> <span class="token punctuation">&#123;</span>
+		<span class="token keyword">case</span> <span class="token operator">&lt;-</span>p<span class="token punctuation">.</span>done<span class="token punctuation">:</span>
+			logp<span class="token punctuation">.</span><span class="token function">Info</span><span class="token punctuation">(</span><span class="token string">"input ticker stopped"</span><span class="token punctuation">)</span>
+			<span class="token keyword">return</span>
+		<span class="token keyword">case</span> <span class="token operator">&lt;-</span>time<span class="token punctuation">.</span><span class="token function">After</span><span class="token punctuation">(</span>p<span class="token punctuation">.</span>config<span class="token punctuation">.</span>ScanFrequency<span class="token punctuation">)</span><span class="token punctuation">:</span>
+			logp<span class="token punctuation">.</span><span class="token function">Debug</span><span class="token punctuation">(</span><span class="token string">"input"</span><span class="token punctuation">,</span> <span class="token string">"Run input"</span><span class="token punctuation">)</span>
+			p<span class="token punctuation">.</span>input<span class="token punctuation">.</span><span class="token function">Run</span><span class="token punctuation">(</span><span class="token punctuation">)</span>
+		<span class="token punctuation">&#125;</span>
+	<span class="token punctuation">&#125;</span>
+<span class="token punctuation">&#125;</span><span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span></span></code></pre>
+
+<p>由于我们最常用的就是通过<code>filebeat</code>来采集日志，我们这里就以<code>log</code>为例，来看其的具体流程，文件为<code>filebeat/input/log/input.go</code>：</p>
+<pre class="line-numbers language-go" data-language="go"><code class="language-go"><span class="token comment">// Run runs the input</span>
+<span class="token keyword">func</span> <span class="token punctuation">(</span>p <span class="token operator">*</span>Input<span class="token punctuation">)</span> <span class="token function">Run</span><span class="token punctuation">(</span><span class="token punctuation">)</span> <span class="token punctuation">&#123;</span>
+	logp<span class="token punctuation">.</span><span class="token function">Debug</span><span class="token punctuation">(</span><span class="token string">"input"</span><span class="token punctuation">,</span> <span class="token string">"Start next scan"</span><span class="token punctuation">)</span>
+
+	<span class="token comment">// TailFiles is like ignore_older = 1ns and only on startup</span>
+	<span class="token keyword">if</span> p<span class="token punctuation">.</span>config<span class="token punctuation">.</span>TailFiles <span class="token punctuation">&#123;</span>
+		ignoreOlder <span class="token operator">:=</span> p<span class="token punctuation">.</span>config<span class="token punctuation">.</span>IgnoreOlder
+
+		<span class="token comment">// Overwrite ignore_older for the first scan</span>
+		p<span class="token punctuation">.</span>config<span class="token punctuation">.</span>IgnoreOlder <span class="token operator">=</span> <span class="token number">1</span>
+		<span class="token keyword">defer</span> <span class="token keyword">func</span><span class="token punctuation">(</span><span class="token punctuation">)</span> <span class="token punctuation">&#123;</span>
+			<span class="token comment">// Reset ignore_older after first run</span>
+			p<span class="token punctuation">.</span>config<span class="token punctuation">.</span>IgnoreOlder <span class="token operator">=</span> ignoreOlder
+			<span class="token comment">// Disable tail_files after the first run</span>
+			p<span class="token punctuation">.</span>config<span class="token punctuation">.</span>TailFiles <span class="token operator">=</span> <span class="token boolean">false</span>
+		<span class="token punctuation">&#125;</span><span class="token punctuation">(</span><span class="token punctuation">)</span>
+	<span class="token punctuation">&#125;</span>
+  
+  <span class="token comment">// 扫码，核心方法</span>
+	p<span class="token punctuation">.</span><span class="token function">scan</span><span class="token punctuation">(</span><span class="token punctuation">)</span>
+
+	<span class="token comment">// It is important that a first scan is run before cleanup to make sure all new states are read first</span>
+	<span class="token keyword">if</span> p<span class="token punctuation">.</span>config<span class="token punctuation">.</span>CleanInactive <span class="token operator">></span> <span class="token number">0</span> <span class="token operator">||</span> p<span class="token punctuation">.</span>config<span class="token punctuation">.</span>CleanRemoved <span class="token punctuation">&#123;</span>
+		beforeCount <span class="token operator">:=</span> p<span class="token punctuation">.</span>states<span class="token punctuation">.</span><span class="token function">Count</span><span class="token punctuation">(</span><span class="token punctuation">)</span>
+		cleanedStates<span class="token punctuation">,</span> pendingClean <span class="token operator">:=</span> p<span class="token punctuation">.</span>states<span class="token punctuation">.</span><span class="token function">Cleanup</span><span class="token punctuation">(</span><span class="token punctuation">)</span>
+		logp<span class="token punctuation">.</span><span class="token function">Debug</span><span class="token punctuation">(</span><span class="token string">"input"</span><span class="token punctuation">,</span> <span class="token string">"input states cleaned up. Before: %d, After: %d, Pending: %d"</span><span class="token punctuation">,</span>
+			beforeCount<span class="token punctuation">,</span> beforeCount<span class="token operator">-</span>cleanedStates<span class="token punctuation">,</span> pendingClean<span class="token punctuation">)</span>
+	<span class="token punctuation">&#125;</span>
+
+	<span class="token comment">// Marking removed files to be cleaned up. Cleanup happens after next scan to make sure all states are updated first</span>
+	<span class="token keyword">if</span> p<span class="token punctuation">.</span>config<span class="token punctuation">.</span>CleanRemoved <span class="token punctuation">&#123;</span>
+		<span class="token keyword">for</span> <span class="token boolean">_</span><span class="token punctuation">,</span> state <span class="token operator">:=</span> <span class="token keyword">range</span> p<span class="token punctuation">.</span>states<span class="token punctuation">.</span><span class="token function">GetStates</span><span class="token punctuation">(</span><span class="token punctuation">)</span> <span class="token punctuation">&#123;</span>
+			<span class="token comment">// os.Stat will return an error in case the file does not exist</span>
+			stat<span class="token punctuation">,</span> err <span class="token operator">:=</span> os<span class="token punctuation">.</span><span class="token function">Stat</span><span class="token punctuation">(</span>state<span class="token punctuation">.</span>Source<span class="token punctuation">)</span>
+			<span class="token keyword">if</span> err <span class="token operator">!=</span> <span class="token boolean">nil</span> <span class="token punctuation">&#123;</span>
+				<span class="token keyword">if</span> os<span class="token punctuation">.</span><span class="token function">IsNotExist</span><span class="token punctuation">(</span>err<span class="token punctuation">)</span> <span class="token punctuation">&#123;</span>
+					p<span class="token punctuation">.</span><span class="token function">removeState</span><span class="token punctuation">(</span>state<span class="token punctuation">)</span>
+					logp<span class="token punctuation">.</span><span class="token function">Debug</span><span class="token punctuation">(</span><span class="token string">"input"</span><span class="token punctuation">,</span> <span class="token string">"Remove state for file as file removed: %s"</span><span class="token punctuation">,</span> state<span class="token punctuation">.</span>Source<span class="token punctuation">)</span>
+				<span class="token punctuation">&#125;</span> <span class="token keyword">else</span> <span class="token punctuation">&#123;</span>
+					logp<span class="token punctuation">.</span><span class="token function">Err</span><span class="token punctuation">(</span><span class="token string">"input state for %s was not removed: %s"</span><span class="token punctuation">,</span> state<span class="token punctuation">.</span>Source<span class="token punctuation">,</span> err<span class="token punctuation">)</span>
+				<span class="token punctuation">&#125;</span>
+			<span class="token punctuation">&#125;</span> <span class="token keyword">else</span> <span class="token punctuation">&#123;</span>
+				<span class="token comment">// Check if existing source on disk and state are the same. Remove if not the case.</span>
+				newState <span class="token operator">:=</span> file<span class="token punctuation">.</span><span class="token function">NewState</span><span class="token punctuation">(</span>stat<span class="token punctuation">,</span> state<span class="token punctuation">.</span>Source<span class="token punctuation">,</span> p<span class="token punctuation">.</span>config<span class="token punctuation">.</span>Type<span class="token punctuation">,</span> p<span class="token punctuation">.</span>meta<span class="token punctuation">,</span> p<span class="token punctuation">.</span>fileStateIdentifier<span class="token punctuation">)</span>
+				<span class="token keyword">if</span> state<span class="token punctuation">.</span>IdentifierName <span class="token operator">!=</span> newState<span class="token punctuation">.</span>IdentifierName <span class="token punctuation">&#123;</span>
+					logp<span class="token punctuation">.</span><span class="token function">Debug</span><span class="token punctuation">(</span><span class="token string">"input"</span><span class="token punctuation">,</span> <span class="token string">"file_identity configuration for file has changed from %s to %s, generating new id"</span><span class="token punctuation">,</span> state<span class="token punctuation">.</span>IdentifierName<span class="token punctuation">,</span> newState<span class="token punctuation">.</span>IdentifierName<span class="token punctuation">)</span>
+					state<span class="token punctuation">.</span>Id<span class="token punctuation">,</span> state<span class="token punctuation">.</span>IdentifierName <span class="token operator">=</span> p<span class="token punctuation">.</span>fileStateIdentifier<span class="token punctuation">.</span><span class="token function">GenerateID</span><span class="token punctuation">(</span>state<span class="token punctuation">)</span>
+				<span class="token punctuation">&#125;</span>
+				<span class="token keyword">if</span> <span class="token operator">!</span>state<span class="token punctuation">.</span><span class="token function">IsEqual</span><span class="token punctuation">(</span><span class="token operator">&amp;</span>newState<span class="token punctuation">)</span> <span class="token punctuation">&#123;</span>
+					p<span class="token punctuation">.</span><span class="token function">removeState</span><span class="token punctuation">(</span>state<span class="token punctuation">)</span>
+					logp<span class="token punctuation">.</span><span class="token function">Debug</span><span class="token punctuation">(</span><span class="token string">"input"</span><span class="token punctuation">,</span> <span class="token string">"Remove state of file as its identity has changed: %s"</span><span class="token punctuation">,</span> state<span class="token punctuation">.</span>Source<span class="token punctuation">)</span>
+				<span class="token punctuation">&#125;</span>
+			<span class="token punctuation">&#125;</span>
+		<span class="token punctuation">&#125;</span>
+	<span class="token punctuation">&#125;</span>
+<span class="token punctuation">&#125;</span><span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span></span></code></pre>
+
+<p>其中<code>p.scan()</code>是其中的核心方法，跟踪进去看具体的实现：</p>
+<pre class="line-numbers language-go" data-language="go"><code class="language-go"><span class="token comment">// Scan starts a scanGlob for each provided path/glob</span>
+<span class="token keyword">func</span> <span class="token punctuation">(</span>p <span class="token operator">*</span>Input<span class="token punctuation">)</span> <span class="token function">scan</span><span class="token punctuation">(</span><span class="token punctuation">)</span> <span class="token punctuation">&#123;</span>
+	<span class="token keyword">var</span> sortInfos <span class="token punctuation">[</span><span class="token punctuation">]</span>FileSortInfo
+	<span class="token keyword">var</span> files <span class="token punctuation">[</span><span class="token punctuation">]</span><span class="token builtin">string</span>
+
+	paths <span class="token operator">:=</span> p<span class="token punctuation">.</span><span class="token function">getFiles</span><span class="token punctuation">(</span><span class="token punctuation">)</span>
+
+	<span class="token keyword">var</span> err <span class="token builtin">error</span>
+
+	<span class="token keyword">if</span> p<span class="token punctuation">.</span>config<span class="token punctuation">.</span>ScanSort <span class="token operator">!=</span> <span class="token string">""</span> <span class="token punctuation">&#123;</span>
+		sortInfos<span class="token punctuation">,</span> err <span class="token operator">=</span> <span class="token function">getSortedFiles</span><span class="token punctuation">(</span>p<span class="token punctuation">.</span>config<span class="token punctuation">.</span>ScanOrder<span class="token punctuation">,</span> p<span class="token punctuation">.</span>config<span class="token punctuation">.</span>ScanSort<span class="token punctuation">,</span> <span class="token function">getSortInfos</span><span class="token punctuation">(</span>paths<span class="token punctuation">)</span><span class="token punctuation">)</span>
+		<span class="token keyword">if</span> err <span class="token operator">!=</span> <span class="token boolean">nil</span> <span class="token punctuation">&#123;</span>
+			logp<span class="token punctuation">.</span><span class="token function">Err</span><span class="token punctuation">(</span><span class="token string">"Failed to sort files during scan due to error %s"</span><span class="token punctuation">,</span> err<span class="token punctuation">)</span>
+		<span class="token punctuation">&#125;</span>
+	<span class="token punctuation">&#125;</span>
+
+	<span class="token keyword">if</span> sortInfos <span class="token operator">==</span> <span class="token boolean">nil</span> <span class="token punctuation">&#123;</span>
+		files <span class="token operator">=</span> <span class="token function">getKeys</span><span class="token punctuation">(</span>paths<span class="token punctuation">)</span>
+	<span class="token punctuation">&#125;</span>
+
+	<span class="token keyword">for</span> i <span class="token operator">:=</span> <span class="token number">0</span><span class="token punctuation">;</span> i <span class="token operator">&lt;</span> <span class="token function">len</span><span class="token punctuation">(</span>paths<span class="token punctuation">)</span><span class="token punctuation">;</span> i<span class="token operator">++</span> <span class="token punctuation">&#123;</span>
+
+		<span class="token keyword">var</span> path <span class="token builtin">string</span>
+		<span class="token keyword">var</span> info os<span class="token punctuation">.</span>FileInfo
+
+		<span class="token keyword">if</span> sortInfos <span class="token operator">==</span> <span class="token boolean">nil</span> <span class="token punctuation">&#123;</span>
+			path <span class="token operator">=</span> files<span class="token punctuation">[</span>i<span class="token punctuation">]</span>
+			info <span class="token operator">=</span> paths<span class="token punctuation">[</span>path<span class="token punctuation">]</span>
+		<span class="token punctuation">&#125;</span> <span class="token keyword">else</span> <span class="token punctuation">&#123;</span>
+			path <span class="token operator">=</span> sortInfos<span class="token punctuation">[</span>i<span class="token punctuation">]</span><span class="token punctuation">.</span>path
+			info <span class="token operator">=</span> sortInfos<span class="token punctuation">[</span>i<span class="token punctuation">]</span><span class="token punctuation">.</span>info
+		<span class="token punctuation">&#125;</span>
+
+		<span class="token keyword">select</span> <span class="token punctuation">&#123;</span>
+		<span class="token keyword">case</span> <span class="token operator">&lt;-</span>p<span class="token punctuation">.</span>done<span class="token punctuation">:</span>
+			logp<span class="token punctuation">.</span><span class="token function">Info</span><span class="token punctuation">(</span><span class="token string">"Scan aborted because input stopped."</span><span class="token punctuation">)</span>
+			<span class="token keyword">return</span>
+		<span class="token keyword">default</span><span class="token punctuation">:</span>
+		<span class="token punctuation">&#125;</span>
+
+		newState<span class="token punctuation">,</span> err <span class="token operator">:=</span> <span class="token function">getFileState</span><span class="token punctuation">(</span>path<span class="token punctuation">,</span> info<span class="token punctuation">,</span> p<span class="token punctuation">)</span>
+		<span class="token keyword">if</span> err <span class="token operator">!=</span> <span class="token boolean">nil</span> <span class="token punctuation">&#123;</span>
+			logp<span class="token punctuation">.</span><span class="token function">Err</span><span class="token punctuation">(</span><span class="token string">"Skipping file %s due to error %s"</span><span class="token punctuation">,</span> path<span class="token punctuation">,</span> err<span class="token punctuation">)</span>
+		<span class="token punctuation">&#125;</span>
+
+		<span class="token comment">// Load last state</span>
+		isNewState <span class="token operator">:=</span> p<span class="token punctuation">.</span>states<span class="token punctuation">.</span><span class="token function">IsNew</span><span class="token punctuation">(</span>newState<span class="token punctuation">)</span>
+
+		<span class="token comment">// Ignores all files which fall under ignore_older</span>
+		<span class="token keyword">if</span> p<span class="token punctuation">.</span><span class="token function">isIgnoreOlder</span><span class="token punctuation">(</span>newState<span class="token punctuation">)</span> <span class="token punctuation">&#123;</span>
+			err <span class="token operator">:=</span> p<span class="token punctuation">.</span><span class="token function">handleIgnoreOlder</span><span class="token punctuation">(</span>isNewState<span class="token punctuation">,</span> newState<span class="token punctuation">)</span>
+			<span class="token keyword">if</span> err <span class="token operator">!=</span> <span class="token boolean">nil</span> <span class="token punctuation">&#123;</span>
+				logp<span class="token punctuation">.</span><span class="token function">Err</span><span class="token punctuation">(</span><span class="token string">"Updating ignore_older state error: %s"</span><span class="token punctuation">,</span> err<span class="token punctuation">)</span>
+			<span class="token punctuation">&#125;</span>
+			<span class="token keyword">continue</span>
+		<span class="token punctuation">&#125;</span>
+
+		<span class="token comment">// Decides if previous state exists</span>
+		<span class="token keyword">if</span> isNewState <span class="token punctuation">&#123;</span>
+			logp<span class="token punctuation">.</span><span class="token function">Debug</span><span class="token punctuation">(</span><span class="token string">"input"</span><span class="token punctuation">,</span> <span class="token string">"Start harvester for new file: %s"</span><span class="token punctuation">,</span> newState<span class="token punctuation">.</span>Source<span class="token punctuation">)</span>
+      <span class="token comment">// 发现是新文件，需构建新的harvester对象并运行</span>
+			err <span class="token operator">:=</span> p<span class="token punctuation">.</span><span class="token function">startHarvester</span><span class="token punctuation">(</span>newState<span class="token punctuation">,</span> <span class="token number">0</span><span class="token punctuation">)</span>
+			<span class="token keyword">if</span> err <span class="token operator">==</span> errHarvesterLimit <span class="token punctuation">&#123;</span>
+				logp<span class="token punctuation">.</span><span class="token function">Debug</span><span class="token punctuation">(</span><span class="token string">"input"</span><span class="token punctuation">,</span> harvesterErrMsg<span class="token punctuation">,</span> newState<span class="token punctuation">.</span>Source<span class="token punctuation">,</span> err<span class="token punctuation">)</span>
+				<span class="token keyword">continue</span>
+			<span class="token punctuation">&#125;</span>
+			<span class="token keyword">if</span> err <span class="token operator">!=</span> <span class="token boolean">nil</span> <span class="token punctuation">&#123;</span>
+				logp<span class="token punctuation">.</span><span class="token function">Err</span><span class="token punctuation">(</span>harvesterErrMsg<span class="token punctuation">,</span> newState<span class="token punctuation">.</span>Source<span class="token punctuation">,</span> err<span class="token punctuation">)</span>
+			<span class="token punctuation">&#125;</span>
+		<span class="token punctuation">&#125;</span> <span class="token keyword">else</span> <span class="token punctuation">&#123;</span>
+			lastState <span class="token operator">:=</span> p<span class="token punctuation">.</span>states<span class="token punctuation">.</span><span class="token function">FindPrevious</span><span class="token punctuation">(</span>newState<span class="token punctuation">)</span>
+			p<span class="token punctuation">.</span><span class="token function">harvestExistingFile</span><span class="token punctuation">(</span>newState<span class="token punctuation">,</span> lastState<span class="token punctuation">)</span>
+		<span class="token punctuation">&#125;</span>
+	<span class="token punctuation">&#125;</span>
+<span class="token punctuation">&#125;</span><span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span></span></code></pre>
+
+<p><code>scan</code>方法内首先获取所有的文件。其次获取文件状态，根据状态来判定收集最新数据，还是从历史文件收集。文件收集会构建<code>Harvester</code>对象。<code>p.startHarvester(newState, 0)</code>是其核心方法：</p>
+<pre class="line-numbers language-none"><code class="language-none">&#x2F;&#x2F; startHarvester starts a new harvester with the given offset
+&#x2F;&#x2F; In case the HarvesterLimit is reached, an error is returned
+func (p *Input) startHarvester(state file.State, offset int64) error &#123;
+	if p.numHarvesters.Inc() &gt; p.config.HarvesterLimit &amp;&amp; p.config.HarvesterLimit &gt; 0 &#123;
+		p.numHarvesters.Dec()
+		harvesterSkipped.Add(1)
+		return errHarvesterLimit
+	&#125;
+	&#x2F;&#x2F; Set state to &quot;not&quot; finished to indicate that a harvester is running
+	state.Finished &#x3D; false
+	state.Offset &#x3D; offset
+
+	&#x2F;&#x2F; Create harvester with state
+	&#x2F;&#x2F; 创建harvester 
+	h, err :&#x3D; p.createHarvester(state, func() &#123; p.numHarvesters.Dec() &#125;)
+	if err !&#x3D; nil &#123;
+		p.numHarvesters.Dec()
+		return err
+	&#125;
+
+ &#x2F;&#x2F; 对harvester 进行配置
+	err &#x3D; h.Setup()
+	if err !&#x3D; nil &#123;
+		p.numHarvesters.Dec()
+		return fmt.Errorf(&quot;error setting up harvester: %s&quot;, err)
+	&#125;
+
+	&#x2F;&#x2F; Update state before staring harvester
+	&#x2F;&#x2F; This makes sure the states is set to Finished: false
+	&#x2F;&#x2F; This is synchronous state update as part of the scan
+	h.SendStateUpdate()
+	&#x2F;&#x2F; 启动harvester
+	if err &#x3D; p.harvesters.Start(h); err !&#x3D; nil &#123;
+		p.numHarvesters.Dec()
+	&#125;
+	return err
+&#125;<span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span></span></code></pre>
+
+<p>整个方法的核心内容可以概括成三步：</p>
+<ol>
+<li><code>p.createHarvester</code>构建<code>harvester</code></li>
+<li><code>p.Setup</code>配置<code>harvester</code>。<code>Setup</code>方法内会初始化文件相关的内容，以及构建文件<code>reader</code>。</li>
+<li><code>p.harvesters.Start(h)</code>运行<code>harvester</code></li>
+</ol>
+<p>这里我们具体看下<code>p.harvesters.Start(h)</code>这个方法，其的作用就是继续在一个<code>go routine</code>中启动<code>harvester.run</code>。</p>
+<pre class="line-numbers language-go" data-language="go"><code class="language-go"><span class="token comment">// Start starts the given harvester and add its to the registry</span>
+<span class="token keyword">func</span> <span class="token punctuation">(</span>r <span class="token operator">*</span>Registry<span class="token punctuation">)</span> <span class="token function">Start</span><span class="token punctuation">(</span>h Harvester<span class="token punctuation">)</span> <span class="token builtin">error</span> <span class="token punctuation">&#123;</span>
+	<span class="token comment">// Make sure stop is not called during starting a harvester</span>
+	r<span class="token punctuation">.</span><span class="token function">Lock</span><span class="token punctuation">(</span><span class="token punctuation">)</span>
+	<span class="token keyword">defer</span> r<span class="token punctuation">.</span><span class="token function">Unlock</span><span class="token punctuation">(</span><span class="token punctuation">)</span>
+
+	<span class="token comment">// Make sure no new harvesters are started after stop was called</span>
+	<span class="token keyword">if</span> <span class="token operator">!</span>r<span class="token punctuation">.</span><span class="token function">active</span><span class="token punctuation">(</span><span class="token punctuation">)</span> <span class="token punctuation">&#123;</span>
+		<span class="token keyword">return</span> errors<span class="token punctuation">.</span><span class="token function">New</span><span class="token punctuation">(</span><span class="token string">"registry already stopped"</span><span class="token punctuation">)</span>
+	<span class="token punctuation">&#125;</span>
+
+	r<span class="token punctuation">.</span>wg<span class="token punctuation">.</span><span class="token function">Add</span><span class="token punctuation">(</span><span class="token number">1</span><span class="token punctuation">)</span>
+
+	<span class="token comment">// Add the harvester to the registry and share the lock with stop making sure Start() and Stop()</span>
+	<span class="token comment">// have a consistent view of the harvesters.</span>
+	r<span class="token punctuation">.</span>harvesters<span class="token punctuation">[</span>h<span class="token punctuation">.</span><span class="token function">ID</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">]</span> <span class="token operator">=</span> h
+
+	<span class="token keyword">go</span> <span class="token keyword">func</span><span class="token punctuation">(</span><span class="token punctuation">)</span> <span class="token punctuation">&#123;</span>
+		<span class="token keyword">defer</span> <span class="token keyword">func</span><span class="token punctuation">(</span><span class="token punctuation">)</span> <span class="token punctuation">&#123;</span>
+			r<span class="token punctuation">.</span><span class="token function">remove</span><span class="token punctuation">(</span>h<span class="token punctuation">)</span>
+			r<span class="token punctuation">.</span>wg<span class="token punctuation">.</span><span class="token function">Done</span><span class="token punctuation">(</span><span class="token punctuation">)</span>
+		<span class="token punctuation">&#125;</span><span class="token punctuation">(</span><span class="token punctuation">)</span>
+		<span class="token comment">// Starts harvester and picks the right type. In case type is not set, set it to default (log)</span>
+		err <span class="token operator">:=</span> h<span class="token punctuation">.</span><span class="token function">Run</span><span class="token punctuation">(</span><span class="token punctuation">)</span>
+		<span class="token keyword">if</span> err <span class="token operator">!=</span> <span class="token boolean">nil</span> <span class="token punctuation">&#123;</span>
+			logp<span class="token punctuation">.</span><span class="token function">Err</span><span class="token punctuation">(</span><span class="token string">"Error running input: %v"</span><span class="token punctuation">,</span> err<span class="token punctuation">)</span>
+		<span class="token punctuation">&#125;</span>
+	<span class="token punctuation">&#125;</span><span class="token punctuation">(</span><span class="token punctuation">)</span>
+	<span class="token keyword">return</span> <span class="token boolean">nil</span>
+<span class="token punctuation">&#125;</span><span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span></span></code></pre>
+
+<p>而<code>h.Run</code>其实又是一个interface方法，这里我们继续以<code>log</code>为例，因此我们这里跟踪<code>filebeat/input/log/harvester.go</code>中的<code>Run</code>方法：</p>
+<pre class="line-numbers language-go" data-language="go"><code class="language-go"><span class="token comment">// Run start the harvester and reads files line by line and sends events to the defined output</span>
+<span class="token keyword">func</span> <span class="token punctuation">(</span>h <span class="token operator">*</span>Harvester<span class="token punctuation">)</span> <span class="token function">Run</span><span class="token punctuation">(</span><span class="token punctuation">)</span> <span class="token builtin">error</span> <span class="token punctuation">&#123;</span>
+	<span class="token comment">// Allow for some cleanup on termination</span>
+	<span class="token keyword">if</span> h<span class="token punctuation">.</span>onTerminate <span class="token operator">!=</span> <span class="token boolean">nil</span> <span class="token punctuation">&#123;</span>
+		<span class="token keyword">defer</span> h<span class="token punctuation">.</span><span class="token function">onTerminate</span><span class="token punctuation">(</span><span class="token punctuation">)</span>
+	<span class="token punctuation">&#125;</span>
+
+	outlet <span class="token operator">:=</span> channel<span class="token punctuation">.</span><span class="token function">CloseOnSignal</span><span class="token punctuation">(</span>h<span class="token punctuation">.</span><span class="token function">outletFactory</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">,</span> h<span class="token punctuation">.</span>done<span class="token punctuation">)</span>
+	forwarder <span class="token operator">:=</span> harvester<span class="token punctuation">.</span><span class="token function">NewForwarder</span><span class="token punctuation">(</span>outlet<span class="token punctuation">)</span>
+
+	<span class="token comment">// This is to make sure a harvester is not started anymore if stop was already</span>
+	<span class="token comment">// called before the harvester was started. The waitgroup is not incremented afterwards</span>
+	<span class="token comment">// as otherwise it could happened that between checking for the close channel and incrementing</span>
+	<span class="token comment">// the waitgroup, the harvester could be stopped.</span>
+	<span class="token comment">// Here stopLock is used to prevent a data race where stopWg.Add(1) below is called</span>
+	<span class="token comment">// while stopWg.Wait() is executing in a different goroutine, which is forbidden</span>
+	<span class="token comment">// according to sync.WaitGroup docs.</span>
+	h<span class="token punctuation">.</span>stopLock<span class="token punctuation">.</span><span class="token function">Lock</span><span class="token punctuation">(</span><span class="token punctuation">)</span>
+	h<span class="token punctuation">.</span>stopWg<span class="token punctuation">.</span><span class="token function">Add</span><span class="token punctuation">(</span><span class="token number">1</span><span class="token punctuation">)</span>
+	h<span class="token punctuation">.</span>stopLock<span class="token punctuation">.</span><span class="token function">Unlock</span><span class="token punctuation">(</span><span class="token punctuation">)</span>
+	<span class="token keyword">select</span> <span class="token punctuation">&#123;</span>
+	<span class="token keyword">case</span> <span class="token operator">&lt;-</span>h<span class="token punctuation">.</span>done<span class="token punctuation">:</span>
+		h<span class="token punctuation">.</span>stopWg<span class="token punctuation">.</span><span class="token function">Done</span><span class="token punctuation">(</span><span class="token punctuation">)</span>
+		<span class="token keyword">return</span> <span class="token boolean">nil</span>
+	<span class="token keyword">default</span><span class="token punctuation">:</span>
+	<span class="token punctuation">&#125;</span>
+
+	<span class="token keyword">defer</span> <span class="token keyword">func</span><span class="token punctuation">(</span><span class="token punctuation">)</span> <span class="token punctuation">&#123;</span>
+		<span class="token comment">// Channel to stop internal harvester routines</span>
+		h<span class="token punctuation">.</span><span class="token function">stop</span><span class="token punctuation">(</span><span class="token punctuation">)</span>
+
+		<span class="token comment">// Makes sure file is properly closed when the harvester is stopped</span>
+		h<span class="token punctuation">.</span><span class="token function">cleanup</span><span class="token punctuation">(</span><span class="token punctuation">)</span>
+
+		harvesterRunning<span class="token punctuation">.</span><span class="token function">Add</span><span class="token punctuation">(</span><span class="token operator">-</span><span class="token number">1</span><span class="token punctuation">)</span>
+
+		<span class="token comment">// Marks harvester stopping completed</span>
+		h<span class="token punctuation">.</span>stopWg<span class="token punctuation">.</span><span class="token function">Done</span><span class="token punctuation">(</span><span class="token punctuation">)</span>
+	<span class="token punctuation">&#125;</span><span class="token punctuation">(</span><span class="token punctuation">)</span>
+
+	harvesterStarted<span class="token punctuation">.</span><span class="token function">Add</span><span class="token punctuation">(</span><span class="token number">1</span><span class="token punctuation">)</span>
+	harvesterRunning<span class="token punctuation">.</span><span class="token function">Add</span><span class="token punctuation">(</span><span class="token number">1</span><span class="token punctuation">)</span>
+
+	<span class="token comment">// Closes reader after timeout or when done channel is closed</span>
+	<span class="token comment">// This routine is also responsible to properly stop the reader</span>
+	<span class="token keyword">go</span> <span class="token keyword">func</span><span class="token punctuation">(</span>source <span class="token builtin">string</span><span class="token punctuation">)</span> <span class="token punctuation">&#123;</span>
+		closeTimeout <span class="token operator">:=</span> <span class="token function">make</span><span class="token punctuation">(</span><span class="token operator">&lt;-</span><span class="token keyword">chan</span> time<span class="token punctuation">.</span>Time<span class="token punctuation">)</span>
+		<span class="token comment">// starts close_timeout timer</span>
+		<span class="token keyword">if</span> h<span class="token punctuation">.</span>config<span class="token punctuation">.</span>CloseTimeout <span class="token operator">></span> <span class="token number">0</span> <span class="token punctuation">&#123;</span>
+			closeTimeout <span class="token operator">=</span> time<span class="token punctuation">.</span><span class="token function">After</span><span class="token punctuation">(</span>h<span class="token punctuation">.</span>config<span class="token punctuation">.</span>CloseTimeout<span class="token punctuation">)</span>
+		<span class="token punctuation">&#125;</span>
+
+		<span class="token keyword">select</span> <span class="token punctuation">&#123;</span>
+		<span class="token comment">// Applies when timeout is reached</span>
+		<span class="token keyword">case</span> <span class="token operator">&lt;-</span>closeTimeout<span class="token punctuation">:</span>
+			logp<span class="token punctuation">.</span><span class="token function">Info</span><span class="token punctuation">(</span><span class="token string">"Closing harvester because close_timeout was reached: %s"</span><span class="token punctuation">,</span> source<span class="token punctuation">)</span>
+		<span class="token comment">// Required when reader loop returns and reader finished</span>
+		<span class="token keyword">case</span> <span class="token operator">&lt;-</span>h<span class="token punctuation">.</span>done<span class="token punctuation">:</span>
+		<span class="token punctuation">&#125;</span>
+
+		h<span class="token punctuation">.</span><span class="token function">stop</span><span class="token punctuation">(</span><span class="token punctuation">)</span>
+		err <span class="token operator">:=</span> h<span class="token punctuation">.</span>reader<span class="token punctuation">.</span><span class="token function">Close</span><span class="token punctuation">(</span><span class="token punctuation">)</span>
+		<span class="token keyword">if</span> err <span class="token operator">!=</span> <span class="token boolean">nil</span> <span class="token punctuation">&#123;</span>
+			logp<span class="token punctuation">.</span><span class="token function">Err</span><span class="token punctuation">(</span><span class="token string">"Failed to stop harvester for file %s: %v"</span><span class="token punctuation">,</span> h<span class="token punctuation">.</span>state<span class="token punctuation">.</span>Source<span class="token punctuation">,</span> err<span class="token punctuation">)</span>
+		<span class="token punctuation">&#125;</span>
+	<span class="token punctuation">&#125;</span><span class="token punctuation">(</span>h<span class="token punctuation">.</span>state<span class="token punctuation">.</span>Source<span class="token punctuation">)</span>
+
+	logp<span class="token punctuation">.</span><span class="token function">Info</span><span class="token punctuation">(</span><span class="token string">"Harvester started for file: %s"</span><span class="token punctuation">,</span> h<span class="token punctuation">.</span>state<span class="token punctuation">.</span>Source<span class="token punctuation">)</span>
+
+	h<span class="token punctuation">.</span>doneWg<span class="token punctuation">.</span><span class="token function">Add</span><span class="token punctuation">(</span><span class="token number">1</span><span class="token punctuation">)</span>
+	<span class="token keyword">go</span> <span class="token keyword">func</span><span class="token punctuation">(</span><span class="token punctuation">)</span> <span class="token punctuation">&#123;</span>
+		h<span class="token punctuation">.</span><span class="token function">monitorFileSize</span><span class="token punctuation">(</span><span class="token punctuation">)</span>
+		h<span class="token punctuation">.</span>doneWg<span class="token punctuation">.</span><span class="token function">Done</span><span class="token punctuation">(</span><span class="token punctuation">)</span>
+	<span class="token punctuation">&#125;</span><span class="token punctuation">(</span><span class="token punctuation">)</span>
+
+	<span class="token keyword">for</span> <span class="token punctuation">&#123;</span>
+		<span class="token keyword">select</span> <span class="token punctuation">&#123;</span>
+		<span class="token keyword">case</span> <span class="token operator">&lt;-</span>h<span class="token punctuation">.</span>done<span class="token punctuation">:</span>
+			<span class="token keyword">return</span> <span class="token boolean">nil</span>
+		<span class="token keyword">default</span><span class="token punctuation">:</span>
+		<span class="token punctuation">&#125;</span>
+
+		message<span class="token punctuation">,</span> err <span class="token operator">:=</span> h<span class="token punctuation">.</span>reader<span class="token punctuation">.</span><span class="token function">Next</span><span class="token punctuation">(</span><span class="token punctuation">)</span>
+		<span class="token keyword">if</span> err <span class="token operator">!=</span> <span class="token boolean">nil</span> <span class="token punctuation">&#123;</span>
+			<span class="token keyword">switch</span> err <span class="token punctuation">&#123;</span>
+			<span class="token keyword">case</span> ErrFileTruncate<span class="token punctuation">:</span>
+				logp<span class="token punctuation">.</span><span class="token function">Info</span><span class="token punctuation">(</span><span class="token string">"File was truncated. Begin reading file from offset 0: %s"</span><span class="token punctuation">,</span> h<span class="token punctuation">.</span>state<span class="token punctuation">.</span>Source<span class="token punctuation">)</span>
+				h<span class="token punctuation">.</span>state<span class="token punctuation">.</span>Offset <span class="token operator">=</span> <span class="token number">0</span>
+				filesTruncated<span class="token punctuation">.</span><span class="token function">Add</span><span class="token punctuation">(</span><span class="token number">1</span><span class="token punctuation">)</span>
+			<span class="token keyword">case</span> ErrRemoved<span class="token punctuation">:</span>
+				logp<span class="token punctuation">.</span><span class="token function">Info</span><span class="token punctuation">(</span><span class="token string">"File was removed: %s. Closing because close_removed is enabled."</span><span class="token punctuation">,</span> h<span class="token punctuation">.</span>state<span class="token punctuation">.</span>Source<span class="token punctuation">)</span>
+			<span class="token keyword">case</span> ErrRenamed<span class="token punctuation">:</span>
+				logp<span class="token punctuation">.</span><span class="token function">Info</span><span class="token punctuation">(</span><span class="token string">"File was renamed: %s. Closing because close_renamed is enabled."</span><span class="token punctuation">,</span> h<span class="token punctuation">.</span>state<span class="token punctuation">.</span>Source<span class="token punctuation">)</span>
+			<span class="token keyword">case</span> ErrClosed<span class="token punctuation">:</span>
+				logp<span class="token punctuation">.</span><span class="token function">Info</span><span class="token punctuation">(</span><span class="token string">"Reader was closed: %s. Closing."</span><span class="token punctuation">,</span> h<span class="token punctuation">.</span>state<span class="token punctuation">.</span>Source<span class="token punctuation">)</span>
+			<span class="token keyword">case</span> io<span class="token punctuation">.</span>EOF<span class="token punctuation">:</span>
+				logp<span class="token punctuation">.</span><span class="token function">Info</span><span class="token punctuation">(</span><span class="token string">"End of file reached: %s. Closing because close_eof is enabled."</span><span class="token punctuation">,</span> h<span class="token punctuation">.</span>state<span class="token punctuation">.</span>Source<span class="token punctuation">)</span>
+			<span class="token keyword">case</span> ErrInactive<span class="token punctuation">:</span>
+				logp<span class="token punctuation">.</span><span class="token function">Info</span><span class="token punctuation">(</span><span class="token string">"File is inactive: %s. Closing because close_inactive of %v reached."</span><span class="token punctuation">,</span> h<span class="token punctuation">.</span>state<span class="token punctuation">.</span>Source<span class="token punctuation">,</span> h<span class="token punctuation">.</span>config<span class="token punctuation">.</span>CloseInactive<span class="token punctuation">)</span>
+			<span class="token keyword">case</span> reader<span class="token punctuation">.</span>ErrLineUnparsable<span class="token punctuation">:</span>
+				logp<span class="token punctuation">.</span><span class="token function">Info</span><span class="token punctuation">(</span><span class="token string">"Skipping unparsable line in file: %v"</span><span class="token punctuation">,</span> h<span class="token punctuation">.</span>state<span class="token punctuation">.</span>Source<span class="token punctuation">)</span>
+				<span class="token comment">//line unparsable, go to next line</span>
+				<span class="token keyword">continue</span>
+			<span class="token keyword">default</span><span class="token punctuation">:</span>
+				logp<span class="token punctuation">.</span><span class="token function">Err</span><span class="token punctuation">(</span><span class="token string">"Read line error: %v; File: %v"</span><span class="token punctuation">,</span> err<span class="token punctuation">,</span> h<span class="token punctuation">.</span>state<span class="token punctuation">.</span>Source<span class="token punctuation">)</span>
+			<span class="token punctuation">&#125;</span>
+			<span class="token keyword">return</span> <span class="token boolean">nil</span>
+		<span class="token punctuation">&#125;</span>
+
+		<span class="token comment">// Get copy of state to work on</span>
+		<span class="token comment">// This is important in case sending is not successful so on shutdown</span>
+		<span class="token comment">// the old offset is reported</span>
+		state <span class="token operator">:=</span> h<span class="token punctuation">.</span><span class="token function">getState</span><span class="token punctuation">(</span><span class="token punctuation">)</span>
+		startingOffset <span class="token operator">:=</span> state<span class="token punctuation">.</span>Offset
+		state<span class="token punctuation">.</span>Offset <span class="token operator">+=</span> <span class="token function">int64</span><span class="token punctuation">(</span>message<span class="token punctuation">.</span>Bytes<span class="token punctuation">)</span>
+
+		<span class="token comment">// Stop harvester in case of an error</span>
+		<span class="token keyword">if</span> <span class="token operator">!</span>h<span class="token punctuation">.</span><span class="token function">onMessage</span><span class="token punctuation">(</span>forwarder<span class="token punctuation">,</span> state<span class="token punctuation">,</span> message<span class="token punctuation">,</span> startingOffset<span class="token punctuation">)</span> <span class="token punctuation">&#123;</span>
+			<span class="token keyword">return</span> <span class="token boolean">nil</span>
+		<span class="token punctuation">&#125;</span>
+
+		<span class="token comment">// Update state of harvester as successfully sent</span>
+		h<span class="token punctuation">.</span>state <span class="token operator">=</span> state
+
+		<span class="token comment">// Update metics of harvester as event was sent</span>
+		h<span class="token punctuation">.</span>metrics<span class="token punctuation">.</span>readOffset<span class="token punctuation">.</span><span class="token function">Set</span><span class="token punctuation">(</span>state<span class="token punctuation">.</span>Offset<span class="token punctuation">)</span>
+		h<span class="token punctuation">.</span>metrics<span class="token punctuation">.</span>lastPublished<span class="token punctuation">.</span><span class="token function">Set</span><span class="token punctuation">(</span>time<span class="token punctuation">.</span><span class="token function">Now</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">)</span>
+		h<span class="token punctuation">.</span>metrics<span class="token punctuation">.</span>lastPublishedEventTimestamp<span class="token punctuation">.</span><span class="token function">Set</span><span class="token punctuation">(</span>message<span class="token punctuation">.</span>Ts<span class="token punctuation">)</span>
+	<span class="token punctuation">&#125;</span>
+<span class="token punctuation">&#125;</span><span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span></span></code></pre>
+
+<p>整个方法主要分为这么几步：</p>
+<ol>
+<li>创建一个<code>forwarder</code>转发器</li>
+<li>死循环从<code>reader</code>里的读取内容</li>
+<li>通过<code>farwarder</code>向下转发</li>
+</ol>
+<p><code>h.sendEvent(data, forwarder)</code>这段代码将采集的数据发送到下游，内部其实就是用<code>forwarder</code>转发了数据。</p>
+<p>到此整个采集的流程就基本完成了。</p>
+<h3 id="感慨"><a href="#感慨" class="headerlink" title="感慨"></a>感慨</h3><p>通过以上这些流程的分析，可以看出filebeat中其实大量使用到了<code>go routine</code>协程。而这也是<code>go</code>的最大一个特性。<code>filebeat</code>其实相当于一个大的管理器，他管理者以单个<code>input</code>文件为单位的n组协程，这样的好处就是他们之间是相互没有影响的，并且由于协程比线程要来的轻量很多，并且对于cpu的上下文切换也要少很多，对于系统资源的消耗也会小很多。那为什么有时候我们又会看到<code>filebeat</code>占用了近20%的cpu利用率，这个其实就在于<code>forwarder</code>转发后的处理流程了，如果你引入了过多的计算<code>process</code>，或者你的<code>output</code>里有重cpu的计算例如压缩，那当然会消耗更多的cpu资源，因此在使用时还是要评估好你的方案对系统资源的消耗。</p>
+
+    </div>
+
+    
+    
+    
+      
+  <div class="popular-posts-header">相关文章</div>
+  <ul class="popular-posts">
+    <li class="popular-posts-item">
+      <div class="popular-posts-title"><a href="\posts\6bf64646.html" rel="bookmark">Filebeat 浅析（一）</a></div>
+    </li>
+  </ul>
+
+
+    <footer class="post-footer">
+          
+
+<div class="post-copyright">
+<ul>
+  <li class="post-copyright-author">
+      <strong>本文作者： </strong>Job Shen
+  </li>
+  <li class="post-copyright-link">
+      <strong>本文链接：</strong>
+      <a href="http://blog.jobshen.com/posts/5be0aa9e.html" title="Filebeat 浅析（二）">http://blog.jobshen.com/posts/5be0aa9e.html</a>
+  </li>
+  <li class="post-copyright-license">
+    <strong>版权声明： </strong>本博客所有文章除特别声明外，均采用 <a href="https://creativecommons.org/licenses/by-nc-sa/4.0/deed.zh" rel="noopener" target="_blank"><i class="fab fa-fw fa-creative-commons"></i>BY-NC-SA</a> 许可协议。转载请注明出处！
+  </li>
+</ul>
+</div>
+
+          <div class="followme">
+  <span>欢迎关注我的其它发布渠道</span>
+
+  <div class="social-list">
+
+      <div class="social-item">
+        <a target="_blank" class="social-link" href="/atom.xml">
+          <span class="icon">
+            <i class="fa fa-rss"></i>
+          </span>
+
+          <span class="label">RSS</span>
+        </a>
+      </div>
+  </div>
+</div>
+
+          <div class="post-tags">
+              <a href="/tags/filebeat/" rel="tag"># filebeat</a>
+          </div>
+
+        
+
+          <div class="post-nav">
+            <div class="post-nav-item">
+                <a href="/posts/6bf64646.html" rel="prev" title="Filebeat 浅析（一）">
+                  <i class="fa fa-chevron-left"></i> Filebeat 浅析（一）
+                </a>
+            </div>
+            <div class="post-nav-item">
+            </div>
+          </div>
+    </footer>
+  </article>
+</div>
+
+
+
+
+
+
+      
+    <div class="comments" id="gitalk-container"></div>
+
+<script>
+  window.addEventListener('tabs:register', () => {
+    let { activeClass } = CONFIG.comments;
+    if (CONFIG.comments.storage) {
+      activeClass = localStorage.getItem('comments_active') || activeClass;
+    }
+    if (activeClass) {
+      const activeTab = document.querySelector(`a[href="#comment-${activeClass}"]`);
+      if (activeTab) {
+        activeTab.click();
+      }
+    }
+  });
+  if (CONFIG.comments.storage) {
+    window.addEventListener('tabs:click', event => {
+      if (!event.target.matches('.tabs-comment .tab-content .tab-pane')) return;
+      const commentClass = event.target.classList[1];
+      localStorage.setItem('comments_active', commentClass);
+    });
+  }
+</script>
+
+    </div>
+  </main>
+
+  <footer class="footer">
+    <div class="footer-inner">
+      
+
+      
+
+<div class="copyright">
+  
+  &copy; 2017 – 
+  <span itemprop="copyrightYear">2021</span>
+  <span class="with-love">
+    <i class="fa fa-heart"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">Job Shen</span>
+</div>
+<div class="wordcount">
+  <span class="post-meta-item">
+    <span class="post-meta-item-icon">
+      <i class="fa fa-chart-line"></i>
+    </span>
+    <span title="站点总字数">78k</span>
+  </span>
+  <span class="post-meta-item">
+    <span class="post-meta-item-icon">
+      <i class="fa fa-coffee"></i>
+    </span>
+    <span title="站点阅读时长">2:10</span>
+  </span>
+</div>
+  <div class="powered-by">由 <a href="https://hexo.io/" class="theme-link" rel="noopener" target="_blank">Hexo</a> & <a href="https://theme-next.js.org/" class="theme-link" rel="noopener" target="_blank">NexT.Gemini</a> 强力驱动
+  </div>
+
+    </div>
+  </footer>
+
+  
+  <script src="//cdn.jsdelivr.net/npm/animejs@3.2.1/lib/anime.min.js"></script>
+  <script src="//cdn.jsdelivr.net/npm/lozad@1.16.0/dist/lozad.min.js"></script>
+<script src="/js/utils.js"></script><script src="/js/motion.js"></script><script src="/js/next-boot.js"></script><script src="/js/bookmark.js"></script>
+
+  
+
+
+
+
+  <script src="/js/local-search.js"></script>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+
+
+
+
+
+
+<script>
+  (function() {
+    function leancloudSelector(url) {
+      url = encodeURI(url);
+      return document.getElementById(url).querySelector('.leancloud-visitors-count');
+    }
+
+    function addCount(Counter) {
+      const visitors = document.querySelector('.leancloud_visitors');
+      const url = decodeURI(visitors.id);
+      const title = visitors.dataset.flagTitle;
+
+      Counter('get', '/classes/Counter?where=' + encodeURIComponent(JSON.stringify({ url })))
+        .then(response => response.json())
+        .then(({ results }) => {
+          if (results.length > 0) {
+            const counter = results[0];
+            leancloudSelector(url).innerText = counter.time + 1;
+            Counter('put', '/classes/Counter/' + counter.objectId, { time: { '__op': 'Increment', 'amount': 1 } })
+              .catch(error => {
+                console.error('Failed to save visitor count', error);
+              });
+          } else {
+              Counter('post', '/classes/Counter', { title, url, time: 1 })
+                .then(response => response.json())
+                .then(() => {
+                  leancloudSelector(url).innerText = 1;
+                })
+                .catch(error => {
+                  console.error('Failed to create', error);
+                });
+          }
+        })
+        .catch(error => {
+          console.error('LeanCloud Counter Error', error);
+        });
+    }
+
+    function showTime(Counter) {
+      const visitors = document.querySelectorAll('.leancloud_visitors');
+      const entries = [...visitors].map(element => {
+        return decodeURI(element.id);
+      });
+
+      Counter('get', '/classes/Counter?where=' + encodeURIComponent(JSON.stringify({ url: { '$in': entries } })))
+        .then(response => response.json())
+        .then(({ results }) => {
+          for (let url of entries) {
+            const target = results.find(item => item.url === url);
+            leancloudSelector(url).innerText = target ? target.time : 0;
+          }
+        })
+        .catch(error => {
+          console.error('LeanCloud Counter Error', error);
+        });
+    }
+
+    const { app_id, app_key, server_url } = {"enable":true,"app_id":"XtypLwqMgeOwaXKki3a4bC6B-gzGzoHsz","app_key":"a8kiSiniEd0HlNvj4gTSdfsi","server_url":null,"security":false};
+    function fetchData(api_server) {
+      const Counter = (method, url, data) => {
+        return fetch(`${api_server}/1.1${url}`, {
+          method,
+          headers: {
+            'X-LC-Id'     : app_id,
+            'X-LC-Key'    : app_key,
+            'Content-Type': 'application/json',
+          },
+          body: JSON.stringify(data)
+        });
+      };
+      if (CONFIG.page.isPost) {
+        if (CONFIG.hostname !== location.hostname) return;
+        addCount(Counter);
+      } else if (document.querySelectorAll('.post-title-link').length >= 1) {
+        showTime(Counter);
+      }
+    }
+
+    const api_server = app_id.slice(-9) === '-MdYXbMMI' ? `https://${app_id.slice(0, 8).toLowerCase()}.api.lncldglobal.com` : server_url;
+
+    if (api_server) {
+      fetchData(api_server);
+    } else {
+      fetch('https://app-router.leancloud.cn/2/route?appId=' + app_id)
+        .then(response => response.json())
+        .then(({ api_server }) => {
+          fetchData('https://' + api_server);
+        });
+    }
+  })();
+</script>
+
+
+  
+
+  
+
+<link rel="stylesheet" href="//cdn.jsdelivr.net/npm/gitalk@1.7.0/dist/gitalk.css">
+
+<script>
+NexT.utils.loadComments('#gitalk-container', () => {
+  NexT.utils.getScript('//cdn.jsdelivr.net/npm/gitalk@1.7.0/dist/gitalk.min.js', () => {
+    var gitalk = new Gitalk({
+      clientID    : '0027cb40e78eba0adbfe',
+      clientSecret: '133ffa343a0ee4b23fef6d2ea7e36244770c2df9',
+      repo        : 'blog_git_talk',
+      owner       : 'kitdine',
+      admin       : ['kitdine'],
+      id          : 'd27670da38e11faead6be62664ff3a0d',
+        language: 'zh-CN',
+      distractionFreeMode: true
+    });
+    gitalk.render('gitalk-container');
+  }, window.Gitalk);
+});
+</script>
+
+</body>
+</html>
