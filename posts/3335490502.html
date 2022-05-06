@@ -2,108 +2,59 @@
 <html lang="zh-CN">
 <head>
   <meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=2">
-<meta name="theme-color" content="#222">
-<meta name="generator" content="Hexo 5.2.0">
+<meta name="viewport" content="width=device-width">
+<meta name="theme-color" content="#222" media="(prefers-color-scheme: light)">
+<meta name="theme-color" content="#222" media="(prefers-color-scheme: dark)"><meta name="generator" content="Hexo 6.1.0">
 
 
   <link rel="apple-touch-icon" sizes="180x180" href="/images/apple-touch-icon.png">
   <link rel="icon" type="image/png" sizes="32x32" href="/images/favicon-32x32.png">
   <link rel="icon" type="image/png" sizes="16x16" href="/images/favicon-16x16.png">
-  <link rel="mask-icon" href="/images/safari-pinned-tab.svg" color="#222">
+  <link rel="mask-icon" href="/images/logo.svg" color="#222">
 
 <link rel="stylesheet" href="/css/main.css">
 
-<link rel="stylesheet" href="//fonts.googleapis.com/css?family=Noto+Sans+SC:300,300italic,400,400italic,700,700italic|Cascadia+Code:300,300italic,400,400italic,700,700italic&display=swap&subset=latin,latin-ext">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Noto+Sans+SC:300,300italic,400,400italic,700,700italic%7CCascadia+Code:300,300italic,400,400italic,700,700italic&display=swap&subset=latin,latin-ext">
 
-<link rel="stylesheet" href="//cdn.jsdelivr.net/npm/@fortawesome/fontawesome-free@5.15.1/css/all.min.css">
-  <link rel="stylesheet" href="//cdn.jsdelivr.net/npm/animate.css@3.1.1/animate.min.css">
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@fortawesome/fontawesome-free@6.1.1/css/all.min.css" integrity="sha256-DfWjNxDkM94fVBWx1H5BMMp0Zq7luBlV8QRcSES7s+0=" crossorigin="anonymous">
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/animate.css@3.1.1/animate.min.css" integrity="sha256-PR7ttpcvz8qrF57fur/yAx1qXMFJeJFiA6pSzWi0OIE=" crossorigin="anonymous">
 
-<script class="hexo-configurations">
-    var NexT = window.NexT || {};
-    var CONFIG = {"hostname":"blog.jobshen.com","root":"/","scheme":"Gemini","version":"8.0.2","exturl":false,"sidebar":{"position":"left","display":"post","padding":18,"offset":12},"copycode":true,"bookmark":{"enable":true,"color":"#222","save":"auto"},"fancybox":false,"mediumzoom":false,"lazyload":true,"pangu":false,"comments":{"style":"tabs","active":null,"storage":true,"lazyload":false,"nav":null},"motion":{"enable":true,"async":false,"transition":{"post_block":"fadeIn","post_header":"fadeInDown","post_body":"fadeInDown","coll_header":"fadeInLeft","sidebar":"fadeInUp"}},"prism":false,"i18n":{"placeholder":"搜索...","empty":"没有找到任何搜索结果：${query}","hits_time":"找到 ${hits} 个搜索结果（用时 ${time} 毫秒）","hits":"找到 ${hits} 个搜索结果"},"path":"/search.xml","localsearch":{"enable":true,"trigger":"auto","top_n_per_article":1,"unescape":false,"preload":false}};
-  </script>
+<script class="next-config" data-name="main" type="application/json">{"hostname":"blog.jobshen.com","root":"/","images":"/images","scheme":"Gemini","darkmode":true,"version":"8.11.1","exturl":false,"sidebar":{"position":"left","display":"post","padding":18,"offset":12},"copycode":true,"bookmark":{"enable":true,"color":"#222","save":"auto"},"mediumzoom":false,"lazyload":true,"pangu":false,"comments":{"style":"tabs","active":null,"storage":true,"lazyload":false,"nav":null},"stickytabs":false,"motion":{"enable":true,"async":false,"transition":{"post_block":"fadeIn","post_header":"fadeInDown","post_body":"fadeInDown","coll_header":"fadeInLeft","sidebar":"fadeInUp"}},"prism":false,"i18n":{"placeholder":"搜索...","empty":"没有找到任何搜索结果：${query}","hits_time":"找到 ${hits} 个搜索结果（用时 ${time} 毫秒）","hits":"找到 ${hits} 个搜索结果"},"path":"/search.xml","localsearch":{"enable":true,"trigger":"auto","top_n_per_article":1,"unescape":false,"preload":false}}</script><script src="/js/config.js"></script>
 
-  <meta name="description" content="&amp;emsp;&amp;emsp;接着上篇文章，现在开始部署Redis集群，采用方案为四主四从，暂时不考虑搭建哨兵，因此需要八台机器，以下是部署过程中的一些记录。">
+    <meta name="description" content="接着上篇文章，现在开始部署Redis集群，采用方案为四主四从，暂时不考虑搭建哨兵，因此需要八台机器，以下是部署过程中的一些记录。">
 <meta property="og:type" content="article">
 <meta property="og:title" content="Centos-7下常见中间件环境的安装（三）">
-<meta property="og:url" content="http://blog.jobshen.com/posts/3335490502.html">
+<meta property="og:url" content="https://blog.jobshen.com/posts/3335490502.html">
 <meta property="og:site_name" content="一杯咖啡的时间">
-<meta property="og:description" content="&amp;emsp;&amp;emsp;接着上篇文章，现在开始部署Redis集群，采用方案为四主四从，暂时不考虑搭建哨兵，因此需要八台机器，以下是部署过程中的一些记录。">
+<meta property="og:description" content="接着上篇文章，现在开始部署Redis集群，采用方案为四主四从，暂时不考虑搭建哨兵，因此需要八台机器，以下是部署过程中的一些记录。">
 <meta property="og:locale" content="zh_CN">
 <meta property="article:published_time" content="2017-12-17T12:29:46.000Z">
-<meta property="article:modified_time" content="2017-12-17T12:29:46.000Z">
+<meta property="article:modified_time" content="2022-05-06T07:58:03.001Z">
 <meta property="article:author" content="Job Shen">
 <meta property="article:tag" content="Redis">
 <meta property="article:tag" content="Redis Cluster">
 <meta name="twitter:card" content="summary">
 
 
-<link rel="canonical" href="http://blog.jobshen.com/posts/3335490502.html">
+<link rel="canonical" href="https://blog.jobshen.com/posts/3335490502.html">
 
 
-<script class="page-configurations">
-  // https://hexo.io/docs/variables.html
-  CONFIG.page = {
-    sidebar: "",
-    isHome : false,
-    isPost : true,
-    lang   : 'zh-CN'
-  };
-</script>
 
-  <title>Centos-7下常见中间件环境的安装（三） | 一杯咖啡的时间</title>
+<script class="next-config" data-name="page" type="application/json">{"sidebar":"","isHome":false,"isPost":true,"lang":"zh-CN","comments":true,"permalink":"https://blog.jobshen.com/posts/3335490502.html","path":"posts/3335490502.html","title":"Centos-7下常见中间件环境的安装（三）"}</script>
+
+<script class="next-config" data-name="calendar" type="application/json">""</script>
+<title>Centos-7下常见中间件环境的安装（三） | 一杯咖啡的时间</title>
   
-    <script async src="https://www.googletagmanager.com/gtag/js?id=UA-105338633-1"></script>
-    <script>
-      if (CONFIG.hostname === location.hostname) {
-        window.dataLayer = window.dataLayer || [];
-        function gtag(){dataLayer.push(arguments);}
-        gtag('js', new Date());
-        gtag('config', 'UA-105338633-1');
-      }
-    </script>
-
+  <script class="next-config" data-name="google_analytics" type="application/json">{"tracking_id":"G-XM4CDTM8RX","only_pageview":true}</script>
+  <script src="/js/third-party/analytics/google-analytics.js"></script>
 
 
 
 
 
   <noscript>
-  <style>
-  body { margin-top: 2rem; }
-
-  .use-motion .menu-item,
-  .use-motion .sidebar,
-  .use-motion .post-block,
-  .use-motion .pagination,
-  .use-motion .comments,
-  .use-motion .post-header,
-  .use-motion .post-body,
-  .use-motion .collection-header {
-    visibility: visible;
-  }
-
-  .use-motion .header,
-  .use-motion .site-brand-container .toggle,
-  .use-motion .footer { opacity: initial; }
-
-  .use-motion .site-title,
-  .use-motion .site-subtitle,
-  .use-motion .custom-logo-image {
-    opacity: initial;
-    top: initial;
-  }
-
-  .use-motion .logo-line {
-    transform: scaleX(1);
-  }
-
-  .search-pop-overlay, .sidebar-nav { display: none; }
-  .sidebar-panel { display: block; }
-  </style>
-</noscript>
-
+    <link rel="stylesheet" href="/css/noscript.css">
+  </noscript>
 <link rel="alternate" href="/atom.xml" title="一杯咖啡的时间" type="application/atom+xml">
 </head>
 
@@ -114,7 +65,7 @@
     <header class="header" itemscope itemtype="http://schema.org/WPHeader">
       <div class="header-inner"><div class="site-brand-container">
   <div class="site-nav-toggle">
-    <div class="toggle" aria-label="切换导航栏">
+    <div class="toggle" aria-label="切换导航栏" role="button">
         <span class="toggle-line"></span>
         <span class="toggle-line"></span>
         <span class="toggle-line"></span>
@@ -125,7 +76,7 @@
 
     <a href="/" class="brand" rel="start">
       <i class="logo-line"></i>
-      <h1 class="site-title">一杯咖啡的时间</h1>
+      <p class="site-title">一杯咖啡的时间</p>
       <i class="logo-line"></i>
     </a>
       <p class="site-subtitle" itemprop="description">苦中作乐</p>
@@ -141,37 +92,7 @@
 
 
 <nav class="site-nav">
-  <ul class="main-menu menu">
-        <li class="menu-item menu-item-home">
-
-    <a href="/" rel="section"><i class="fa fa-home fa-fw"></i>首页</a>
-
-  </li>
-        <li class="menu-item menu-item-about">
-
-    <a href="/about/" rel="section"><i class="fa fa-user fa-fw"></i>关于</a>
-
-  </li>
-        <li class="menu-item menu-item-tags">
-
-    <a href="/tags/" rel="section"><i class="fa fa-tags fa-fw"></i>标签</a>
-
-  </li>
-        <li class="menu-item menu-item-categories">
-
-    <a href="/categories/" rel="section"><i class="fa fa-th fa-fw"></i>分类</a>
-
-  </li>
-        <li class="menu-item menu-item-archives">
-
-    <a href="/archives/" rel="section"><i class="fa fa-archive fa-fw"></i>归档</a>
-
-  </li>
-        <li class="menu-item menu-item-commonweal">
-
-    <a href="/404/" rel="section"><i class="fa fa-heartbeat fa-fw"></i>公益 404</a>
-
-  </li>
+  <ul class="main-menu menu"><li class="menu-item menu-item-home"><a href="/" rel="section"><i class="fa fa-home fa-fw"></i>首页</a></li><li class="menu-item menu-item-about"><a href="/about/" rel="section"><i class="fa fa-user fa-fw"></i>关于</a></li><li class="menu-item menu-item-tags"><a href="/tags/" rel="section"><i class="fa fa-tags fa-fw"></i>标签</a></li><li class="menu-item menu-item-categories"><a href="/categories/" rel="section"><i class="fa fa-th fa-fw"></i>分类</a></li><li class="menu-item menu-item-archives"><a href="/archives/" rel="section"><i class="fa fa-archive fa-fw"></i>归档</a></li><li class="menu-item menu-item-commonweal"><a href="/404/" rel="section"><i class="fa fa-heartbeat fa-fw"></i>公益 404</a></li>
       <li class="menu-item menu-item-search">
         <a role="button" class="popup-trigger"><i class="fa fa-search fa-fw"></i>搜索
         </a>
@@ -182,8 +103,7 @@
 
 
   <div class="search-pop-overlay">
-    <div class="popup search-popup">
-        <div class="search-header">
+    <div class="popup search-popup"><div class="search-header">
   <span class="search-icon">
     <i class="fa fa-search"></i>
   </span>
@@ -192,7 +112,7 @@
            placeholder="搜索..." spellcheck="false"
            type="search" class="search-input">
   </div>
-  <span class="popup-btn-close">
+  <span class="popup-btn-close" role="button">
     <i class="fa fa-times-circle"></i>
   </span>
 </div>
@@ -208,7 +128,7 @@
 </div>
         
   
-  <div class="toggle sidebar-toggle">
+  <div class="toggle sidebar-toggle" role="button">
     <span class="toggle-line"></span>
     <span class="toggle-line"></span>
     <span class="toggle-line"></span>
@@ -228,12 +148,12 @@
 
       <div class="sidebar-panel-container">
         <!--noindex-->
-        <section class="post-toc-wrap sidebar-panel">
+        <div class="post-toc-wrap sidebar-panel">
             <div class="post-toc animated"><ol class="nav"><li class="nav-item nav-level-2"><a class="nav-link" href="#%E5%87%86%E5%A4%87%E5%B7%A5%E4%BD%9C"><span class="nav-number">1.</span> <span class="nav-text">准备工作</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#%E9%9B%86%E7%BE%A4%E6%9C%BA%E5%99%A8%E4%BF%A1%E6%81%AF"><span class="nav-number">1.1.</span> <span class="nav-text">集群机器信息</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#Redis%E7%BC%96%E8%AF%91"><span class="nav-number">1.2.</span> <span class="nav-text">Redis编译</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#Redis-Cluster-%E9%83%A8%E7%BD%B2"><span class="nav-number">2.</span> <span class="nav-text">Redis Cluster 部署</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#Redis-conf"><span class="nav-number">2.1.</span> <span class="nav-text">Redis.conf</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#Redis-service"><span class="nav-number">2.2.</span> <span class="nav-text">Redis.service</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E5%90%AF%E5%8A%A8Redis"><span class="nav-number">2.3.</span> <span class="nav-text">启动Redis</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E5%88%9B%E5%BB%BARedis%E9%9B%86%E7%BE%A4"><span class="nav-number">2.4.</span> <span class="nav-text">创建Redis集群</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E9%AA%8C%E8%AF%81"><span class="nav-number">2.5.</span> <span class="nav-text">验证</span></a></li></ol></li></ol></div>
-        </section>
+        </div>
         <!--/noindex-->
 
-        <section class="site-overview-wrap sidebar-panel">
+        <div class="site-overview-wrap sidebar-panel">
           <div class="site-author site-overview-item animated" itemprop="author" itemscope itemtype="http://schema.org/Person">
     <img class="site-author-image" itemprop="image" alt="Job Shen"
       src="/images/Avatar.png">
@@ -243,22 +163,19 @@
 <div class="site-state-wrap site-overview-item animated">
   <nav class="site-state">
       <div class="site-state-item site-state-posts">
-          <a href="/archives/">
-        
-          <span class="site-state-item-count">11</span>
+        <a href="/archives/">
+          <span class="site-state-item-count">10</span>
           <span class="site-state-item-name">日志</span>
         </a>
       </div>
       <div class="site-state-item site-state-categories">
-            <a href="/categories/">
-          
-        <span class="site-state-item-count">7</span>
+          <a href="/categories/">
+        <span class="site-state-item-count">6</span>
         <span class="site-state-item-name">分类</span></a>
       </div>
       <div class="site-state-item site-state-tags">
-            <a href="/tags/">
-          
-        <span class="site-state-item-count">19</span>
+          <a href="/tags/">
+        <span class="site-state-item-count">16</span>
         <span class="site-state-item-name">标签</span></a>
       </div>
   </nav>
@@ -269,12 +186,12 @@
       </span>
   </div>
   <div class="cc-license site-overview-item animated" itemprop="license">
-    <a href="https://creativecommons.org/licenses/by-nc-sa/4.0/deed.zh" class="cc-opacity" rel="noopener" target="_blank"><img src="/images/cc-by-nc-sa.svg" alt="Creative Commons"></a>
+    <a href="https://creativecommons.org/licenses/by-nc-sa/4.0/deed.zh" class="cc-opacity" rel="noopener" target="_blank"><img src="https://cdn.jsdelivr.net/npm/@creativecommons/vocabulary@2020.11.3/assets/license_badges/small/by_nc_sa.svg" alt="Creative Commons"></a>
   </div>
 
 
 
-        </section>
+        </div>
       </div>
     </div>
   </aside>
@@ -284,7 +201,7 @@
     </header>
 
     
-  <div class="back-to-top">
+  <div class="back-to-top" role="button" aria-label="返回顶部">
     <i class="fa fa-arrow-up"></i>
     <span>0%</span>
   </div>
@@ -297,9 +214,7 @@
 
 
     <div class="main-inner post posts-expand">
-      
 
-      
 
   
 
@@ -309,16 +224,21 @@
   
 
   <article itemscope itemtype="http://schema.org/Article" class="post-content" lang="zh-CN">
-    <link itemprop="mainEntityOfPage" href="http://blog.jobshen.com/posts/3335490502.html">
+    <link itemprop="mainEntityOfPage" href="https://blog.jobshen.com/posts/3335490502.html">
 
     <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
       <meta itemprop="image" content="/images/Avatar.png">
       <meta itemprop="name" content="Job Shen">
-      <meta itemprop="description" content="">
     </span>
 
     <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
       <meta itemprop="name" content="一杯咖啡的时间">
+      <meta itemprop="description" content="">
+    </span>
+
+    <span hidden itemprop="post" itemscope itemtype="http://schema.org/CreativeWork">
+      <meta itemprop="name" content="Centos-7下常见中间件环境的安装（三） | 一杯咖啡的时间">
+      <meta itemprop="description" content="">
     </span>
       <header class="post-header">
         <h1 class="post-title" itemprop="name headline">
@@ -337,6 +257,13 @@
     </span>
     <span class="post-meta-item">
       <span class="post-meta-item-icon">
+        <i class="far fa-calendar-check"></i>
+      </span>
+      <span class="post-meta-item-text">更新于</span>
+      <time title="修改时间：2022-05-06 15:58:03" itemprop="dateModified" datetime="2022-05-06T15:58:03+08:00">2022-05-06</time>
+    </span>
+    <span class="post-meta-item">
+      <span class="post-meta-item-icon">
         <i class="far fa-folder"></i>
       </span>
       <span class="post-meta-item-text">分类于</span>
@@ -346,21 +273,20 @@
     </span>
 
   
-    <span id="/posts/3335490502.html" class="post-meta-item leancloud_visitors" data-flag-title="Centos-7下常见中间件环境的安装（三）" title="阅读次数">
+    <span class="post-meta-item" title="阅读次数">
       <span class="post-meta-item-icon">
         <i class="far fa-eye"></i>
       </span>
       <span class="post-meta-item-text">阅读次数：</span>
-      <span class="leancloud-visitors-count"></span>
+      <span class="firestore-visitors-count"></span>
     </span>
-      </div>
-      <div class="post-meta">
+    <span class="post-meta-break"></span>
     <span class="post-meta-item" title="本文字数">
       <span class="post-meta-item-icon">
         <i class="far fa-file-word"></i>
       </span>
       <span class="post-meta-item-text">本文字数：</span>
-      <span>3.9k</span>
+      <span>3.5k</span>
     </span>
     <span class="post-meta-item" title="阅读时长">
       <span class="post-meta-item-icon">
@@ -378,8 +304,8 @@
     
     
     <div class="post-body" itemprop="articleBody">
-        <p>&emsp;&emsp;接着上篇文章，现在开始部署Redis集群，采用方案为四主四从，暂时不考虑搭建哨兵，因此需要八台机器，以下是部署过程中的一些记录。</p>
-<a id="more"></a>
+        <p>接着上篇文章，现在开始部署Redis集群，采用方案为四主四从，暂时不考虑搭建哨兵，因此需要八台机器，以下是部署过程中的一些记录。</p>
+<span id="more"></span>
 
 <h2 id="准备工作"><a href="#准备工作" class="headerlink" title="准备工作"></a>准备工作</h2><h3 id="集群机器信息"><a href="#集群机器信息" class="headerlink" title="集群机器信息"></a>集群机器信息</h3><table>
 <thead>
@@ -423,74 +349,25 @@
 </tbody></table>
 <p><em>Redis 为内存数据库，因此机器内存必须较大，根据经验，Redis占用内存一般不能超过机器内存的一半，不否则Redis的性能就会开始下降</em></p>
 <h3 id="Redis编译"><a href="#Redis编译" class="headerlink" title="Redis编译"></a>Redis编译</h3><p>由于Redis并不能通过包管理工具（例如 <em>yum</em>、<em>apt-get</em>等）进行快速安装，只能下载源码进行编译安装。</p>
-<pre class="line-numbers language-shell" data-language="shell"><code class="language-shell">jobshen@JobShen-PC:&#x2F;usr&#x2F;local$ curl -O http:&#x2F;&#x2F;download.redis.io&#x2F;releases&#x2F;redis-4.0.6.tar.gz
-jobshen@JobShen-PC:&#x2F;usr&#x2F;local$ tar -zxf redis-4.0.6.tar.gz
-jobshen@JobShen-PC:&#x2F;usr&#x2F;local$ ln -s redis-4.0.6 redis
-jobshen@JobShen-PC:&#x2F;usr&#x2F;local$ cd redis
-jobshen@JobShen-PC:&#x2F;usr&#x2F;local&#x2F;redis$ make &amp;&amp; make install<span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span></span></code></pre>
+<figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line">jobshen@JobShen-PC:/usr/local$ curl -O http://download.redis.io/releases/redis-4.0.6.tar.gz</span><br><span class="line">jobshen@JobShen-PC:/usr/local$ tar -zxf redis-4.0.6.tar.gz</span><br><span class="line">jobshen@JobShen-PC:/usr/local$ ln -s redis-4.0.6 redis</span><br><span class="line">jobshen@JobShen-PC:/usr/local$ cd redis</span><br><span class="line">jobshen@JobShen-PC:/usr/local/redis$ make &amp;&amp; make install</span><br></pre></td></tr></table></figure>
 
-<h2 id="Redis-Cluster-部署"><a href="#Redis-Cluster-部署" class="headerlink" title="Redis Cluster 部署"></a>Redis Cluster 部署</h2><h3 id="Redis-conf"><a href="#Redis-conf" class="headerlink" title="Redis.conf"></a>Redis.conf</h3><p>新建*<strong>cluster**<em>文件夹，以及新建</em></strong>redis.conf***文件并添加以下内容：</p>
-<pre class="line-numbers language-shell" data-language="shell"><code class="language-shell">jobshen@JobShen-PC:&#x2F;usr&#x2F;local&#x2F;redis$ mkdir cluster
-jobshen@JobShen-PC:&#x2F;usr&#x2F;local&#x2F;redis$ vim cluster&#x2F;redis.conf<span aria-hidden="true" class="line-numbers-rows"><span></span><span></span></span></code></pre>
+<h2 id="Redis-Cluster-部署"><a href="#Redis-Cluster-部署" class="headerlink" title="Redis Cluster 部署"></a>Redis Cluster 部署</h2><h3 id="Redis-conf"><a href="#Redis-conf" class="headerlink" title="Redis.conf"></a>Redis.conf</h3><p>新建<em><strong>cluster</strong></em>文件夹，以及新建<em><strong>redis.conf</strong></em>文件并添加以下内容：</p>
+<figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">jobshen@JobShen-PC:/usr/local/redis$ mkdir cluster</span><br><span class="line">jobshen@JobShen-PC:/usr/local/redis$ vim cluster/redis.conf</span><br></pre></td></tr></table></figure>
 
-<pre class="line-numbers language-none"><code class="language-none">bind 10.100.1.31 127.0.0.1
-protected-mode yes
-port 6379
-daemonize yes
-supervised systemd
-pidfile &#x2F;var&#x2F;run&#x2F;redis_6379.pid
-logfile &quot;&#x2F;usr&#x2F;local&#x2F;redis&#x2F;cluster&#x2F;redis.log&quot;
-databases 16
-save 900 1
-save 300 10
-save 60 10000
-stop-writes-on-bgsave-error yes
-dbfilename dump.rdb
-slave-serve-stale-data yes
-slave-read-only yes
-slave-priority 100
-maxmemory 34359738368
-appendonly yes
-cluster-enabled yes
-cluster-config-file nodes-6379.conf
-cluster-node-timeout 15000<span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span></span></code></pre>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br></pre></td><td class="code"><pre><span class="line">bind 10.100.1.31 127.0.0.1</span><br><span class="line">protected-mode yes</span><br><span class="line">port 6379</span><br><span class="line">daemonize yes</span><br><span class="line">supervised systemd</span><br><span class="line">pidfile /var/run/redis_6379.pid</span><br><span class="line">logfile &quot;/usr/local/redis/cluster/redis.log&quot;</span><br><span class="line">databases 16</span><br><span class="line">save 900 1</span><br><span class="line">save 300 10</span><br><span class="line">save 60 10000</span><br><span class="line">stop-writes-on-bgsave-error yes</span><br><span class="line">dbfilename dump.rdb</span><br><span class="line">slave-serve-stale-data yes</span><br><span class="line">slave-read-only yes</span><br><span class="line">slave-priority 100</span><br><span class="line">maxmemory 34359738368</span><br><span class="line">appendonly yes</span><br><span class="line">cluster-enabled yes</span><br><span class="line">cluster-config-file nodes-6379.conf</span><br><span class="line">cluster-node-timeout 15000</span><br></pre></td></tr></table></figure>
 
 <h3 id="Redis-service"><a href="#Redis-service" class="headerlink" title="Redis.service"></a>Redis.service</h3><p>创建<em>systemd</em>服务，</p>
-<pre class="line-numbers language-shell" data-language="shell"><code class="language-shell">jobshen@JobShen-PC:&#x2F;usr&#x2F;local&#x2F;redis$ vim &#x2F;lib&#x2F;systemd&#x2F;system&#x2F;redis.service<span aria-hidden="true" class="line-numbers-rows"><span></span></span></code></pre>
+<figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">jobshen@JobShen-PC:/usr/local/redis$ vim /lib/systemd/system/redis.service</span><br></pre></td></tr></table></figure>
 
-<pre class="line-numbers language-shell" data-language="shell"><code class="language-shell">[Unit]
-Description&#x3D;Redis
-After&#x3D;network.target
+<figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br></pre></td><td class="code"><pre><span class="line">[Unit]</span><br><span class="line">Description=Redis</span><br><span class="line">After=network.target</span><br><span class="line"></span><br><span class="line">[Service]</span><br><span class="line">ExecStart=/usr/local/redis/src/redis-server /usr/local/redis/cluster/redis.conf --daemonize no</span><br><span class="line">ExecStop=/usr/local/redis/src/redis-cli -h 127.0.0.1 -p 6379 shutdown</span><br><span class="line"></span><br><span class="line">[Install]</span><br><span class="line">WantedBy=multi-user.target</span><br></pre></td></tr></table></figure>
 
-[Service]
-ExecStart&#x3D;&#x2F;usr&#x2F;local&#x2F;redis&#x2F;src&#x2F;redis-server &#x2F;usr&#x2F;local&#x2F;redis&#x2F;cluster&#x2F;redis.conf --daemonize no
-ExecStop&#x3D;&#x2F;usr&#x2F;local&#x2F;redis&#x2F;src&#x2F;redis-cli -h 127.0.0.1 -p 6379 shutdown
-
-[Install]
-WantedBy&#x3D;multi-user.target<span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span></span></code></pre>
-
-<h3 id="启动Redis"><a href="#启动Redis" class="headerlink" title="启动Redis"></a>启动Redis</h3><pre class="line-numbers language-shell" data-language="shell"><code class="language-shell">jobshen@JobShen-PC:&#x2F;usr&#x2F;local&#x2F;redis$ systemctl start redis<span aria-hidden="true" class="line-numbers-rows"><span></span></span></code></pre>
+<h3 id="启动Redis"><a href="#启动Redis" class="headerlink" title="启动Redis"></a>启动Redis</h3><figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">jobshen@JobShen-PC:/usr/local/redis$ systemctl start redis</span><br></pre></td></tr></table></figure>
 
 <h3 id="创建Redis集群"><a href="#创建Redis集群" class="headerlink" title="创建Redis集群"></a>创建Redis集群</h3><p>以下命令可以只在一台机器上执行，但为了后期维护Redis集群方便，可以在所有redis机器上都安装集群管理工具。</p>
-<pre class="line-numbers language-shell" data-language="shell"><code class="language-shell">jobshen@JobShen-PC:&#x2F;usr&#x2F;local&#x2F;redis$ gpg --keyserver hkp:&#x2F;&#x2F;keys.gnupg.net --recv-keys 409B6B1796C275462A1703113804BB82D39DC0E3 7D2BAF1CF37B13E2069D6956105BD0E739499BDB
-jobshen@JobShen-PC:&#x2F;usr&#x2F;local&#x2F;redis$ curl -sSL https:&#x2F;&#x2F;get.rvm.io | bash -s stable
-jobshen@JobShen-PC:&#x2F;usr&#x2F;local&#x2F;redis$ rvm install 2.4.3
-jobshen@JobShen-PC:&#x2F;usr&#x2F;local&#x2F;redis$ rvm use 2.4.3 --default --create
-jobshen@JobShen-PC:&#x2F;usr&#x2F;local&#x2F;redis$ gem install redis
-jobshen@JobShen-PC:&#x2F;usr&#x2F;local&#x2F;redis$ .&#x2F;src&#x2F;redis-trib.rb create --replicas 1 10.100.1.31:6379 10.100.1.32:6379 10.100.1.33:6379 10.100.1.34:6379 10.100.1.35:6379 10.100.1.36:6379 10.100.1.37:6379 10.100.1.38:6379<span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span><span></span></span></code></pre>
+<figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line">jobshen@JobShen-PC:/usr/local/redis$ gpg --keyserver hkp://keys.gnupg.net --recv-keys 409B6B1796C275462A1703113804BB82D39DC0E3 7D2BAF1CF37B13E2069D6956105BD0E739499BDB</span><br><span class="line">jobshen@JobShen-PC:/usr/local/redis$ curl -sSL https://get.rvm.io | bash -s stable</span><br><span class="line">jobshen@JobShen-PC:/usr/local/redis$ rvm install 2.4.3</span><br><span class="line">jobshen@JobShen-PC:/usr/local/redis$ rvm use 2.4.3 --default --create</span><br><span class="line">jobshen@JobShen-PC:/usr/local/redis$ gem install redis</span><br><span class="line">jobshen@JobShen-PC:/usr/local/redis$ ./src/redis-trib.rb create --replicas 1 10.100.1.31:6379 10.100.1.32:6379 10.100.1.33:6379 10.100.1.34:6379 10.100.1.35:6379 10.100.1.36:6379 10.100.1.37:6379 10.100.1.38:6379</span><br></pre></td></tr></table></figure>
 
 <h3 id="验证"><a href="#验证" class="headerlink" title="验证"></a>验证</h3><p>登入任意一台redis，查看集群信息</p>
-<pre class="line-numbers language-shell" data-language="shell"><code class="language-shell">jobshen@JobShen-PC:&#x2F;usr&#x2F;local&#x2F;redis$ .&#x2F;src&#x2F;redis-cli -c -p 6369
-127.0.0.1:6379&gt; cluster nodes
-31f29a40699e44ae9b0dce5c8ded53cc92546c7f 10.100.1.31:6379@16379 master - 0 1513599855000 2 connected 4096-8191
-bd148fc244c821f0ebc502e2ef80e90e3ce8020f 10.100.1.32:6379@16379 master - 0 1513599857582 4 connected 12288-16383
-24c0c11cceb08a0a2c0f76773a1c3ecb5553fdd1 10.100.1.33:6379@16379 slave bd148fc244c821f0ebc502e2ef80e90e3ce8020f 0 1513599857000 8 connected
-b8ed99aef612d728f69015b20dae32751af5a668 10.100.1.34:6379@16379 myself,master - 0 1513599854000 1 connected 0-4095
-ee420f56a64c89c519c82adf2131724456656711 10.100.1.35:6379@16379 slave b8ed99aef612d728f69015b20dae32751af5a668 0 1513599856000 5 connected
-fa8f3b33ed93a8bb76c3f44b410436f12ca45d8c 10.100.1.36:6379@16379 slave 914483a3760cc5f7fc4422ea3326f39b0fc505b4 0 1513599854000 7 connected
-914483a3760cc5f7fc4422ea3326f39b0fc505b4 10.100.1.37:6379@16379 master - 0 1513599854000 3 connected 8192-12287
-da57f16f2f5b86cae95478157723c9b2972d460d 10.100.1.38:6379@16379 slave 31f29a40699e44ae9b0dce5c8ded53cc92546c7f 0 1513599854000 6 connected
-127.0.0.1:6379&gt; <span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span></span></code></pre>
+<figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br></pre></td><td class="code"><pre><span class="line">jobshen@JobShen-PC:/usr/local/redis$ ./src/redis-cli -c -p 6369</span><br><span class="line">127.0.0.1:6379&gt; cluster nodes</span><br><span class="line">31f29a40699e44ae9b0dce5c8ded53cc92546c7f 10.100.1.31:6379@16379 master - 0 1513599855000 2 connected 4096-8191</span><br><span class="line">bd148fc244c821f0ebc502e2ef80e90e3ce8020f 10.100.1.32:6379@16379 master - 0 1513599857582 4 connected 12288-16383</span><br><span class="line">24c0c11cceb08a0a2c0f76773a1c3ecb5553fdd1 10.100.1.33:6379@16379 slave bd148fc244c821f0ebc502e2ef80e90e3ce8020f 0 1513599857000 8 connected</span><br><span class="line">b8ed99aef612d728f69015b20dae32751af5a668 10.100.1.34:6379@16379 myself,master - 0 1513599854000 1 connected 0-4095</span><br><span class="line">ee420f56a64c89c519c82adf2131724456656711 10.100.1.35:6379@16379 slave b8ed99aef612d728f69015b20dae32751af5a668 0 1513599856000 5 connected</span><br><span class="line">fa8f3b33ed93a8bb76c3f44b410436f12ca45d8c 10.100.1.36:6379@16379 slave 914483a3760cc5f7fc4422ea3326f39b0fc505b4 0 1513599854000 7 connected</span><br><span class="line">914483a3760cc5f7fc4422ea3326f39b0fc505b4 10.100.1.37:6379@16379 master - 0 1513599854000 3 connected 8192-12287</span><br><span class="line">da57f16f2f5b86cae95478157723c9b2972d460d 10.100.1.38:6379@16379 slave 31f29a40699e44ae9b0dce5c8ded53cc92546c7f 0 1513599854000 6 connected</span><br><span class="line">127.0.0.1:6379&gt; </span><br></pre></td></tr></table></figure>
 
 <p>到现在为止，整个<em>Redis集群</em>的搭建就完成了。</p>
 
@@ -499,17 +376,6 @@ da57f16f2f5b86cae95478157723c9b2972d460d 10.100.1.38:6379@16379 slave 31f29a4069
     
     
     
-      
-  <div class="popular-posts-header">相关文章</div>
-  <ul class="popular-posts">
-    <li class="popular-posts-item">
-      <div class="popular-posts-title"><a href="\posts\1461710894.html" rel="bookmark">记一次线上Redis故障恢复和分析（二）</a></div>
-    </li>
-    <li class="popular-posts-item">
-      <div class="popular-posts-title"><a href="\posts\1728650486.html" rel="bookmark">记一次线上Redis故障恢复和分析（一）</a></div>
-    </li>
-  </ul>
-
 
     <footer class="post-footer">
           
@@ -521,29 +387,12 @@ da57f16f2f5b86cae95478157723c9b2972d460d 10.100.1.38:6379@16379 slave 31f29a4069
   </li>
   <li class="post-copyright-link">
       <strong>本文链接：</strong>
-      <a href="http://blog.jobshen.com/posts/3335490502.html" title="Centos-7下常见中间件环境的安装（三）">http://blog.jobshen.com/posts/3335490502.html</a>
+      <a href="https://blog.jobshen.com/posts/3335490502.html" title="Centos-7下常见中间件环境的安装（三）">https://blog.jobshen.com/posts/3335490502.html</a>
   </li>
   <li class="post-copyright-license">
     <strong>版权声明： </strong>本博客所有文章除特别声明外，均采用 <a href="https://creativecommons.org/licenses/by-nc-sa/4.0/deed.zh" rel="noopener" target="_blank"><i class="fab fa-fw fa-creative-commons"></i>BY-NC-SA</a> 许可协议。转载请注明出处！
   </li>
 </ul>
-</div>
-
-          <div class="followme">
-  <span>欢迎关注我的其它发布渠道</span>
-
-  <div class="social-list">
-
-      <div class="social-item">
-        <a target="_blank" class="social-link" href="/atom.xml">
-          <span class="icon">
-            <i class="fa fa-rss"></i>
-          </span>
-
-          <span class="label">RSS</span>
-        </a>
-      </div>
-  </div>
 </div>
 
           <div class="post-tags">
@@ -574,44 +423,17 @@ da57f16f2f5b86cae95478157723c9b2972d460d 10.100.1.38:6379@16379 slave 31f29a4069
 
 
 
-      
-    <div class="comments" id="gitalk-container"></div>
-
-<script>
-  window.addEventListener('tabs:register', () => {
-    let { activeClass } = CONFIG.comments;
-    if (CONFIG.comments.storage) {
-      activeClass = localStorage.getItem('comments_active') || activeClass;
-    }
-    if (activeClass) {
-      const activeTab = document.querySelector(`a[href="#comment-${activeClass}"]`);
-      if (activeTab) {
-        activeTab.click();
-      }
-    }
-  });
-  if (CONFIG.comments.storage) {
-    window.addEventListener('tabs:click', event => {
-      if (!event.target.matches('.tabs-comment .tab-content .tab-pane')) return;
-      const commentClass = event.target.classList[1];
-      localStorage.setItem('comments_active', commentClass);
-    });
-  }
-</script>
-
-    </div>
+    <div class="comments gitalk-container"></div>
+</div>
   </main>
 
   <footer class="footer">
     <div class="footer-inner">
-      
 
-      
 
 <div class="copyright">
-  
   &copy; 2017 – 
-  <span itemprop="copyrightYear">2021</span>
+  <span itemprop="copyrightYear">2022</span>
   <span class="with-love">
     <i class="fa fa-heart"></i>
   </span>
@@ -622,42 +444,29 @@ da57f16f2f5b86cae95478157723c9b2972d460d 10.100.1.38:6379@16379 slave 31f29a4069
     <span class="post-meta-item-icon">
       <i class="fa fa-chart-line"></i>
     </span>
-    <span title="站点总字数">78k</span>
+    <span title="站点总字数">73k</span>
   </span>
   <span class="post-meta-item">
     <span class="post-meta-item-icon">
       <i class="fa fa-coffee"></i>
     </span>
-    <span title="站点阅读时长">2:10</span>
+    <span title="站点阅读时长">2:01</span>
   </span>
 </div>
-  <div class="powered-by">由 <a href="https://hexo.io/" class="theme-link" rel="noopener" target="_blank">Hexo</a> & <a href="https://theme-next.js.org/" class="theme-link" rel="noopener" target="_blank">NexT.Gemini</a> 强力驱动
+  <div class="powered-by">由 <a href="https://hexo.io/" rel="noopener" target="_blank">Hexo</a> & <a href="https://theme-next.js.org/" rel="noopener" target="_blank">NexT.Gemini</a> 强力驱动
   </div>
 
     </div>
   </footer>
 
   
-  <script src="//cdn.jsdelivr.net/npm/animejs@3.2.1/lib/anime.min.js"></script>
-  <script src="//cdn.jsdelivr.net/npm/lozad@1.16.0/dist/lozad.min.js"></script>
-<script src="/js/utils.js"></script><script src="/js/motion.js"></script><script src="/js/next-boot.js"></script><script src="/js/bookmark.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/animejs@3.2.1/lib/anime.min.js" integrity="sha256-XL2inqUJaslATFnHdJOi9GfQ60on8Wx1C2H8DYiN1xY=" crossorigin="anonymous"></script>
+  <script src="https://cdn.jsdelivr.net/npm/lozad@1.16.0/dist/lozad.min.js" integrity="sha256-mOFREFhqmHeQbXpK2lp4nA3qooVgACfh88fpJftLBbc=" crossorigin="anonymous"></script>
+<script src="/js/comments.js"></script><script src="/js/utils.js"></script><script src="/js/motion.js"></script><script src="/js/next-boot.js"></script><script src="/js/bookmark.js"></script>
 
   
-
-
-
-
-  <script src="/js/local-search.js"></script>
-
-
-
-
-
-
-
-
-
-
+<script src="https://cdn.jsdelivr.net/npm/hexo-generator-searchdb@1.4.0/dist/search.js" integrity="sha256-vXZMYLEqsROAXkEw93GGIvaB2ab+QW6w3+1ahD9nXXA=" crossorigin="anonymous"></script>
+<script src="/js/third-party/search/local-search.js"></script>
 
 
 
@@ -665,127 +474,17 @@ da57f16f2f5b86cae95478157723c9b2972d460d 10.100.1.38:6379@16379 slave 31f29a4069
 
   
 
+  <script src="https://cdn.jsdelivr.net/npm/firebase@9.7.0/firebase-app-compat.js" integrity="sha256-kazmBornWCBvhzKX9OvlPP7/4RbDozFe7VyVx4fj/vg=" crossorigin="anonymous"></script>
+  <script src="https://cdn.jsdelivr.net/npm/firebase@9.7.0/firebase-firestore-compat.js" integrity="sha256-JsvvsDGyUIHrfyMHH2FPJrbHRhjv7hOjtg1VdsuxI0s=" crossorigin="anonymous"></script>
+  <script class="next-config" data-name="firestore" type="application/json">{"enable":true,"collection":"articles","apiKey":"AIzaSyAPnpab6t0qB5X8xTX_TZFUTkSFVLNyQdw","projectId":"blog-e5d21"}</script>
+  <script src="/js/third-party/statistics/firestore.js"></script>
 
 
 
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/gitalk@1.7.2/dist/gitalk.css" integrity="sha256-AJnUHL7dBv6PGaeyPQJcgQPDjt/Hn/PvYZde1iqfp8U=" crossorigin="anonymous">
 
-
-<script>
-  (function() {
-    function leancloudSelector(url) {
-      url = encodeURI(url);
-      return document.getElementById(url).querySelector('.leancloud-visitors-count');
-    }
-
-    function addCount(Counter) {
-      const visitors = document.querySelector('.leancloud_visitors');
-      const url = decodeURI(visitors.id);
-      const title = visitors.dataset.flagTitle;
-
-      Counter('get', '/classes/Counter?where=' + encodeURIComponent(JSON.stringify({ url })))
-        .then(response => response.json())
-        .then(({ results }) => {
-          if (results.length > 0) {
-            const counter = results[0];
-            leancloudSelector(url).innerText = counter.time + 1;
-            Counter('put', '/classes/Counter/' + counter.objectId, { time: { '__op': 'Increment', 'amount': 1 } })
-              .catch(error => {
-                console.error('Failed to save visitor count', error);
-              });
-          } else {
-              Counter('post', '/classes/Counter', { title, url, time: 1 })
-                .then(response => response.json())
-                .then(() => {
-                  leancloudSelector(url).innerText = 1;
-                })
-                .catch(error => {
-                  console.error('Failed to create', error);
-                });
-          }
-        })
-        .catch(error => {
-          console.error('LeanCloud Counter Error', error);
-        });
-    }
-
-    function showTime(Counter) {
-      const visitors = document.querySelectorAll('.leancloud_visitors');
-      const entries = [...visitors].map(element => {
-        return decodeURI(element.id);
-      });
-
-      Counter('get', '/classes/Counter?where=' + encodeURIComponent(JSON.stringify({ url: { '$in': entries } })))
-        .then(response => response.json())
-        .then(({ results }) => {
-          for (let url of entries) {
-            const target = results.find(item => item.url === url);
-            leancloudSelector(url).innerText = target ? target.time : 0;
-          }
-        })
-        .catch(error => {
-          console.error('LeanCloud Counter Error', error);
-        });
-    }
-
-    const { app_id, app_key, server_url } = {"enable":true,"app_id":"XtypLwqMgeOwaXKki3a4bC6B-gzGzoHsz","app_key":"a8kiSiniEd0HlNvj4gTSdfsi","server_url":null,"security":false};
-    function fetchData(api_server) {
-      const Counter = (method, url, data) => {
-        return fetch(`${api_server}/1.1${url}`, {
-          method,
-          headers: {
-            'X-LC-Id'     : app_id,
-            'X-LC-Key'    : app_key,
-            'Content-Type': 'application/json',
-          },
-          body: JSON.stringify(data)
-        });
-      };
-      if (CONFIG.page.isPost) {
-        if (CONFIG.hostname !== location.hostname) return;
-        addCount(Counter);
-      } else if (document.querySelectorAll('.post-title-link').length >= 1) {
-        showTime(Counter);
-      }
-    }
-
-    const api_server = app_id.slice(-9) === '-MdYXbMMI' ? `https://${app_id.slice(0, 8).toLowerCase()}.api.lncldglobal.com` : server_url;
-
-    if (api_server) {
-      fetchData(api_server);
-    } else {
-      fetch('https://app-router.leancloud.cn/2/route?appId=' + app_id)
-        .then(response => response.json())
-        .then(({ api_server }) => {
-          fetchData('https://' + api_server);
-        });
-    }
-  })();
-</script>
-
-
-  
-
-  
-
-<link rel="stylesheet" href="//cdn.jsdelivr.net/npm/gitalk@1.7.0/dist/gitalk.css">
-
-<script>
-NexT.utils.loadComments('#gitalk-container', () => {
-  NexT.utils.getScript('//cdn.jsdelivr.net/npm/gitalk@1.7.0/dist/gitalk.min.js', () => {
-    var gitalk = new Gitalk({
-      clientID    : '0027cb40e78eba0adbfe',
-      clientSecret: '133ffa343a0ee4b23fef6d2ea7e36244770c2df9',
-      repo        : 'blog_git_talk',
-      owner       : 'kitdine',
-      admin       : ['kitdine'],
-      id          : 'bb3f8944f719209fa509e206605ccb01',
-        language: 'zh-CN',
-      distractionFreeMode: true
-    });
-    gitalk.render('gitalk-container');
-  }, window.Gitalk);
-});
-</script>
+<script class="next-config" data-name="gitalk" type="application/json">{"enable":true,"github_id":"kitdine","repo":"blog_git_talk","client_id":"0027cb40e78eba0adbfe","client_secret":"133ffa343a0ee4b23fef6d2ea7e36244770c2df9","admin_user":"kitdine","distraction_free_mode":true,"proxy":"https://cors-anywhere.azm.workers.dev/https://github.com/login/oauth/access_token","language":"zh-CN","js":{"url":"https://cdn.jsdelivr.net/npm/gitalk@1.7.2/dist/gitalk.min.js","integrity":"sha256-Pmj85ojLaPOWwRtlMJwmezB/Qg8BzvJp5eTzvXaYAfA="},"path_md5":"bb3f8944f719209fa509e206605ccb01"}</script>
+<script src="/js/third-party/comments/gitalk.js"></script>
 
 </body>
 </html>

@@ -2,108 +2,59 @@
 <html lang="zh-CN">
 <head>
   <meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=2">
-<meta name="theme-color" content="#222">
-<meta name="generator" content="Hexo 5.2.0">
+<meta name="viewport" content="width=device-width">
+<meta name="theme-color" content="#222" media="(prefers-color-scheme: light)">
+<meta name="theme-color" content="#222" media="(prefers-color-scheme: dark)"><meta name="generator" content="Hexo 6.1.0">
 
 
   <link rel="apple-touch-icon" sizes="180x180" href="/images/apple-touch-icon.png">
   <link rel="icon" type="image/png" sizes="32x32" href="/images/favicon-32x32.png">
   <link rel="icon" type="image/png" sizes="16x16" href="/images/favicon-16x16.png">
-  <link rel="mask-icon" href="/images/safari-pinned-tab.svg" color="#222">
+  <link rel="mask-icon" href="/images/logo.svg" color="#222">
 
 <link rel="stylesheet" href="/css/main.css">
 
-<link rel="stylesheet" href="//fonts.googleapis.com/css?family=Noto+Sans+SC:300,300italic,400,400italic,700,700italic|Cascadia+Code:300,300italic,400,400italic,700,700italic&display=swap&subset=latin,latin-ext">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Noto+Sans+SC:300,300italic,400,400italic,700,700italic%7CCascadia+Code:300,300italic,400,400italic,700,700italic&display=swap&subset=latin,latin-ext">
 
-<link rel="stylesheet" href="//cdn.jsdelivr.net/npm/@fortawesome/fontawesome-free@5.15.1/css/all.min.css">
-  <link rel="stylesheet" href="//cdn.jsdelivr.net/npm/animate.css@3.1.1/animate.min.css">
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@fortawesome/fontawesome-free@6.1.1/css/all.min.css" integrity="sha256-DfWjNxDkM94fVBWx1H5BMMp0Zq7luBlV8QRcSES7s+0=" crossorigin="anonymous">
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/animate.css@3.1.1/animate.min.css" integrity="sha256-PR7ttpcvz8qrF57fur/yAx1qXMFJeJFiA6pSzWi0OIE=" crossorigin="anonymous">
 
-<script class="hexo-configurations">
-    var NexT = window.NexT || {};
-    var CONFIG = {"hostname":"blog.jobshen.com","root":"/","scheme":"Gemini","version":"8.0.2","exturl":false,"sidebar":{"position":"left","display":"post","padding":18,"offset":12},"copycode":true,"bookmark":{"enable":true,"color":"#222","save":"auto"},"fancybox":false,"mediumzoom":false,"lazyload":true,"pangu":false,"comments":{"style":"tabs","active":null,"storage":true,"lazyload":false,"nav":null},"motion":{"enable":true,"async":false,"transition":{"post_block":"fadeIn","post_header":"fadeInDown","post_body":"fadeInDown","coll_header":"fadeInLeft","sidebar":"fadeInUp"}},"prism":false,"i18n":{"placeholder":"搜索...","empty":"没有找到任何搜索结果：${query}","hits_time":"找到 ${hits} 个搜索结果（用时 ${time} 毫秒）","hits":"找到 ${hits} 个搜索结果"},"path":"/search.xml","localsearch":{"enable":true,"trigger":"auto","top_n_per_article":1,"unescape":false,"preload":false}};
-  </script>
+<script class="next-config" data-name="main" type="application/json">{"hostname":"blog.jobshen.com","root":"/","images":"/images","scheme":"Gemini","darkmode":true,"version":"8.11.1","exturl":false,"sidebar":{"position":"left","display":"post","padding":18,"offset":12},"copycode":true,"bookmark":{"enable":true,"color":"#222","save":"auto"},"mediumzoom":false,"lazyload":true,"pangu":false,"comments":{"style":"tabs","active":null,"storage":true,"lazyload":false,"nav":null},"stickytabs":false,"motion":{"enable":true,"async":false,"transition":{"post_block":"fadeIn","post_header":"fadeInDown","post_body":"fadeInDown","coll_header":"fadeInLeft","sidebar":"fadeInUp"}},"prism":false,"i18n":{"placeholder":"搜索...","empty":"没有找到任何搜索结果：${query}","hits_time":"找到 ${hits} 个搜索结果（用时 ${time} 毫秒）","hits":"找到 ${hits} 个搜索结果"},"path":"/search.xml","localsearch":{"enable":true,"trigger":"auto","top_n_per_article":1,"unescape":false,"preload":false}}</script><script src="/js/config.js"></script>
 
-  <meta name="description" content="&amp;emsp;&amp;emsp;接着上篇文章，现在开始部署RocketMQ集群，采用的部署方案是阿里推荐的两主两从异步刷盘的模式，因此准备了四台服务器来进行MQ集群的部署，以下是部署过程中的一些记录，">
+    <meta name="description" content="接着上篇文章，现在开始部署RocketMQ集群，采用的部署方案是阿里推荐的两主两从异步刷盘的模式，因此准备了四台服务器来进行MQ集群的部署，以下是部署过程中的一些记录，">
 <meta property="og:type" content="article">
 <meta property="og:title" content="Centos-7下常见中间件环境的安装（二）">
-<meta property="og:url" content="http://blog.jobshen.com/posts/2345740436.html">
+<meta property="og:url" content="https://blog.jobshen.com/posts/2345740436.html">
 <meta property="og:site_name" content="一杯咖啡的时间">
-<meta property="og:description" content="&amp;emsp;&amp;emsp;接着上篇文章，现在开始部署RocketMQ集群，采用的部署方案是阿里推荐的两主两从异步刷盘的模式，因此准备了四台服务器来进行MQ集群的部署，以下是部署过程中的一些记录，">
+<meta property="og:description" content="接着上篇文章，现在开始部署RocketMQ集群，采用的部署方案是阿里推荐的两主两从异步刷盘的模式，因此准备了四台服务器来进行MQ集群的部署，以下是部署过程中的一些记录，">
 <meta property="og:locale" content="zh_CN">
 <meta property="article:published_time" content="2017-12-09T12:53:12.000Z">
-<meta property="article:modified_time" content="2017-12-09T12:53:12.000Z">
+<meta property="article:modified_time" content="2022-05-06T07:58:03.001Z">
 <meta property="article:author" content="Job Shen">
 <meta property="article:tag" content="jdk">
 <meta property="article:tag" content="rocketmq">
 <meta name="twitter:card" content="summary">
 
 
-<link rel="canonical" href="http://blog.jobshen.com/posts/2345740436.html">
+<link rel="canonical" href="https://blog.jobshen.com/posts/2345740436.html">
 
 
-<script class="page-configurations">
-  // https://hexo.io/docs/variables.html
-  CONFIG.page = {
-    sidebar: "",
-    isHome : false,
-    isPost : true,
-    lang   : 'zh-CN'
-  };
-</script>
 
-  <title>Centos-7下常见中间件环境的安装（二） | 一杯咖啡的时间</title>
+<script class="next-config" data-name="page" type="application/json">{"sidebar":"","isHome":false,"isPost":true,"lang":"zh-CN","comments":true,"permalink":"https://blog.jobshen.com/posts/2345740436.html","path":"posts/2345740436.html","title":"Centos-7下常见中间件环境的安装（二）"}</script>
+
+<script class="next-config" data-name="calendar" type="application/json">""</script>
+<title>Centos-7下常见中间件环境的安装（二） | 一杯咖啡的时间</title>
   
-    <script async src="https://www.googletagmanager.com/gtag/js?id=UA-105338633-1"></script>
-    <script>
-      if (CONFIG.hostname === location.hostname) {
-        window.dataLayer = window.dataLayer || [];
-        function gtag(){dataLayer.push(arguments);}
-        gtag('js', new Date());
-        gtag('config', 'UA-105338633-1');
-      }
-    </script>
-
+  <script class="next-config" data-name="google_analytics" type="application/json">{"tracking_id":"G-XM4CDTM8RX","only_pageview":true}</script>
+  <script src="/js/third-party/analytics/google-analytics.js"></script>
 
 
 
 
 
   <noscript>
-  <style>
-  body { margin-top: 2rem; }
-
-  .use-motion .menu-item,
-  .use-motion .sidebar,
-  .use-motion .post-block,
-  .use-motion .pagination,
-  .use-motion .comments,
-  .use-motion .post-header,
-  .use-motion .post-body,
-  .use-motion .collection-header {
-    visibility: visible;
-  }
-
-  .use-motion .header,
-  .use-motion .site-brand-container .toggle,
-  .use-motion .footer { opacity: initial; }
-
-  .use-motion .site-title,
-  .use-motion .site-subtitle,
-  .use-motion .custom-logo-image {
-    opacity: initial;
-    top: initial;
-  }
-
-  .use-motion .logo-line {
-    transform: scaleX(1);
-  }
-
-  .search-pop-overlay, .sidebar-nav { display: none; }
-  .sidebar-panel { display: block; }
-  </style>
-</noscript>
-
+    <link rel="stylesheet" href="/css/noscript.css">
+  </noscript>
 <link rel="alternate" href="/atom.xml" title="一杯咖啡的时间" type="application/atom+xml">
 </head>
 
@@ -114,7 +65,7 @@
     <header class="header" itemscope itemtype="http://schema.org/WPHeader">
       <div class="header-inner"><div class="site-brand-container">
   <div class="site-nav-toggle">
-    <div class="toggle" aria-label="切换导航栏">
+    <div class="toggle" aria-label="切换导航栏" role="button">
         <span class="toggle-line"></span>
         <span class="toggle-line"></span>
         <span class="toggle-line"></span>
@@ -125,7 +76,7 @@
 
     <a href="/" class="brand" rel="start">
       <i class="logo-line"></i>
-      <h1 class="site-title">一杯咖啡的时间</h1>
+      <p class="site-title">一杯咖啡的时间</p>
       <i class="logo-line"></i>
     </a>
       <p class="site-subtitle" itemprop="description">苦中作乐</p>
@@ -141,37 +92,7 @@
 
 
 <nav class="site-nav">
-  <ul class="main-menu menu">
-        <li class="menu-item menu-item-home">
-
-    <a href="/" rel="section"><i class="fa fa-home fa-fw"></i>首页</a>
-
-  </li>
-        <li class="menu-item menu-item-about">
-
-    <a href="/about/" rel="section"><i class="fa fa-user fa-fw"></i>关于</a>
-
-  </li>
-        <li class="menu-item menu-item-tags">
-
-    <a href="/tags/" rel="section"><i class="fa fa-tags fa-fw"></i>标签</a>
-
-  </li>
-        <li class="menu-item menu-item-categories">
-
-    <a href="/categories/" rel="section"><i class="fa fa-th fa-fw"></i>分类</a>
-
-  </li>
-        <li class="menu-item menu-item-archives">
-
-    <a href="/archives/" rel="section"><i class="fa fa-archive fa-fw"></i>归档</a>
-
-  </li>
-        <li class="menu-item menu-item-commonweal">
-
-    <a href="/404/" rel="section"><i class="fa fa-heartbeat fa-fw"></i>公益 404</a>
-
-  </li>
+  <ul class="main-menu menu"><li class="menu-item menu-item-home"><a href="/" rel="section"><i class="fa fa-home fa-fw"></i>首页</a></li><li class="menu-item menu-item-about"><a href="/about/" rel="section"><i class="fa fa-user fa-fw"></i>关于</a></li><li class="menu-item menu-item-tags"><a href="/tags/" rel="section"><i class="fa fa-tags fa-fw"></i>标签</a></li><li class="menu-item menu-item-categories"><a href="/categories/" rel="section"><i class="fa fa-th fa-fw"></i>分类</a></li><li class="menu-item menu-item-archives"><a href="/archives/" rel="section"><i class="fa fa-archive fa-fw"></i>归档</a></li><li class="menu-item menu-item-commonweal"><a href="/404/" rel="section"><i class="fa fa-heartbeat fa-fw"></i>公益 404</a></li>
       <li class="menu-item menu-item-search">
         <a role="button" class="popup-trigger"><i class="fa fa-search fa-fw"></i>搜索
         </a>
@@ -182,8 +103,7 @@
 
 
   <div class="search-pop-overlay">
-    <div class="popup search-popup">
-        <div class="search-header">
+    <div class="popup search-popup"><div class="search-header">
   <span class="search-icon">
     <i class="fa fa-search"></i>
   </span>
@@ -192,7 +112,7 @@
            placeholder="搜索..." spellcheck="false"
            type="search" class="search-input">
   </div>
-  <span class="popup-btn-close">
+  <span class="popup-btn-close" role="button">
     <i class="fa fa-times-circle"></i>
   </span>
 </div>
@@ -208,7 +128,7 @@
 </div>
         
   
-  <div class="toggle sidebar-toggle">
+  <div class="toggle sidebar-toggle" role="button">
     <span class="toggle-line"></span>
     <span class="toggle-line"></span>
     <span class="toggle-line"></span>
@@ -228,12 +148,12 @@
 
       <div class="sidebar-panel-container">
         <!--noindex-->
-        <section class="post-toc-wrap sidebar-panel">
+        <div class="post-toc-wrap sidebar-panel">
             <div class="post-toc animated"><ol class="nav"><li class="nav-item nav-level-2"><a class="nav-link" href="#%E5%87%86%E5%A4%87%E5%B7%A5%E4%BD%9C"><span class="nav-number">1.</span> <span class="nav-text">准备工作</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#%E9%9B%86%E7%BE%A4%E6%9C%BA%E5%99%A8%E4%BF%A1%E6%81%AF"><span class="nav-number">1.1.</span> <span class="nav-text">集群机器信息</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E8%BF%90%E8%A1%8C%E7%8E%AF%E5%A2%83"><span class="nav-number">1.2.</span> <span class="nav-text">运行环境</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#Maven-%E5%AE%89%E8%A3%85"><span class="nav-number">1.3.</span> <span class="nav-text">Maven 安装</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#RocketMQ-%E7%BC%96%E8%AF%91"><span class="nav-number">1.4.</span> <span class="nav-text">RocketMQ 编译</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#RocketMQ-%E9%83%A8%E7%BD%B2"><span class="nav-number">2.</span> <span class="nav-text">RocketMQ 部署</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#%E4%BF%AE%E6%94%B9%E7%9B%AE%E5%BD%95%E9%85%8D%E7%BD%AE%E4%BF%A1%E6%81%AF"><span class="nav-number">2.1.</span> <span class="nav-text">修改目录配置信息</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E9%83%A8%E7%BD%B2NameServer"><span class="nav-number">2.2.</span> <span class="nav-text">部署NameServer</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E9%83%A8%E7%BD%B2Broker"><span class="nav-number">2.3.</span> <span class="nav-text">部署Broker</span></a><ol class="nav-child"><li class="nav-item nav-level-4"><a class="nav-link" href="#%E9%83%A8%E7%BD%B2broker-a"><span class="nav-number">2.3.1.</span> <span class="nav-text">部署broker-a</span></a><ol class="nav-child"><li class="nav-item nav-level-5"><a class="nav-link" href="#Master"><span class="nav-number">2.3.1.1.</span> <span class="nav-text">Master</span></a></li><li class="nav-item nav-level-5"><a class="nav-link" href="#Slave"><span class="nav-number">2.3.1.2.</span> <span class="nav-text">Slave</span></a></li></ol></li><li class="nav-item nav-level-4"><a class="nav-link" href="#%E9%83%A8%E7%BD%B2broker-b"><span class="nav-number">2.3.2.</span> <span class="nav-text">部署broker-b</span></a></li></ol></li></ol></li></ol></div>
-        </section>
+        </div>
         <!--/noindex-->
 
-        <section class="site-overview-wrap sidebar-panel">
+        <div class="site-overview-wrap sidebar-panel">
           <div class="site-author site-overview-item animated" itemprop="author" itemscope itemtype="http://schema.org/Person">
     <img class="site-author-image" itemprop="image" alt="Job Shen"
       src="/images/Avatar.png">
@@ -243,22 +163,19 @@
 <div class="site-state-wrap site-overview-item animated">
   <nav class="site-state">
       <div class="site-state-item site-state-posts">
-          <a href="/archives/">
-        
-          <span class="site-state-item-count">11</span>
+        <a href="/archives/">
+          <span class="site-state-item-count">10</span>
           <span class="site-state-item-name">日志</span>
         </a>
       </div>
       <div class="site-state-item site-state-categories">
-            <a href="/categories/">
-          
-        <span class="site-state-item-count">7</span>
+          <a href="/categories/">
+        <span class="site-state-item-count">6</span>
         <span class="site-state-item-name">分类</span></a>
       </div>
       <div class="site-state-item site-state-tags">
-            <a href="/tags/">
-          
-        <span class="site-state-item-count">19</span>
+          <a href="/tags/">
+        <span class="site-state-item-count">16</span>
         <span class="site-state-item-name">标签</span></a>
       </div>
   </nav>
@@ -269,12 +186,12 @@
       </span>
   </div>
   <div class="cc-license site-overview-item animated" itemprop="license">
-    <a href="https://creativecommons.org/licenses/by-nc-sa/4.0/deed.zh" class="cc-opacity" rel="noopener" target="_blank"><img src="/images/cc-by-nc-sa.svg" alt="Creative Commons"></a>
+    <a href="https://creativecommons.org/licenses/by-nc-sa/4.0/deed.zh" class="cc-opacity" rel="noopener" target="_blank"><img src="https://cdn.jsdelivr.net/npm/@creativecommons/vocabulary@2020.11.3/assets/license_badges/small/by_nc_sa.svg" alt="Creative Commons"></a>
   </div>
 
 
 
-        </section>
+        </div>
       </div>
     </div>
   </aside>
@@ -284,7 +201,7 @@
     </header>
 
     
-  <div class="back-to-top">
+  <div class="back-to-top" role="button" aria-label="返回顶部">
     <i class="fa fa-arrow-up"></i>
     <span>0%</span>
   </div>
@@ -297,9 +214,7 @@
 
 
     <div class="main-inner post posts-expand">
-      
 
-      
 
   
 
@@ -309,16 +224,21 @@
   
 
   <article itemscope itemtype="http://schema.org/Article" class="post-content" lang="zh-CN">
-    <link itemprop="mainEntityOfPage" href="http://blog.jobshen.com/posts/2345740436.html">
+    <link itemprop="mainEntityOfPage" href="https://blog.jobshen.com/posts/2345740436.html">
 
     <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
       <meta itemprop="image" content="/images/Avatar.png">
       <meta itemprop="name" content="Job Shen">
-      <meta itemprop="description" content="">
     </span>
 
     <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
       <meta itemprop="name" content="一杯咖啡的时间">
+      <meta itemprop="description" content="">
+    </span>
+
+    <span hidden itemprop="post" itemscope itemtype="http://schema.org/CreativeWork">
+      <meta itemprop="name" content="Centos-7下常见中间件环境的安装（二） | 一杯咖啡的时间">
+      <meta itemprop="description" content="">
     </span>
       <header class="post-header">
         <h1 class="post-title" itemprop="name headline">
@@ -337,6 +257,13 @@
     </span>
     <span class="post-meta-item">
       <span class="post-meta-item-icon">
+        <i class="far fa-calendar-check"></i>
+      </span>
+      <span class="post-meta-item-text">更新于</span>
+      <time title="修改时间：2022-05-06 15:58:03" itemprop="dateModified" datetime="2022-05-06T15:58:03+08:00">2022-05-06</time>
+    </span>
+    <span class="post-meta-item">
+      <span class="post-meta-item-icon">
         <i class="far fa-folder"></i>
       </span>
       <span class="post-meta-item-text">分类于</span>
@@ -346,28 +273,27 @@
     </span>
 
   
-    <span id="/posts/2345740436.html" class="post-meta-item leancloud_visitors" data-flag-title="Centos-7下常见中间件环境的安装（二）" title="阅读次数">
+    <span class="post-meta-item" title="阅读次数">
       <span class="post-meta-item-icon">
         <i class="far fa-eye"></i>
       </span>
       <span class="post-meta-item-text">阅读次数：</span>
-      <span class="leancloud-visitors-count"></span>
+      <span class="firestore-visitors-count"></span>
     </span>
-      </div>
-      <div class="post-meta">
+    <span class="post-meta-break"></span>
     <span class="post-meta-item" title="本文字数">
       <span class="post-meta-item-icon">
         <i class="far fa-file-word"></i>
       </span>
       <span class="post-meta-item-text">本文字数：</span>
-      <span>22k</span>
+      <span>16k</span>
     </span>
     <span class="post-meta-item" title="阅读时长">
       <span class="post-meta-item-icon">
         <i class="far fa-clock"></i>
       </span>
       <span class="post-meta-item-text">阅读时长 &asymp;</span>
-      <span>37 分钟</span>
+      <span>26 分钟</span>
     </span>
 </div>
 
@@ -378,8 +304,8 @@
     
     
     <div class="post-body" itemprop="articleBody">
-        <p>&emsp;&emsp;接着上篇文章，现在开始部署RocketMQ集群，采用的部署方案是阿里推荐的两主两从异步刷盘的模式，因此准备了四台服务器来进行MQ集群的部署，以下是部署过程中的一些记录，</p>
-<a id="more"></a>
+        <p>接着上篇文章，现在开始部署RocketMQ集群，采用的部署方案是阿里推荐的两主两从异步刷盘的模式，因此准备了四台服务器来进行MQ集群的部署，以下是部署过程中的一些记录，</p>
+<span id="more"></span>
 
 <h2 id="准备工作"><a href="#准备工作" class="headerlink" title="准备工作"></a>准备工作</h2><h3 id="集群机器信息"><a href="#集群机器信息" class="headerlink" title="集群机器信息"></a>集群机器信息</h3><table>
 <thead>
@@ -415,41 +341,22 @@
 <ul>
 <li>下载</li>
 </ul>
-<pre class="line-numbers language-shell" data-language="shell"><code class="language-shell">jobshen@JobShen-PC:&#x2F;usr&#x2F;local$ curl -O http:&#x2F;&#x2F;mirrors.hust.edu.cn&#x2F;apache&#x2F;maven&#x2F;maven-3&#x2F;3.5.2&#x2F;binaries&#x2F;apache-maven-3.5.2-bin.tar.gz
-jobshen@JobShen-PC:&#x2F;usr&#x2F;local$ tar -zxf apache-maven-3.5.2-bin.tar.gz
-jobshen@JobShen-PC:&#x2F;usr&#x2F;local$ vim apache-maven-3.5.2&#x2F;conf&#x2F;settings.xml<span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span></span></code></pre>
+<figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">jobshen@JobShen-PC:/usr/local$ curl -O http://mirrors.hust.edu.cn/apache/maven/maven-3/3.5.2/binaries/apache-maven-3.5.2-bin.tar.gz</span><br><span class="line">jobshen@JobShen-PC:/usr/local$ tar -zxf apache-maven-3.5.2-bin.tar.gz</span><br><span class="line">jobshen@JobShen-PC:/usr/local$ vim apache-maven-3.5.2/conf/settings.xml</span><br></pre></td></tr></table></figure>
 
 <ul>
 <li>修改mirror 镜像源，改为阿里云的镜像：</li>
 </ul>
-<pre class="line-numbers language-xml" data-language="xml"><code class="language-xml"> <span class="token tag"><span class="token tag"><span class="token punctuation">&lt;</span>mirrors</span><span class="token punctuation">></span></span>   
-<span class="token tag"><span class="token tag"><span class="token punctuation">&lt;</span>mirror</span><span class="token punctuation">></span></span>
-     <span class="token tag"><span class="token tag"><span class="token punctuation">&lt;</span>id</span><span class="token punctuation">></span></span>nexus<span class="token tag"><span class="token tag"><span class="token punctuation">&lt;/</span>id</span><span class="token punctuation">></span></span>
-     <span class="token tag"><span class="token tag"><span class="token punctuation">&lt;</span>mirrorOf</span><span class="token punctuation">></span></span>external:*,!spring-milestones<span class="token tag"><span class="token tag"><span class="token punctuation">&lt;/</span>mirrorOf</span><span class="token punctuation">></span></span>
-     <span class="token tag"><span class="token tag"><span class="token punctuation">&lt;</span>url</span><span class="token punctuation">></span></span>http://maven.aliyun.com/nexus/content/groups/public<span class="token tag"><span class="token tag"><span class="token punctuation">&lt;/</span>url</span><span class="token punctuation">></span></span>
-   <span class="token tag"><span class="token tag"><span class="token punctuation">&lt;/</span>mirror</span><span class="token punctuation">></span></span>
- <span class="token tag"><span class="token tag"><span class="token punctuation">&lt;/</span>mirrors</span><span class="token punctuation">></span></span><span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span><span></span><span></span></span></code></pre>
+<figure class="highlight xml"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line"> <span class="tag">&lt;<span class="name">mirrors</span>&gt;</span>   </span><br><span class="line"><span class="tag">&lt;<span class="name">mirror</span>&gt;</span></span><br><span class="line">     <span class="tag">&lt;<span class="name">id</span>&gt;</span>nexus<span class="tag">&lt;/<span class="name">id</span>&gt;</span></span><br><span class="line">     <span class="tag">&lt;<span class="name">mirrorOf</span>&gt;</span>external:*,!spring-milestones<span class="tag">&lt;/<span class="name">mirrorOf</span>&gt;</span></span><br><span class="line">     <span class="tag">&lt;<span class="name">url</span>&gt;</span>http://maven.aliyun.com/nexus/content/groups/public<span class="tag">&lt;/<span class="name">url</span>&gt;</span></span><br><span class="line">   <span class="tag">&lt;/<span class="name">mirror</span>&gt;</span></span><br><span class="line"> <span class="tag">&lt;/<span class="name">mirrors</span>&gt;</span></span><br></pre></td></tr></table></figure>
 
 <ul>
 <li>设置环境变量</li>
 </ul>
-<pre class="line-numbers language-shell" data-language="shell"><code class="language-shell">jobshen@JobShen-PC:&#x2F;usr&#x2F;local$ vim &#x2F;etc&#x2F;profile
-&#x2F;&#x2F; 在末尾添加以下内容
-export M2_HOME&#x3D;&#x2F;usr&#x2F;local&#x2F;apache-maven-3.5.2&#x2F;bin
-export PATH&#x3D;$M2_HOME&#x2F;bin:$PATH
-&#x2F;&#x2F; 保存 使其生效
-jobshen@JobShen-PC:&#x2F;usr&#x2F;local$ source &#x2F;etc&#x2F;profile<span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span><span></span></span></code></pre>
+<figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line">jobshen@JobShen-PC:/usr/local$ vim /etc/profile</span><br><span class="line">// 在末尾添加以下内容</span><br><span class="line">export M2_HOME=/usr/local/apache-maven-3.5.2/bin</span><br><span class="line">export PATH=$M2_HOME/bin:$PATH</span><br><span class="line">// 保存 使其生效</span><br><span class="line">jobshen@JobShen-PC:/usr/local$ source /etc/profile</span><br></pre></td></tr></table></figure>
 
 <h3 id="RocketMQ-编译"><a href="#RocketMQ-编译" class="headerlink" title="RocketMQ 编译"></a>RocketMQ 编译</h3><ul>
 <li>克隆代码编译</li>
 </ul>
-<pre class="line-numbers language-shell" data-language="shell"><code class="language-shell">jobshen@JobShen-PC:&#x2F;usr&#x2F;local$ git clone -b develop https:&#x2F;&#x2F;github.com&#x2F;apache&#x2F;rocketmq.git
-jobshen@JobShen-PC:&#x2F;usr&#x2F;local$ cd rocketmq
-jobshen@JobShen-PC:&#x2F;usr&#x2F;local&#x2F;rocketmq$ mvn -Prelease-all -DskipTests clean install -U
-jobshen@JobShen-PC:&#x2F;usr&#x2F;local&#x2F;rocketmq$ cd distribution&#x2F;target
-jobshen@JobShen-PC:&#x2F;usr&#x2F;local&#x2F;rocketmq$ cp apache-rocketmq.tar.gz &#x2F;usr&#x2F;local&#x2F;apache-rocketmq.tar.gz
-jobshen@JobShen-PC:&#x2F;usr&#x2F;local&#x2F;rocketmq$ cd &#x2F;usr&#x2F;local
-jobshen@JobShen-PC:&#x2F;usr&#x2F;local$ tar -zxf apache-rocketmq.tar.gz<span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span><span></span><span></span></span></code></pre>
+<figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line">jobshen@JobShen-PC:/usr/local$ git clone -b develop https://github.com/apache/rocketmq.git</span><br><span class="line">jobshen@JobShen-PC:/usr/local$ cd rocketmq</span><br><span class="line">jobshen@JobShen-PC:/usr/local/rocketmq$ mvn -Prelease-all -DskipTests clean install -U</span><br><span class="line">jobshen@JobShen-PC:/usr/local/rocketmq$ cd distribution/target</span><br><span class="line">jobshen@JobShen-PC:/usr/local/rocketmq$ cp apache-rocketmq.tar.gz /usr/local/apache-rocketmq.tar.gz</span><br><span class="line">jobshen@JobShen-PC:/usr/local/rocketmq$ cd /usr/local</span><br><span class="line">jobshen@JobShen-PC:/usr/local$ tar -zxf apache-rocketmq.tar.gz</span><br></pre></td></tr></table></figure>
 
 <ul>
 <li>将压缩包拷贝到集群中所有机器，并解压</li>
@@ -457,353 +364,85 @@ jobshen@JobShen-PC:&#x2F;usr&#x2F;local$ tar -zxf apache-rocketmq.tar.gz<span ar
 <h2 id="RocketMQ-部署"><a href="#RocketMQ-部署" class="headerlink" title="RocketMQ 部署"></a>RocketMQ 部署</h2><h3 id="修改目录配置信息"><a href="#修改目录配置信息" class="headerlink" title="修改目录配置信息"></a>修改目录配置信息</h3><ul>
 <li>log 日志根目录 store 存储根目录</li>
 </ul>
-<pre class="line-numbers language-shell" data-language="shell"><code class="language-shell">jobshen@JobShen-PC:&#x2F;usr&#x2F;local$ mkdir -p rocketmq_data&#x2F;logs rocketmq_data&#x2F;store<span aria-hidden="true" class="line-numbers-rows"><span></span></span></code></pre>
+<figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">jobshen@JobShen-PC:/usr/local$ mkdir -p rocketmq_data/logs rocketmq_data/store</span><br></pre></td></tr></table></figure>
 
 <ul>
 <li>修改日志配置文件中路径</li>
 </ul>
 <p>将<code>logback_broker.xml </code> 、<code>logback_filtersrv.xml</code> 、<code>logback_broker.xml</code>、<code>logback_namesrv.xml</code>、<code>logback_tools.xml</code>中的<code>$&#123;user.home&#125;</code> 修改为 <code>/usr/local/rocketmq_data</code></p>
 <h3 id="部署NameServer"><a href="#部署NameServer" class="headerlink" title="部署NameServer"></a>部署NameServer</h3><ul>
-<li>在<code>10.100.1.23</code>、<code>10.100.1.24</code>两台机器上添加 <strong><em>nameserver</em></strong> 配置文件：<code>nameserver.properties</code>：</li>
+<li>在<code>10.100.1.23</code>、<code>10.100.1.24</code>两台机器上添加 <em><strong>nameserver</strong></em> 配置文件：<code>nameserver.properties</code>：</li>
 </ul>
-<pre class="line-numbers language-shell" data-language="shell"><code class="language-shell">jobshen@JobShen-PC:&#x2F;usr&#x2F;local$ mkdir apache-rocketmq&#x2F;conf&#x2F;product
-jobshen@JobShen-PC:&#x2F;usr&#x2F;local$ vim apache-rocketmq&#x2F;conf&#x2F;product&#x2F;nameserver.properties<span aria-hidden="true" class="line-numbers-rows"><span></span><span></span></span></code></pre>
+<figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">jobshen@JobShen-PC:/usr/local$ mkdir apache-rocketmq/conf/product</span><br><span class="line">jobshen@JobShen-PC:/usr/local$ vim apache-rocketmq/conf/product/nameserver.properties</span><br></pre></td></tr></table></figure>
 
-<pre class="line-numbers language-properties" data-language="properties"><code class="language-properties"><span class="token attr-name">rocketmqHome</span><span class="token punctuation">=</span><span class="token attr-value">/usr/local/apache-rocketmq</span>
-<span class="token attr-name">kvConfigPath</span><span class="token punctuation">=</span><span class="token attr-value">/usr/local/rocketmq_data/store/namesrv/kvConfig.json</span>
-<span class="token attr-name">listenPort</span><span class="token punctuation">=</span><span class="token attr-value">9876</span>
-<span class="token attr-name">serverWorkerThreads</span><span class="token punctuation">=</span><span class="token attr-value">16</span>
-<span class="token attr-name">serverCallbackExecutorThreads</span><span class="token punctuation">=</span><span class="token attr-value">0</span>
-<span class="token attr-name">serverSelectorThreads</span><span class="token punctuation">=</span><span class="token attr-value">6</span>
-<span class="token attr-name">serverOnewaySemaphoreValue</span><span class="token punctuation">=</span><span class="token attr-value">512</span>
-<span class="token attr-name">serverAsyncSemaphoreValue</span><span class="token punctuation">=</span><span class="token attr-value">128</span>
-<span class="token attr-name">serverChannelMaxIdleTimeSeconds</span><span class="token punctuation">=</span><span class="token attr-value">240</span>
-<span class="token attr-name">serverSocketSndBufSize</span><span class="token punctuation">=</span><span class="token attr-value">4096</span>
-<span class="token attr-name">serverSocketRcvBufSize</span><span class="token punctuation">=</span><span class="token attr-value">2048</span>
-<span class="token attr-name">serverPooledByteBufAllocatorEnable</span><span class="token punctuation">=</span><span class="token attr-value">false</span><span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span></span></code></pre>
+<figure class="highlight properties"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br></pre></td><td class="code"><pre><span class="line"><span class="attr">rocketmqHome</span>=<span class="string">/usr/local/apache-rocketmq</span></span><br><span class="line"><span class="attr">kvConfigPath</span>=<span class="string">/usr/local/rocketmq_data/store/namesrv/kvConfig.json</span></span><br><span class="line"><span class="attr">listenPort</span>=<span class="string">9876</span></span><br><span class="line"><span class="attr">serverWorkerThreads</span>=<span class="string">16</span></span><br><span class="line"><span class="attr">serverCallbackExecutorThreads</span>=<span class="string">0</span></span><br><span class="line"><span class="attr">serverSelectorThreads</span>=<span class="string">6</span></span><br><span class="line"><span class="attr">serverOnewaySemaphoreValue</span>=<span class="string">512</span></span><br><span class="line"><span class="attr">serverAsyncSemaphoreValue</span>=<span class="string">128</span></span><br><span class="line"><span class="attr">serverChannelMaxIdleTimeSeconds</span>=<span class="string">240</span></span><br><span class="line"><span class="attr">serverSocketSndBufSize</span>=<span class="string">4096</span></span><br><span class="line"><span class="attr">serverSocketRcvBufSize</span>=<span class="string">2048</span></span><br><span class="line"><span class="attr">serverPooledByteBufAllocatorEnable</span>=<span class="string">false</span></span><br></pre></td></tr></table></figure>
 
 <ul>
 <li>修改<code>jvm</code>启动参数：</li>
 </ul>
-<pre class="line-numbers language-shell" data-language="shell"><code class="language-shell">jobshen@JobShen-PC:&#x2F;usr&#x2F;local&#x2F;apache-rocketmq$ vim bin&#x2F;runserver.sh<span aria-hidden="true" class="line-numbers-rows"><span></span></span></code></pre>
+<figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">jobshen@JobShen-PC:/usr/local/apache-rocketmq$ vim bin/runserver.sh</span><br></pre></td></tr></table></figure>
 
-<pre class="line-numbers language-shell" data-language="shell"><code class="language-shell">#!&#x2F;bin&#x2F;sh
-
-# Licensed to the Apache Software Foundation (ASF) under one or more
-# contributor license agreements.  See the NOTICE file distributed with
-# this work for additional information regarding copyright ownership.
-# The ASF licenses this file to You under the Apache License, Version 2.0
-# (the &quot;License&quot;); you may not use this file except in compliance with
-# the License.  You may obtain a copy of the License at
-#
-#     http:&#x2F;&#x2F;www.apache.org&#x2F;licenses&#x2F;LICENSE-2.0
-#
-# Unless required by applicable law or agreed to in writing, software
-# distributed under the License is distributed on an &quot;AS IS&quot; BASIS,
-# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-# See the License for the specific language governing permissions and
-# limitations under the License.
-
-#&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;
-# Java Environment Setting
-#&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;
-error_exit ()
-&#123;
-    echo &quot;ERROR: $1 !!&quot;
-    exit 1
-&#125;
-
-[ ! -e &quot;$JAVA_HOME&#x2F;bin&#x2F;java&quot; ] &amp;&amp; JAVA_HOME&#x3D;$HOME&#x2F;jdk&#x2F;java
-[ ! -e &quot;$JAVA_HOME&#x2F;bin&#x2F;java&quot; ] &amp;&amp; JAVA_HOME&#x3D;&#x2F;usr&#x2F;java
-[ ! -e &quot;$JAVA_HOME&#x2F;bin&#x2F;java&quot; ] &amp;&amp; error_exit &quot;Please set the JAVA_HOME variable in your environment, We need java(x64)!&quot;
-
-export JAVA_HOME
-export JAVA&#x3D;&quot;$JAVA_HOME&#x2F;bin&#x2F;java&quot;
-export BASE_DIR&#x3D;$(dirname $0)&#x2F;..
-export CLASSPATH&#x3D;.:$&#123;BASE_DIR&#125;&#x2F;conf:$&#123;CLASSPATH&#125;
-
-#&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;
-# JVM Configuration
-#&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;
-JAVA_OPT&#x3D;&quot;$&#123;JAVA_OPT&#125; -server -Xms16g -Xmx16g -Xmn4g -XX:MetaspaceSize&#x3D;256m -XX:MaxMetaspaceSize&#x3D;1024m -XX:+AlwaysPreTouch -XX:-UseBiasedLocking&quot;
-JAVA_OPT&#x3D;&quot;$&#123;JAVA_OPT&#125; -XX:+UseG1GC -XX:G1HeapRegionSize&#x3D;50m -XX:G1ReservePercent&#x3D;25 -XX:InitiatingHeapOccupancyPercent&#x3D;30&quot;
-JAVA_OPT&#x3D;&quot;$&#123;JAVA_OPT&#125; -XX:+UseGCLogFileRotation -XX:NumberOfGCLogFiles&#x3D;5 -XX:GCLogFileSize&#x3D;30m -verbose:gc -Xloggc:&#x2F;dev&#x2F;shm&#x2F;rmq_srv_gc.log -XX:+PrintGCDetails&quot;
-JAVA_OPT&#x3D;&quot;$&#123;JAVA_OPT&#125; -XX:-OmitStackTraceInFastThrow&quot;
-JAVA_OPT&#x3D;&quot;$&#123;JAVA_OPT&#125;  -XX:-UseLargePages&quot;
-JAVA_OPT&#x3D;&quot;$&#123;JAVA_OPT&#125; -Djava.ext.dirs&#x3D;$&#123;JAVA_HOME&#125;&#x2F;jre&#x2F;lib&#x2F;ext:$&#123;BASE_DIR&#125;&#x2F;lib&quot;
-#JAVA_OPT&#x3D;&quot;$&#123;JAVA_OPT&#125; -Xdebug -Xrunjdwp:transport&#x3D;dt_socket,address&#x3D;9555,server&#x3D;y,suspend&#x3D;n&quot;
-JAVA_OPT&#x3D;&quot;$&#123;JAVA_OPT&#125; $&#123;JAVA_OPT_EXT&#125;&quot;
-JAVA_OPT&#x3D;&quot;$&#123;JAVA_OPT&#125; -cp $&#123;CLASSPATH&#125;&quot;
-
-$JAVA $&#123;JAVA_OPT&#125; $@<span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span></span></code></pre>
+<figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta prompt_">#</span><span class="language-bash">!/bin/sh</span></span><br><span class="line"><span class="meta prompt_"></span></span><br><span class="line"><span class="meta prompt_"># </span><span class="language-bash">Licensed to the Apache Software Foundation (ASF) under one or more</span></span><br><span class="line"><span class="meta prompt_"># </span><span class="language-bash">contributor license agreements.  See the NOTICE file distributed with</span></span><br><span class="line"><span class="meta prompt_"># </span><span class="language-bash">this work <span class="keyword">for</span> additional information regarding copyright ownership.</span></span><br><span class="line"><span class="meta prompt_"># </span><span class="language-bash">The ASF licenses this file to You under the Apache License, Version 2.0</span></span><br><span class="line"><span class="meta prompt_"># </span><span class="language-bash">(the <span class="string">&quot;License&quot;</span>); you may not use this file except <span class="keyword">in</span> compliance with</span></span><br><span class="line"><span class="meta prompt_"># </span><span class="language-bash">the License.  You may obtain a copy of the License at</span></span><br><span class="line"><span class="meta prompt_">#</span><span class="language-bash"></span></span><br><span class="line"><span class="language-bash"><span class="comment">#     http://www.apache.org/licenses/LICENSE-2.0</span></span></span><br><span class="line"><span class="meta prompt_">#</span><span class="language-bash"></span></span><br><span class="line"><span class="language-bash"><span class="comment"># Unless required by applicable law or agreed to in writing, software</span></span></span><br><span class="line"><span class="meta prompt_"># </span><span class="language-bash">distributed under the License is distributed on an <span class="string">&quot;AS IS&quot;</span> BASIS,</span></span><br><span class="line"><span class="meta prompt_"># </span><span class="language-bash">WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.</span></span><br><span class="line"><span class="meta prompt_"># </span><span class="language-bash">See the License <span class="keyword">for</span> the specific language governing permissions and</span></span><br><span class="line"><span class="meta prompt_"># </span><span class="language-bash">limitations under the License.</span></span><br><span class="line"><span class="meta prompt_"></span></span><br><span class="line"><span class="meta prompt_">#</span><span class="language-bash">===========================================================================================</span></span><br><span class="line"><span class="meta prompt_"># </span><span class="language-bash">Java Environment Setting</span></span><br><span class="line"><span class="meta prompt_">#</span><span class="language-bash">===========================================================================================</span></span><br><span class="line">error_exit ()</span><br><span class="line">&#123;</span><br><span class="line">    echo &quot;ERROR: $1 !!&quot;</span><br><span class="line">    exit 1</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line">[ ! -e &quot;$JAVA_HOME/bin/java&quot; ] &amp;&amp; JAVA_HOME=$HOME/jdk/java</span><br><span class="line">[ ! -e &quot;$JAVA_HOME/bin/java&quot; ] &amp;&amp; JAVA_HOME=/usr/java</span><br><span class="line">[ ! -e &quot;$JAVA_HOME/bin/java&quot; ] &amp;&amp; error_exit &quot;Please set the JAVA_HOME variable in your environment, We need java(x64)!&quot;</span><br><span class="line"></span><br><span class="line">export JAVA_HOME</span><br><span class="line">export JAVA=&quot;$JAVA_HOME/bin/java&quot;</span><br><span class="line">export BASE_DIR=$(dirname $0)/..</span><br><span class="line">export CLASSPATH=.:$&#123;BASE_DIR&#125;/conf:$&#123;CLASSPATH&#125;</span><br><span class="line"><span class="meta prompt_"></span></span><br><span class="line"><span class="meta prompt_">#</span><span class="language-bash">===========================================================================================</span></span><br><span class="line"><span class="meta prompt_"># </span><span class="language-bash">JVM Configuration</span></span><br><span class="line"><span class="meta prompt_">#</span><span class="language-bash">===========================================================================================</span></span><br><span class="line">JAVA_OPT=&quot;$&#123;JAVA_OPT&#125; -server -Xms16g -Xmx16g -Xmn4g -XX:MetaspaceSize=256m -XX:MaxMetaspaceSize=1024m -XX:+AlwaysPreTouch -XX:-UseBiasedLocking&quot;</span><br><span class="line">JAVA_OPT=&quot;$&#123;JAVA_OPT&#125; -XX:+UseG1GC -XX:G1HeapRegionSize=50m -XX:G1ReservePercent=25 -XX:InitiatingHeapOccupancyPercent=30&quot;</span><br><span class="line">JAVA_OPT=&quot;$&#123;JAVA_OPT&#125; -XX:+UseGCLogFileRotation -XX:NumberOfGCLogFiles=5 -XX:GCLogFileSize=30m -verbose:gc -Xloggc:/dev/shm/rmq_srv_gc.log -XX:+PrintGCDetails&quot;</span><br><span class="line">JAVA_OPT=&quot;$&#123;JAVA_OPT&#125; -XX:-OmitStackTraceInFastThrow&quot;</span><br><span class="line">JAVA_OPT=&quot;$&#123;JAVA_OPT&#125;  -XX:-UseLargePages&quot;</span><br><span class="line">JAVA_OPT=&quot;$&#123;JAVA_OPT&#125; -Djava.ext.dirs=$&#123;JAVA_HOME&#125;/jre/lib/ext:$&#123;BASE_DIR&#125;/lib&quot;</span><br><span class="line"><span class="meta prompt_">#</span><span class="language-bash">JAVA_OPT=<span class="string">&quot;<span class="variable">$&#123;JAVA_OPT&#125;</span> -Xdebug -Xrunjdwp:transport=dt_socket,address=9555,server=y,suspend=n&quot;</span></span></span><br><span class="line">JAVA_OPT=&quot;$&#123;JAVA_OPT&#125; $&#123;JAVA_OPT_EXT&#125;&quot;</span><br><span class="line">JAVA_OPT=&quot;$&#123;JAVA_OPT&#125; -cp $&#123;CLASSPATH&#125;&quot;</span><br><span class="line"><span class="meta prompt_"></span></span><br><span class="line"><span class="meta prompt_">$</span><span class="language-bash">JAVA <span class="variable">$&#123;JAVA_OPT&#125;</span> <span class="variable">$@</span></span></span><br></pre></td></tr></table></figure>
 
 <ul>
 <li>制作<code>systemd</code>脚本：namesrv.service</li>
 </ul>
-<pre class="line-numbers language-shell" data-language="shell"><code class="language-shell">jobshen@JobShen-PC:&#x2F;usr&#x2F;local&#x2F;apache-rocketmq$ vim &#x2F;lib&#x2F;systemd&#x2F;system&#x2F;namesrv.service<span aria-hidden="true" class="line-numbers-rows"><span></span></span></code></pre>
+<figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">jobshen@JobShen-PC:/usr/local/apache-rocketmq$ vim /lib/systemd/system/namesrv.service</span><br></pre></td></tr></table></figure>
 
-<pre class="line-numbers language-shell" data-language="shell"><code class="language-shell">[Unit]
-Description&#x3D;RocketMQ-Nameserver
-After&#x3D;network.target
+<figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br></pre></td><td class="code"><pre><span class="line">[Unit]</span><br><span class="line">Description=RocketMQ-Nameserver</span><br><span class="line">After=network.target</span><br><span class="line"></span><br><span class="line">[Service]</span><br><span class="line">ExecStart=/usr/local/apache-rocketmq/bin/mqnamesrv -c /usr/local/apache-rocketmq/conf/product/namesrv.properties</span><br><span class="line">ExecStop=/usr/local/apache-rocketmq/bin/mqshutdown namesrv</span><br><span class="line"></span><br><span class="line">[Install]</span><br><span class="line">WantedBy=multi-user.target</span><br></pre></td></tr></table></figure>
 
-[Service]
-ExecStart&#x3D;&#x2F;usr&#x2F;local&#x2F;apache-rocketmq&#x2F;bin&#x2F;mqnamesrv -c &#x2F;usr&#x2F;local&#x2F;apache-rocketmq&#x2F;conf&#x2F;product&#x2F;namesrv.properties
-ExecStop&#x3D;&#x2F;usr&#x2F;local&#x2F;apache-rocketmq&#x2F;bin&#x2F;mqshutdown namesrv
-
-[Install]
-WantedBy&#x3D;multi-user.target<span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span></span></code></pre>
-
-<pre class="line-numbers language-shell" data-language="shell"><code class="language-shell">jobshen@JobShen-PC:&#x2F;usr&#x2F;local&#x2F;apache-rocketmq$ ln -s &#x2F;etc&#x2F;systemd&#x2F;system&#x2F;namesrv.service &#x2F;lib&#x2F;systemd&#x2F;system&#x2F;namesrv.service
-jobshen@JobShen-PC:&#x2F;usr&#x2F;local&#x2F;apache-rocketmq$ systemctl daemon-reload<span aria-hidden="true" class="line-numbers-rows"><span></span><span></span></span></code></pre>
+<figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">jobshen@JobShen-PC:/usr/local/apache-rocketmq$ ln -s /etc/systemd/system/namesrv.service /lib/systemd/system/namesrv.service</span><br><span class="line">jobshen@JobShen-PC:/usr/local/apache-rocketmq$ systemctl daemon-reload</span><br></pre></td></tr></table></figure>
 
 <ul>
-<li>启动**<em>nameserver**</em></li>
+<li>启动<em><strong>nameserver</strong></em></li>
 </ul>
-<pre class="line-numbers language-shell" data-language="shell"><code class="language-shell">jobshen@JobShen-PC:&#x2F;usr&#x2F;local&#x2F;apache-rocketmq$ systemctl start namesrv<span aria-hidden="true" class="line-numbers-rows"><span></span></span></code></pre>
+<figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">jobshen@JobShen-PC:/usr/local/apache-rocketmq$ systemctl start namesrv</span><br></pre></td></tr></table></figure>
 
 <h3 id="部署Broker"><a href="#部署Broker" class="headerlink" title="部署Broker"></a>部署Broker</h3><h4 id="部署broker-a"><a href="#部署broker-a" class="headerlink" title="部署broker-a"></a>部署broker-a</h4><h5 id="Master"><a href="#Master" class="headerlink" title="Master"></a>Master</h5><ul>
 <li>在<code>10.100.1.21</code>上新建<code>broker-a-master.properties</code>文件：</li>
 </ul>
-<pre class="line-numbers language-shell" data-language="shell"><code class="language-shell">jobshen@JobShen-PC:&#x2F;usr&#x2F;local$ mkdir apache-rocketmq&#x2F;conf&#x2F;product
-jobshen@JobShen-PC:&#x2F;usr&#x2F;local$ vim apache-rocketmq&#x2F;conf&#x2F;product&#x2F;broker-a-master.properties<span aria-hidden="true" class="line-numbers-rows"><span></span><span></span></span></code></pre>
+<figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">jobshen@JobShen-PC:/usr/local$ mkdir apache-rocketmq/conf/product</span><br><span class="line">jobshen@JobShen-PC:/usr/local$ vim apache-rocketmq/conf/product/broker-a-master.properties</span><br></pre></td></tr></table></figure>
 
-<pre class="line-numbers language-properties" data-language="properties"><code class="language-properties"><span class="token attr-name">rocketmqHome</span><span class="token punctuation">=</span><span class="token attr-value">/usr/local/apache-rocketmq</span>
-<span class="token attr-name">namesrvAddr</span><span class="token punctuation">=</span><span class="token attr-value">10.100.1.23:9876;10.100.1.24:9876</span>
-<span class="token attr-name">brokerIP1</span><span class="token punctuation">=</span><span class="token attr-value">10.100.1.21</span>
-<span class="token attr-name">brokerIP2</span><span class="token punctuation">=</span><span class="token attr-value">10.100.1.21</span>
-<span class="token attr-name">brokerName</span><span class="token punctuation">=</span><span class="token attr-value">mq_a</span>
-<span class="token attr-name">brokerClusterName</span><span class="token punctuation">=</span><span class="token attr-value">ProductCluster</span>
-<span class="token attr-name">brokerId</span><span class="token punctuation">=</span><span class="token attr-value">0</span>
-<span class="token attr-name">defaultTopicQueueNums</span><span class="token punctuation">=</span><span class="token attr-value">16</span>
-<span class="token attr-name">autoCreateTopicEnable</span><span class="token punctuation">=</span><span class="token attr-value">false</span>
-<span class="token attr-name">clusterTopicEnable</span><span class="token punctuation">=</span><span class="token attr-value">true</span>
-<span class="token attr-name">brokerTopicEnable</span><span class="token punctuation">=</span><span class="token attr-value">true</span>
-<span class="token attr-name">autoCreateSubscriptionGroup</span><span class="token punctuation">=</span><span class="token attr-value">true</span>
-<span class="token attr-name">listenPort</span><span class="token punctuation">=</span><span class="token attr-value">10911</span>
-<span class="token attr-name">storePathRootDir</span><span class="token punctuation">=</span><span class="token attr-value">/usr/local/rocketmq_data/store</span>
-<span class="token attr-name">storePathCommitLog</span><span class="token punctuation">=</span><span class="token attr-value">/usr/local/rocketmq_data/store/commitlog/</span>
-<span class="token attr-name">storePathConsumerQueue</span><span class="token punctuation">=</span><span class="token attr-value">/usr/local/rocketmq_data/store/consumequeue/</span>
-<span class="token attr-name">mapedFileSizeCommitLog</span><span class="token punctuation">=</span><span class="token attr-value">1073741824</span>
-<span class="token attr-name">mapedFileSizeConsumeQueue</span><span class="token punctuation">=</span><span class="token attr-value">6000000</span>
-<span class="token attr-name">deleteWhen</span><span class="token punctuation">=</span><span class="token attr-value">04</span>
-<span class="token attr-name">diskMaxUsedSpaceRatio</span><span class="token punctuation">=</span><span class="token attr-value">75</span>
-<span class="token attr-name">fileReserverdTime</span><span class="token punctuation">=</span><span class="token attr-value">72</span>
-<span class="token attr-name">haListenPort</span><span class="token punctuation">=</span><span class="token attr-value">10912</span>
-<span class="token attr-name">haSendHeartbeatInterval</span><span class="token punctuation">=</span><span class="token attr-value">5000</span>
-<span class="token attr-name">haHousekeepingInterval</span><span class="token punctuation">=</span><span class="token attr-value">20000</span>
-<span class="token attr-name">haTransferBatchSize</span><span class="token punctuation">=</span><span class="token attr-value">32768</span>
-<span class="token attr-name">haMasterAddress</span><span class="token punctuation">=</span>
-<span class="token attr-name">haSlaveFallbehindMax</span><span class="token punctuation">=</span><span class="token attr-value">268435456</span>
-<span class="token attr-name">brokerRole</span><span class="token punctuation">=</span><span class="token attr-value">ASYNC_MASTER</span>
-<span class="token attr-name">flushDiskType</span><span class="token punctuation">=</span><span class="token attr-value">ASYNC_FLUSH</span>
-<span class="token attr-name">syncFlushTimeout</span><span class="token punctuation">=</span><span class="token attr-value">5000</span>
-<span class="token attr-name">messageDelayLevel</span><span class="token punctuation">=</span><span class="token attr-value">1s 5s 10s 30s 1m 2m 3m 4m 5m 6m 7m 8m 9m 10m 20m 30m 1h 2h</span>
-<span class="token attr-name">flushDelayOffsetInterval</span><span class="token punctuation">=</span><span class="token attr-value">10000</span>
-<span class="token attr-name">cleanFileForciblyEnable</span><span class="token punctuation">=</span><span class="token attr-value">true</span><span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span></span></code></pre>
+<figure class="highlight properties"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br></pre></td><td class="code"><pre><span class="line"><span class="attr">rocketmqHome</span>=<span class="string">/usr/local/apache-rocketmq</span></span><br><span class="line"><span class="attr">namesrvAddr</span>=<span class="string">10.100.1.23:9876;10.100.1.24:9876</span></span><br><span class="line"><span class="attr">brokerIP1</span>=<span class="string">10.100.1.21</span></span><br><span class="line"><span class="attr">brokerIP2</span>=<span class="string">10.100.1.21</span></span><br><span class="line"><span class="attr">brokerName</span>=<span class="string">mq_a</span></span><br><span class="line"><span class="attr">brokerClusterName</span>=<span class="string">ProductCluster</span></span><br><span class="line"><span class="attr">brokerId</span>=<span class="string">0</span></span><br><span class="line"><span class="attr">defaultTopicQueueNums</span>=<span class="string">16</span></span><br><span class="line"><span class="attr">autoCreateTopicEnable</span>=<span class="string">false</span></span><br><span class="line"><span class="attr">clusterTopicEnable</span>=<span class="string">true</span></span><br><span class="line"><span class="attr">brokerTopicEnable</span>=<span class="string">true</span></span><br><span class="line"><span class="attr">autoCreateSubscriptionGroup</span>=<span class="string">true</span></span><br><span class="line"><span class="attr">listenPort</span>=<span class="string">10911</span></span><br><span class="line"><span class="attr">storePathRootDir</span>=<span class="string">/usr/local/rocketmq_data/store</span></span><br><span class="line"><span class="attr">storePathCommitLog</span>=<span class="string">/usr/local/rocketmq_data/store/commitlog/</span></span><br><span class="line"><span class="attr">storePathConsumerQueue</span>=<span class="string">/usr/local/rocketmq_data/store/consumequeue/</span></span><br><span class="line"><span class="attr">mapedFileSizeCommitLog</span>=<span class="string">1073741824</span></span><br><span class="line"><span class="attr">mapedFileSizeConsumeQueue</span>=<span class="string">6000000</span></span><br><span class="line"><span class="attr">deleteWhen</span>=<span class="string">04</span></span><br><span class="line"><span class="attr">diskMaxUsedSpaceRatio</span>=<span class="string">75</span></span><br><span class="line"><span class="attr">fileReserverdTime</span>=<span class="string">72</span></span><br><span class="line"><span class="attr">haListenPort</span>=<span class="string">10912</span></span><br><span class="line"><span class="attr">haSendHeartbeatInterval</span>=<span class="string">5000</span></span><br><span class="line"><span class="attr">haHousekeepingInterval</span>=<span class="string">20000</span></span><br><span class="line"><span class="attr">haTransferBatchSize</span>=<span class="string">32768</span></span><br><span class="line"><span class="attr">haMasterAddress</span>=<span class="string"></span></span><br><span class="line"><span class="attr">haSlaveFallbehindMax</span>=<span class="string">268435456</span></span><br><span class="line"><span class="attr">brokerRole</span>=<span class="string">ASYNC_MASTER</span></span><br><span class="line"><span class="attr">flushDiskType</span>=<span class="string">ASYNC_FLUSH</span></span><br><span class="line"><span class="attr">syncFlushTimeout</span>=<span class="string">5000</span></span><br><span class="line"><span class="attr">messageDelayLevel</span>=<span class="string">1s 5s 10s 30s 1m 2m 3m 4m 5m 6m 7m 8m 9m 10m 20m 30m 1h 2h</span></span><br><span class="line"><span class="attr">flushDelayOffsetInterval</span>=<span class="string">10000</span></span><br><span class="line"><span class="attr">cleanFileForciblyEnable</span>=<span class="string">true</span></span><br></pre></td></tr></table></figure>
 
 <ul>
 <li>修改<code>jvm</code>启动参数：</li>
 </ul>
-<pre class="line-numbers language-shell" data-language="shell"><code class="language-shell">jobshen@JobShen-PC:&#x2F;usr&#x2F;local&#x2F;apache-rocketmq$ vim bin&#x2F;runbroker.sh<span aria-hidden="true" class="line-numbers-rows"><span></span></span></code></pre>
+<figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">jobshen@JobShen-PC:/usr/local/apache-rocketmq$ vim bin/runbroker.sh</span><br></pre></td></tr></table></figure>
 
-<pre class="line-numbers language-shell" data-language="shell"><code class="language-shell">#!&#x2F;bin&#x2F;sh
-
-# Licensed to the Apache Software Foundation (ASF) under one or more
-# contributor license agreements.  See the NOTICE file distributed with
-# this work for additional information regarding copyright ownership.
-# The ASF licenses this file to You under the Apache License, Version 2.0
-# (the &quot;License&quot;); you may not use this file except in compliance with
-# the License.  You may obtain a copy of the License at
-#
-#     http:&#x2F;&#x2F;www.apache.org&#x2F;licenses&#x2F;LICENSE-2.0
-#
-# Unless required by applicable law or agreed to in writing, software
-# distributed under the License is distributed on an &quot;AS IS&quot; BASIS,
-# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-# See the License for the specific language governing permissions and
-# limitations under the License.
-
-#&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;
-# Java Environment Setting
-#&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;
-error_exit ()
-&#123;
-    echo &quot;ERROR: $1 !!&quot;
-    exit 1
-&#125;
-
-[ ! -e &quot;$JAVA_HOME&#x2F;bin&#x2F;java&quot; ] &amp;&amp; JAVA_HOME&#x3D;$HOME&#x2F;jdk&#x2F;java
-[ ! -e &quot;$JAVA_HOME&#x2F;bin&#x2F;java&quot; ] &amp;&amp; JAVA_HOME&#x3D;&#x2F;usr&#x2F;java
-[ ! -e &quot;$JAVA_HOME&#x2F;bin&#x2F;java&quot; ] &amp;&amp; error_exit &quot;Please set the JAVA_HOME variable in your environment, We need java(x64)!&quot;
-
-export JAVA_HOME
-export JAVA&#x3D;&quot;$JAVA_HOME&#x2F;bin&#x2F;java&quot;
-export BASE_DIR&#x3D;$(dirname $0)&#x2F;..
-export CLASSPATH&#x3D;.:$&#123;BASE_DIR&#125;&#x2F;conf:$&#123;CLASSPATH&#125;
-
-#&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;
-# JVM Configuration
-#&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;
-JAVA_OPT&#x3D;&quot;$&#123;JAVA_OPT&#125; -server -Xms48g -Xmx48g -Xmn24g&quot;
-JAVA_OPT&#x3D;&quot;$&#123;JAVA_OPT&#125; -XX:+UseG1GC -XX:G1HeapRegionSize&#x3D;64m -XX:G1ReservePercent&#x3D;25 -XX:InitiatingHeapOccupancyPercent&#x3D;30 -XX:SoftRefLRUPolicyMSPerMB&#x3D;0 -XX:SurvivorRatio&#x3D;8&quot;
-JAVA_OPT&#x3D;&quot;$&#123;JAVA_OPT&#125; -verbose:gc -Xloggc:&#x2F;dev&#x2F;shm&#x2F;mq_gc_%p.log -XX:+PrintGCDetails -XX:+PrintGCDateStamps -XX:+PrintGCApplicationStoppedTime -XX:+PrintAdaptiveSizePolicy&quot;
-JAVA_OPT&#x3D;&quot;$&#123;JAVA_OPT&#125; -XX:+UseGCLogFileRotation -XX:NumberOfGCLogFiles&#x3D;5 -XX:GCLogFileSize&#x3D;30m&quot;
-JAVA_OPT&#x3D;&quot;$&#123;JAVA_OPT&#125; -XX:-OmitStackTraceInFastThrow&quot;
-JAVA_OPT&#x3D;&quot;$&#123;JAVA_OPT&#125; -XX:+AlwaysPreTouch&quot;
-JAVA_OPT&#x3D;&quot;$&#123;JAVA_OPT&#125; -XX:MaxDirectMemorySize&#x3D;20g&quot;
-JAVA_OPT&#x3D;&quot;$&#123;JAVA_OPT&#125; -XX:-UseLargePages -XX:-UseBiasedLocking&quot;
-JAVA_OPT&#x3D;&quot;$&#123;JAVA_OPT&#125; -Djava.ext.dirs&#x3D;$&#123;JAVA_HOME&#125;&#x2F;jre&#x2F;lib&#x2F;ext:$&#123;BASE_DIR&#125;&#x2F;lib&quot;
-#JAVA_OPT&#x3D;&quot;$&#123;JAVA_OPT&#125; -Xdebug -Xrunjdwp:transport&#x3D;dt_socket,address&#x3D;9555,server&#x3D;y,suspend&#x3D;n&quot;
-JAVA_OPT&#x3D;&quot;$&#123;JAVA_OPT&#125; $&#123;JAVA_OPT_EXT&#125;&quot;
-JAVA_OPT&#x3D;&quot;$&#123;JAVA_OPT&#125; -cp $&#123;CLASSPATH&#125;&quot;
-
-numactl --interleave&#x3D;all pwd &gt; &#x2F;dev&#x2F;null 2&gt;&amp;1
-if [ $? -eq 0 ]
-then
-	if [ -z &quot;$RMQ_NUMA_NODE&quot; ] ; then
-		numactl --interleave&#x3D;all $JAVA $&#123;JAVA_OPT&#125; $@
-	else
-		numactl --cpunodebind&#x3D;$RMQ_NUMA_NODE --membind&#x3D;$RMQ_NUMA_NODE $JAVA $&#123;JAVA_OPT&#125; $@
-	fi
-else
-	$JAVA $&#123;JAVA_OPT&#125; $@
-fi<span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span></span></code></pre>
+<figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br><span class="line">54</span><br><span class="line">55</span><br><span class="line">56</span><br><span class="line">57</span><br><span class="line">58</span><br><span class="line">59</span><br><span class="line">60</span><br><span class="line">61</span><br><span class="line">62</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta prompt_">#</span><span class="language-bash">!/bin/sh</span></span><br><span class="line"><span class="meta prompt_"></span></span><br><span class="line"><span class="meta prompt_"># </span><span class="language-bash">Licensed to the Apache Software Foundation (ASF) under one or more</span></span><br><span class="line"><span class="meta prompt_"># </span><span class="language-bash">contributor license agreements.  See the NOTICE file distributed with</span></span><br><span class="line"><span class="meta prompt_"># </span><span class="language-bash">this work <span class="keyword">for</span> additional information regarding copyright ownership.</span></span><br><span class="line"><span class="meta prompt_"># </span><span class="language-bash">The ASF licenses this file to You under the Apache License, Version 2.0</span></span><br><span class="line"><span class="meta prompt_"># </span><span class="language-bash">(the <span class="string">&quot;License&quot;</span>); you may not use this file except <span class="keyword">in</span> compliance with</span></span><br><span class="line"><span class="meta prompt_"># </span><span class="language-bash">the License.  You may obtain a copy of the License at</span></span><br><span class="line"><span class="meta prompt_">#</span><span class="language-bash"></span></span><br><span class="line"><span class="language-bash"><span class="comment">#     http://www.apache.org/licenses/LICENSE-2.0</span></span></span><br><span class="line"><span class="meta prompt_">#</span><span class="language-bash"></span></span><br><span class="line"><span class="language-bash"><span class="comment"># Unless required by applicable law or agreed to in writing, software</span></span></span><br><span class="line"><span class="meta prompt_"># </span><span class="language-bash">distributed under the License is distributed on an <span class="string">&quot;AS IS&quot;</span> BASIS,</span></span><br><span class="line"><span class="meta prompt_"># </span><span class="language-bash">WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.</span></span><br><span class="line"><span class="meta prompt_"># </span><span class="language-bash">See the License <span class="keyword">for</span> the specific language governing permissions and</span></span><br><span class="line"><span class="meta prompt_"># </span><span class="language-bash">limitations under the License.</span></span><br><span class="line"><span class="meta prompt_"></span></span><br><span class="line"><span class="meta prompt_">#</span><span class="language-bash">===========================================================================================</span></span><br><span class="line"><span class="meta prompt_"># </span><span class="language-bash">Java Environment Setting</span></span><br><span class="line"><span class="meta prompt_">#</span><span class="language-bash">===========================================================================================</span></span><br><span class="line">error_exit ()</span><br><span class="line">&#123;</span><br><span class="line">    echo &quot;ERROR: $1 !!&quot;</span><br><span class="line">    exit 1</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line">[ ! -e &quot;$JAVA_HOME/bin/java&quot; ] &amp;&amp; JAVA_HOME=$HOME/jdk/java</span><br><span class="line">[ ! -e &quot;$JAVA_HOME/bin/java&quot; ] &amp;&amp; JAVA_HOME=/usr/java</span><br><span class="line">[ ! -e &quot;$JAVA_HOME/bin/java&quot; ] &amp;&amp; error_exit &quot;Please set the JAVA_HOME variable in your environment, We need java(x64)!&quot;</span><br><span class="line"></span><br><span class="line">export JAVA_HOME</span><br><span class="line">export JAVA=&quot;$JAVA_HOME/bin/java&quot;</span><br><span class="line">export BASE_DIR=$(dirname $0)/..</span><br><span class="line">export CLASSPATH=.:$&#123;BASE_DIR&#125;/conf:$&#123;CLASSPATH&#125;</span><br><span class="line"><span class="meta prompt_"></span></span><br><span class="line"><span class="meta prompt_">#</span><span class="language-bash">===========================================================================================</span></span><br><span class="line"><span class="meta prompt_"># </span><span class="language-bash">JVM Configuration</span></span><br><span class="line"><span class="meta prompt_">#</span><span class="language-bash">===========================================================================================</span></span><br><span class="line">JAVA_OPT=&quot;$&#123;JAVA_OPT&#125; -server -Xms48g -Xmx48g -Xmn24g&quot;</span><br><span class="line">JAVA_OPT=&quot;$&#123;JAVA_OPT&#125; -XX:+UseG1GC -XX:G1HeapRegionSize=64m -XX:G1ReservePercent=25 -XX:InitiatingHeapOccupancyPercent=30 -XX:SoftRefLRUPolicyMSPerMB=0 -XX:SurvivorRatio=8&quot;</span><br><span class="line">JAVA_OPT=&quot;$&#123;JAVA_OPT&#125; -verbose:gc -Xloggc:/dev/shm/mq_gc_%p.log -XX:+PrintGCDetails -XX:+PrintGCDateStamps -XX:+PrintGCApplicationStoppedTime -XX:+PrintAdaptiveSizePolicy&quot;</span><br><span class="line">JAVA_OPT=&quot;$&#123;JAVA_OPT&#125; -XX:+UseGCLogFileRotation -XX:NumberOfGCLogFiles=5 -XX:GCLogFileSize=30m&quot;</span><br><span class="line">JAVA_OPT=&quot;$&#123;JAVA_OPT&#125; -XX:-OmitStackTraceInFastThrow&quot;</span><br><span class="line">JAVA_OPT=&quot;$&#123;JAVA_OPT&#125; -XX:+AlwaysPreTouch&quot;</span><br><span class="line">JAVA_OPT=&quot;$&#123;JAVA_OPT&#125; -XX:MaxDirectMemorySize=20g&quot;</span><br><span class="line">JAVA_OPT=&quot;$&#123;JAVA_OPT&#125; -XX:-UseLargePages -XX:-UseBiasedLocking&quot;</span><br><span class="line">JAVA_OPT=&quot;$&#123;JAVA_OPT&#125; -Djava.ext.dirs=$&#123;JAVA_HOME&#125;/jre/lib/ext:$&#123;BASE_DIR&#125;/lib&quot;</span><br><span class="line"><span class="meta prompt_">#</span><span class="language-bash">JAVA_OPT=<span class="string">&quot;<span class="variable">$&#123;JAVA_OPT&#125;</span> -Xdebug -Xrunjdwp:transport=dt_socket,address=9555,server=y,suspend=n&quot;</span></span></span><br><span class="line">JAVA_OPT=&quot;$&#123;JAVA_OPT&#125; $&#123;JAVA_OPT_EXT&#125;&quot;</span><br><span class="line">JAVA_OPT=&quot;$&#123;JAVA_OPT&#125; -cp $&#123;CLASSPATH&#125;&quot;</span><br><span class="line"></span><br><span class="line">numactl --interleave=all pwd &gt; /dev/null 2&gt;&amp;1</span><br><span class="line">if [ $? -eq 0 ]</span><br><span class="line">then</span><br><span class="line">	if [ -z &quot;$RMQ_NUMA_NODE&quot; ] ; then</span><br><span class="line">		numactl --interleave=all $JAVA $&#123;JAVA_OPT&#125; $@</span><br><span class="line">	else</span><br><span class="line">		numactl --cpunodebind=$RMQ_NUMA_NODE --membind=$RMQ_NUMA_NODE $JAVA $&#123;JAVA_OPT&#125; $@</span><br><span class="line">	fi</span><br><span class="line">else</span><br><span class="line"><span class="meta prompt_">	$</span><span class="language-bash">JAVA <span class="variable">$&#123;JAVA_OPT&#125;</span> <span class="variable">$@</span></span></span><br><span class="line">fi</span><br></pre></td></tr></table></figure>
 
 <ul>
 <li>制作<code>systemd</code>脚本：broker.service</li>
 </ul>
-<pre class="line-numbers language-shell" data-language="shell"><code class="language-shell">jobshen@JobShen-PC:&#x2F;usr&#x2F;local&#x2F;apache-rocketmq$ vim &#x2F;lib&#x2F;systemd&#x2F;system&#x2F;broker.service<span aria-hidden="true" class="line-numbers-rows"><span></span></span></code></pre>
+<figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">jobshen@JobShen-PC:/usr/local/apache-rocketmq$ vim /lib/systemd/system/broker.service</span><br></pre></td></tr></table></figure>
 
-<pre class="line-numbers language-shell" data-language="shell"><code class="language-shell">[Unit]
-Description&#x3D;RocketMQ-Broker
-After&#x3D;namesrv.service
+<figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br></pre></td><td class="code"><pre><span class="line">[Unit]</span><br><span class="line">Description=RocketMQ-Broker</span><br><span class="line">After=namesrv.service</span><br><span class="line"></span><br><span class="line">[Service]</span><br><span class="line">ExecStart=/usr/local/apache-rocketmq/bin/mqbroker -c /usr/local/apache-rocketmq/conf/product/broker-a-master.properties</span><br><span class="line">ExecStop=/usr/local/apache-rocketmq/bin/mqshutdown broker</span><br><span class="line"></span><br><span class="line">[Install]</span><br><span class="line">WantedBy=multi-user.target</span><br></pre></td></tr></table></figure>
 
-[Service]
-ExecStart&#x3D;&#x2F;usr&#x2F;local&#x2F;apache-rocketmq&#x2F;bin&#x2F;mqbroker -c &#x2F;usr&#x2F;local&#x2F;apache-rocketmq&#x2F;conf&#x2F;product&#x2F;broker-a-master.properties
-ExecStop&#x3D;&#x2F;usr&#x2F;local&#x2F;apache-rocketmq&#x2F;bin&#x2F;mqshutdown broker
-
-[Install]
-WantedBy&#x3D;multi-user.target<span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span></span></code></pre>
-
-<pre class="line-numbers language-shell" data-language="shell"><code class="language-shell">jobshen@JobShen-PC:&#x2F;usr&#x2F;local&#x2F;apache-rocketmq$ ln -s &#x2F;etc&#x2F;systemd&#x2F;system&#x2F;broker.service &#x2F;lib&#x2F;systemd&#x2F;system&#x2F;broker.service
-jobshen@JobShen-PC:&#x2F;usr&#x2F;local&#x2F;apache-rocketmq$ systemctl daemon-reload<span aria-hidden="true" class="line-numbers-rows"><span></span><span></span></span></code></pre>
+<figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">jobshen@JobShen-PC:/usr/local/apache-rocketmq$ ln -s /etc/systemd/system/broker.service /lib/systemd/system/broker.service</span><br><span class="line">jobshen@JobShen-PC:/usr/local/apache-rocketmq$ systemctl daemon-reload</span><br></pre></td></tr></table></figure>
 
 <ul>
-<li>启动**<em>broker**</em></li>
+<li>启动<em><strong>broker</strong></em></li>
 </ul>
-<pre class="line-numbers language-shell" data-language="shell"><code class="language-shell">jobshen@JobShen-PC:&#x2F;usr&#x2F;local&#x2F;apache-rocketmq$ systemctl start broker<span aria-hidden="true" class="line-numbers-rows"><span></span></span></code></pre>
+<figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">jobshen@JobShen-PC:/usr/local/apache-rocketmq$ systemctl start broker</span><br></pre></td></tr></table></figure>
 
 <h5 id="Slave"><a href="#Slave" class="headerlink" title="Slave"></a>Slave</h5><ul>
 <li>在<code>10.100.1.23</code>上新建<code>broker-a-slave.properties</code>文件：</li>
 </ul>
-<pre class="line-numbers language-shell" data-language="shell"><code class="language-shell">jobshen@JobShen-PC:&#x2F;usr&#x2F;local$ mkdir apache-rocketmq&#x2F;conf&#x2F;product
-jobshen@JobShen-PC:&#x2F;usr&#x2F;local$ vim apache-rocketmq&#x2F;conf&#x2F;product&#x2F;broker-a-slave.properties<span aria-hidden="true" class="line-numbers-rows"><span></span><span></span></span></code></pre>
+<figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">jobshen@JobShen-PC:/usr/local$ mkdir apache-rocketmq/conf/product</span><br><span class="line">jobshen@JobShen-PC:/usr/local$ vim apache-rocketmq/conf/product/broker-a-slave.properties</span><br></pre></td></tr></table></figure>
 
-<pre class="line-numbers language-properties" data-language="properties"><code class="language-properties"><span class="token attr-name">rocketmqHome</span><span class="token punctuation">=</span><span class="token attr-value">/usr/local/apache-rocketmq</span>
-<span class="token attr-name">namesrvAddr</span><span class="token punctuation">=</span><span class="token attr-value">10.100.1.23:9876;10.100.1.24:9876</span>
-<span class="token attr-name">brokerIP1</span><span class="token punctuation">=</span><span class="token attr-value">10.100.1.23</span>
-<span class="token attr-name">brokerIP2</span><span class="token punctuation">=</span><span class="token attr-value">10.100.1.23</span>
-<span class="token attr-name">brokerName</span><span class="token punctuation">=</span><span class="token attr-value">mq_a</span>
-<span class="token attr-name">brokerClusterName</span><span class="token punctuation">=</span><span class="token attr-value">ProductCluster</span>
-<span class="token attr-name">brokerId</span><span class="token punctuation">=</span><span class="token attr-value">1</span>
-<span class="token attr-name">defaultTopicQueueNums</span><span class="token punctuation">=</span><span class="token attr-value">16</span>
-<span class="token attr-name">autoCreateTopicEnable</span><span class="token punctuation">=</span><span class="token attr-value">false</span>
-<span class="token attr-name">clusterTopicEnable</span><span class="token punctuation">=</span><span class="token attr-value">true</span>
-<span class="token attr-name">brokerTopicEnable</span><span class="token punctuation">=</span><span class="token attr-value">true</span>
-<span class="token attr-name">autoCreateSubscriptionGroup</span><span class="token punctuation">=</span><span class="token attr-value">true</span>
-<span class="token attr-name">listenPort</span><span class="token punctuation">=</span><span class="token attr-value">10911</span>
-<span class="token attr-name">storePathRootDir</span><span class="token punctuation">=</span><span class="token attr-value">/usr/local/rocketmq_data/store</span>
-<span class="token attr-name">storePathCommitLog</span><span class="token punctuation">=</span><span class="token attr-value">/usr/local/rocketmq_data/store/commitlog/</span>
-<span class="token attr-name">storePathConsumerQueue</span><span class="token punctuation">=</span><span class="token attr-value">/usr/local/rocketmq_data/store/consumequeue/</span>
-<span class="token attr-name">mapedFileSizeCommitLog</span><span class="token punctuation">=</span><span class="token attr-value">1073741824</span>
-<span class="token attr-name">mapedFileSizeConsumeQueue</span><span class="token punctuation">=</span><span class="token attr-value">6000000</span>
-<span class="token attr-name">deleteWhen</span><span class="token punctuation">=</span><span class="token attr-value">04</span>
-<span class="token attr-name">diskMaxUsedSpaceRatio</span><span class="token punctuation">=</span><span class="token attr-value">75</span>
-<span class="token attr-name">fileReserverdTime</span><span class="token punctuation">=</span><span class="token attr-value">72</span>
-<span class="token attr-name">haListenPort</span><span class="token punctuation">=</span><span class="token attr-value">10912</span>
-<span class="token attr-name">haSendHeartbeatInterval</span><span class="token punctuation">=</span><span class="token attr-value">5000</span>
-<span class="token attr-name">haHousekeepingInterval</span><span class="token punctuation">=</span><span class="token attr-value">20000</span>
-<span class="token attr-name">haTransferBatchSize</span><span class="token punctuation">=</span><span class="token attr-value">32768</span>
-<span class="token attr-name">haMasterAddress</span><span class="token punctuation">=</span>
-<span class="token attr-name">haSlaveFallbehindMax</span><span class="token punctuation">=</span><span class="token attr-value">268435456</span>
-<span class="token attr-name">brokerRole</span><span class="token punctuation">=</span><span class="token attr-value">ASYNC_MASTER</span>
-<span class="token attr-name">flushDiskType</span><span class="token punctuation">=</span><span class="token attr-value">ASYNC_FLUSH</span>
-<span class="token attr-name">syncFlushTimeout</span><span class="token punctuation">=</span><span class="token attr-value">5000</span>
-<span class="token attr-name">messageDelayLevel</span><span class="token punctuation">=</span><span class="token attr-value">1s 5s 10s 30s 1m 2m 3m 4m 5m 6m 7m 8m 9m 10m 20m 30m 1h 2h</span>
-<span class="token attr-name">flushDelayOffsetInterval</span><span class="token punctuation">=</span><span class="token attr-value">10000</span>
-<span class="token attr-name">cleanFileForciblyEnable</span><span class="token punctuation">=</span><span class="token attr-value">true</span><span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span></span></code></pre>
+<figure class="highlight properties"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br></pre></td><td class="code"><pre><span class="line"><span class="attr">rocketmqHome</span>=<span class="string">/usr/local/apache-rocketmq</span></span><br><span class="line"><span class="attr">namesrvAddr</span>=<span class="string">10.100.1.23:9876;10.100.1.24:9876</span></span><br><span class="line"><span class="attr">brokerIP1</span>=<span class="string">10.100.1.23</span></span><br><span class="line"><span class="attr">brokerIP2</span>=<span class="string">10.100.1.23</span></span><br><span class="line"><span class="attr">brokerName</span>=<span class="string">mq_a</span></span><br><span class="line"><span class="attr">brokerClusterName</span>=<span class="string">ProductCluster</span></span><br><span class="line"><span class="attr">brokerId</span>=<span class="string">1</span></span><br><span class="line"><span class="attr">defaultTopicQueueNums</span>=<span class="string">16</span></span><br><span class="line"><span class="attr">autoCreateTopicEnable</span>=<span class="string">false</span></span><br><span class="line"><span class="attr">clusterTopicEnable</span>=<span class="string">true</span></span><br><span class="line"><span class="attr">brokerTopicEnable</span>=<span class="string">true</span></span><br><span class="line"><span class="attr">autoCreateSubscriptionGroup</span>=<span class="string">true</span></span><br><span class="line"><span class="attr">listenPort</span>=<span class="string">10911</span></span><br><span class="line"><span class="attr">storePathRootDir</span>=<span class="string">/usr/local/rocketmq_data/store</span></span><br><span class="line"><span class="attr">storePathCommitLog</span>=<span class="string">/usr/local/rocketmq_data/store/commitlog/</span></span><br><span class="line"><span class="attr">storePathConsumerQueue</span>=<span class="string">/usr/local/rocketmq_data/store/consumequeue/</span></span><br><span class="line"><span class="attr">mapedFileSizeCommitLog</span>=<span class="string">1073741824</span></span><br><span class="line"><span class="attr">mapedFileSizeConsumeQueue</span>=<span class="string">6000000</span></span><br><span class="line"><span class="attr">deleteWhen</span>=<span class="string">04</span></span><br><span class="line"><span class="attr">diskMaxUsedSpaceRatio</span>=<span class="string">75</span></span><br><span class="line"><span class="attr">fileReserverdTime</span>=<span class="string">72</span></span><br><span class="line"><span class="attr">haListenPort</span>=<span class="string">10912</span></span><br><span class="line"><span class="attr">haSendHeartbeatInterval</span>=<span class="string">5000</span></span><br><span class="line"><span class="attr">haHousekeepingInterval</span>=<span class="string">20000</span></span><br><span class="line"><span class="attr">haTransferBatchSize</span>=<span class="string">32768</span></span><br><span class="line"><span class="attr">haMasterAddress</span>=<span class="string"></span></span><br><span class="line"><span class="attr">haSlaveFallbehindMax</span>=<span class="string">268435456</span></span><br><span class="line"><span class="attr">brokerRole</span>=<span class="string">ASYNC_MASTER</span></span><br><span class="line"><span class="attr">flushDiskType</span>=<span class="string">ASYNC_FLUSH</span></span><br><span class="line"><span class="attr">syncFlushTimeout</span>=<span class="string">5000</span></span><br><span class="line"><span class="attr">messageDelayLevel</span>=<span class="string">1s 5s 10s 30s 1m 2m 3m 4m 5m 6m 7m 8m 9m 10m 20m 30m 1h 2h</span></span><br><span class="line"><span class="attr">flushDelayOffsetInterval</span>=<span class="string">10000</span></span><br><span class="line"><span class="attr">cleanFileForciblyEnable</span>=<span class="string">true</span></span><br></pre></td></tr></table></figure>
 
 <ul>
 <li>修改<code>jvm</code>启动参数：</li>
 </ul>
-<pre class="line-numbers language-shell" data-language="shell"><code class="language-shell">jobshen@JobShen-PC:&#x2F;usr&#x2F;local&#x2F;apache-rocketmq$ vim bin&#x2F;runbroker.sh<span aria-hidden="true" class="line-numbers-rows"><span></span></span></code></pre>
+<figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">jobshen@JobShen-PC:/usr/local/apache-rocketmq$ vim bin/runbroker.sh</span><br></pre></td></tr></table></figure>
 
-<pre class="line-numbers language-shell" data-language="shell"><code class="language-shell">#!&#x2F;bin&#x2F;sh
-
-# Licensed to the Apache Software Foundation (ASF) under one or more
-# contributor license agreements.  See the NOTICE file distributed with
-# this work for additional information regarding copyright ownership.
-# The ASF licenses this file to You under the Apache License, Version 2.0
-# (the &quot;License&quot;); you may not use this file except in compliance with
-# the License.  You may obtain a copy of the License at
-#
-#     http:&#x2F;&#x2F;www.apache.org&#x2F;licenses&#x2F;LICENSE-2.0
-#
-# Unless required by applicable law or agreed to in writing, software
-# distributed under the License is distributed on an &quot;AS IS&quot; BASIS,
-# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-# See the License for the specific language governing permissions and
-# limitations under the License.
-
-#&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;
-# Java Environment Setting
-#&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;
-error_exit ()
-&#123;
-    echo &quot;ERROR: $1 !!&quot;
-    exit 1
-&#125;
-
-[ ! -e &quot;$JAVA_HOME&#x2F;bin&#x2F;java&quot; ] &amp;&amp; JAVA_HOME&#x3D;$HOME&#x2F;jdk&#x2F;java
-[ ! -e &quot;$JAVA_HOME&#x2F;bin&#x2F;java&quot; ] &amp;&amp; JAVA_HOME&#x3D;&#x2F;usr&#x2F;java
-[ ! -e &quot;$JAVA_HOME&#x2F;bin&#x2F;java&quot; ] &amp;&amp; error_exit &quot;Please set the JAVA_HOME variable in your environment, We need java(x64)!&quot;
-
-export JAVA_HOME
-export JAVA&#x3D;&quot;$JAVA_HOME&#x2F;bin&#x2F;java&quot;
-export BASE_DIR&#x3D;$(dirname $0)&#x2F;..
-export CLASSPATH&#x3D;.:$&#123;BASE_DIR&#125;&#x2F;conf:$&#123;CLASSPATH&#125;
-
-#&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;
-# JVM Configuration
-#&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;&#x3D;
-JAVA_OPT&#x3D;&quot;$&#123;JAVA_OPT&#125; -server -Xms32g -Xmx32g -Xmn16g&quot;
-JAVA_OPT&#x3D;&quot;$&#123;JAVA_OPT&#125; -XX:+UseG1GC -XX:G1HeapRegionSize&#x3D;32m -XX:G1ReservePercent&#x3D;25 -XX:InitiatingHeapOccupancyPercent&#x3D;30 -XX:SoftRefLRUPolicyMSPerMB&#x3D;0 -XX:SurvivorRatio&#x3D;8&quot;
-JAVA_OPT&#x3D;&quot;$&#123;JAVA_OPT&#125; -verbose:gc -Xloggc:&#x2F;dev&#x2F;shm&#x2F;mq_gc_%p.log -XX:+PrintGCDetails -XX:+PrintGCDateStamps -XX:+PrintGCApplicationStoppedTime -XX:+PrintAdaptiveSizePolicy&quot;
-JAVA_OPT&#x3D;&quot;$&#123;JAVA_OPT&#125; -XX:+UseGCLogFileRotation -XX:NumberOfGCLogFiles&#x3D;5 -XX:GCLogFileSize&#x3D;30m&quot;
-JAVA_OPT&#x3D;&quot;$&#123;JAVA_OPT&#125; -XX:-OmitStackTraceInFastThrow&quot;
-JAVA_OPT&#x3D;&quot;$&#123;JAVA_OPT&#125; -XX:+AlwaysPreTouch&quot;
-JAVA_OPT&#x3D;&quot;$&#123;JAVA_OPT&#125; -XX:MaxDirectMemorySize&#x3D;15g&quot;
-JAVA_OPT&#x3D;&quot;$&#123;JAVA_OPT&#125; -XX:-UseLargePages -XX:-UseBiasedLocking&quot;
-JAVA_OPT&#x3D;&quot;$&#123;JAVA_OPT&#125; -Djava.ext.dirs&#x3D;$&#123;JAVA_HOME&#125;&#x2F;jre&#x2F;lib&#x2F;ext:$&#123;BASE_DIR&#125;&#x2F;lib&quot;
-#JAVA_OPT&#x3D;&quot;$&#123;JAVA_OPT&#125; -Xdebug -Xrunjdwp:transport&#x3D;dt_socket,address&#x3D;9555,server&#x3D;y,suspend&#x3D;n&quot;
-JAVA_OPT&#x3D;&quot;$&#123;JAVA_OPT&#125; $&#123;JAVA_OPT_EXT&#125;&quot;
-JAVA_OPT&#x3D;&quot;$&#123;JAVA_OPT&#125; -cp $&#123;CLASSPATH&#125;&quot;
-
-numactl --interleave&#x3D;all pwd &gt; &#x2F;dev&#x2F;null 2&gt;&amp;1
-if [ $? -eq 0 ]
-then
-	if [ -z &quot;$RMQ_NUMA_NODE&quot; ] ; then
-		numactl --interleave&#x3D;all $JAVA $&#123;JAVA_OPT&#125; $@
-	else
-		numactl --cpunodebind&#x3D;$RMQ_NUMA_NODE --membind&#x3D;$RMQ_NUMA_NODE $JAVA $&#123;JAVA_OPT&#125; $@
-	fi
-else
-	$JAVA $&#123;JAVA_OPT&#125; $@
-fi<span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span></span></code></pre>
+<figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br><span class="line">54</span><br><span class="line">55</span><br><span class="line">56</span><br><span class="line">57</span><br><span class="line">58</span><br><span class="line">59</span><br><span class="line">60</span><br><span class="line">61</span><br><span class="line">62</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta prompt_">#</span><span class="language-bash">!/bin/sh</span></span><br><span class="line"><span class="meta prompt_"></span></span><br><span class="line"><span class="meta prompt_"># </span><span class="language-bash">Licensed to the Apache Software Foundation (ASF) under one or more</span></span><br><span class="line"><span class="meta prompt_"># </span><span class="language-bash">contributor license agreements.  See the NOTICE file distributed with</span></span><br><span class="line"><span class="meta prompt_"># </span><span class="language-bash">this work <span class="keyword">for</span> additional information regarding copyright ownership.</span></span><br><span class="line"><span class="meta prompt_"># </span><span class="language-bash">The ASF licenses this file to You under the Apache License, Version 2.0</span></span><br><span class="line"><span class="meta prompt_"># </span><span class="language-bash">(the <span class="string">&quot;License&quot;</span>); you may not use this file except <span class="keyword">in</span> compliance with</span></span><br><span class="line"><span class="meta prompt_"># </span><span class="language-bash">the License.  You may obtain a copy of the License at</span></span><br><span class="line"><span class="meta prompt_">#</span><span class="language-bash"></span></span><br><span class="line"><span class="language-bash"><span class="comment">#     http://www.apache.org/licenses/LICENSE-2.0</span></span></span><br><span class="line"><span class="meta prompt_">#</span><span class="language-bash"></span></span><br><span class="line"><span class="language-bash"><span class="comment"># Unless required by applicable law or agreed to in writing, software</span></span></span><br><span class="line"><span class="meta prompt_"># </span><span class="language-bash">distributed under the License is distributed on an <span class="string">&quot;AS IS&quot;</span> BASIS,</span></span><br><span class="line"><span class="meta prompt_"># </span><span class="language-bash">WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.</span></span><br><span class="line"><span class="meta prompt_"># </span><span class="language-bash">See the License <span class="keyword">for</span> the specific language governing permissions and</span></span><br><span class="line"><span class="meta prompt_"># </span><span class="language-bash">limitations under the License.</span></span><br><span class="line"><span class="meta prompt_"></span></span><br><span class="line"><span class="meta prompt_">#</span><span class="language-bash">===========================================================================================</span></span><br><span class="line"><span class="meta prompt_"># </span><span class="language-bash">Java Environment Setting</span></span><br><span class="line"><span class="meta prompt_">#</span><span class="language-bash">===========================================================================================</span></span><br><span class="line">error_exit ()</span><br><span class="line">&#123;</span><br><span class="line">    echo &quot;ERROR: $1 !!&quot;</span><br><span class="line">    exit 1</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line">[ ! -e &quot;$JAVA_HOME/bin/java&quot; ] &amp;&amp; JAVA_HOME=$HOME/jdk/java</span><br><span class="line">[ ! -e &quot;$JAVA_HOME/bin/java&quot; ] &amp;&amp; JAVA_HOME=/usr/java</span><br><span class="line">[ ! -e &quot;$JAVA_HOME/bin/java&quot; ] &amp;&amp; error_exit &quot;Please set the JAVA_HOME variable in your environment, We need java(x64)!&quot;</span><br><span class="line"></span><br><span class="line">export JAVA_HOME</span><br><span class="line">export JAVA=&quot;$JAVA_HOME/bin/java&quot;</span><br><span class="line">export BASE_DIR=$(dirname $0)/..</span><br><span class="line">export CLASSPATH=.:$&#123;BASE_DIR&#125;/conf:$&#123;CLASSPATH&#125;</span><br><span class="line"><span class="meta prompt_"></span></span><br><span class="line"><span class="meta prompt_">#</span><span class="language-bash">===========================================================================================</span></span><br><span class="line"><span class="meta prompt_"># </span><span class="language-bash">JVM Configuration</span></span><br><span class="line"><span class="meta prompt_">#</span><span class="language-bash">===========================================================================================</span></span><br><span class="line">JAVA_OPT=&quot;$&#123;JAVA_OPT&#125; -server -Xms32g -Xmx32g -Xmn16g&quot;</span><br><span class="line">JAVA_OPT=&quot;$&#123;JAVA_OPT&#125; -XX:+UseG1GC -XX:G1HeapRegionSize=32m -XX:G1ReservePercent=25 -XX:InitiatingHeapOccupancyPercent=30 -XX:SoftRefLRUPolicyMSPerMB=0 -XX:SurvivorRatio=8&quot;</span><br><span class="line">JAVA_OPT=&quot;$&#123;JAVA_OPT&#125; -verbose:gc -Xloggc:/dev/shm/mq_gc_%p.log -XX:+PrintGCDetails -XX:+PrintGCDateStamps -XX:+PrintGCApplicationStoppedTime -XX:+PrintAdaptiveSizePolicy&quot;</span><br><span class="line">JAVA_OPT=&quot;$&#123;JAVA_OPT&#125; -XX:+UseGCLogFileRotation -XX:NumberOfGCLogFiles=5 -XX:GCLogFileSize=30m&quot;</span><br><span class="line">JAVA_OPT=&quot;$&#123;JAVA_OPT&#125; -XX:-OmitStackTraceInFastThrow&quot;</span><br><span class="line">JAVA_OPT=&quot;$&#123;JAVA_OPT&#125; -XX:+AlwaysPreTouch&quot;</span><br><span class="line">JAVA_OPT=&quot;$&#123;JAVA_OPT&#125; -XX:MaxDirectMemorySize=15g&quot;</span><br><span class="line">JAVA_OPT=&quot;$&#123;JAVA_OPT&#125; -XX:-UseLargePages -XX:-UseBiasedLocking&quot;</span><br><span class="line">JAVA_OPT=&quot;$&#123;JAVA_OPT&#125; -Djava.ext.dirs=$&#123;JAVA_HOME&#125;/jre/lib/ext:$&#123;BASE_DIR&#125;/lib&quot;</span><br><span class="line"><span class="meta prompt_">#</span><span class="language-bash">JAVA_OPT=<span class="string">&quot;<span class="variable">$&#123;JAVA_OPT&#125;</span> -Xdebug -Xrunjdwp:transport=dt_socket,address=9555,server=y,suspend=n&quot;</span></span></span><br><span class="line">JAVA_OPT=&quot;$&#123;JAVA_OPT&#125; $&#123;JAVA_OPT_EXT&#125;&quot;</span><br><span class="line">JAVA_OPT=&quot;$&#123;JAVA_OPT&#125; -cp $&#123;CLASSPATH&#125;&quot;</span><br><span class="line"></span><br><span class="line">numactl --interleave=all pwd &gt; /dev/null 2&gt;&amp;1</span><br><span class="line">if [ $? -eq 0 ]</span><br><span class="line">then</span><br><span class="line">	if [ -z &quot;$RMQ_NUMA_NODE&quot; ] ; then</span><br><span class="line">		numactl --interleave=all $JAVA $&#123;JAVA_OPT&#125; $@</span><br><span class="line">	else</span><br><span class="line">		numactl --cpunodebind=$RMQ_NUMA_NODE --membind=$RMQ_NUMA_NODE $JAVA $&#123;JAVA_OPT&#125; $@</span><br><span class="line">	fi</span><br><span class="line">else</span><br><span class="line"><span class="meta prompt_">	$</span><span class="language-bash">JAVA <span class="variable">$&#123;JAVA_OPT&#125;</span> <span class="variable">$@</span></span></span><br><span class="line">fi</span><br></pre></td></tr></table></figure>
 <ul>
-<li>和**<em>master**</em>一样制作systemd 服务并启动</li>
+<li>和<em><strong>master</strong></em>一样制作systemd 服务并启动</li>
 </ul>
-<h4 id="部署broker-b"><a href="#部署broker-b" class="headerlink" title="部署broker-b"></a>部署broker-b</h4><p>在<code>10.100.1.22</code>上部署*<strong>master**<em>，在<code>10.100.1.24</code>上部署</em></strong>slave*<strong>，方式和**<em>broker-a</em></strong>一样，只需要注意修改ip地址就可以了。</p>
+<h4 id="部署broker-b"><a href="#部署broker-b" class="headerlink" title="部署broker-b"></a>部署broker-b</h4><p>在<code>10.100.1.22</code>上部署<em><strong>master</strong></em>，在<code>10.100.1.24</code>上部署<em><strong>slave</strong></em>，方式和<em><strong>broker-a</strong></em>一样，只需要注意修改ip地址就可以了。</p>
 <p>这样，到这里为止，MQ的部署就完成了。</p>
 
     </div>
@@ -811,14 +450,6 @@ fi<span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><
     
     
     
-      
-  <div class="popular-posts-header">相关文章</div>
-  <ul class="popular-posts">
-    <li class="popular-posts-item">
-      <div class="popular-posts-title"><a href="\posts\3011500279.html" rel="bookmark">Centos 7下常见中间件环境的安装（一）</a></div>
-    </li>
-  </ul>
-
 
     <footer class="post-footer">
           
@@ -830,29 +461,12 @@ fi<span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><
   </li>
   <li class="post-copyright-link">
       <strong>本文链接：</strong>
-      <a href="http://blog.jobshen.com/posts/2345740436.html" title="Centos-7下常见中间件环境的安装（二）">http://blog.jobshen.com/posts/2345740436.html</a>
+      <a href="https://blog.jobshen.com/posts/2345740436.html" title="Centos-7下常见中间件环境的安装（二）">https://blog.jobshen.com/posts/2345740436.html</a>
   </li>
   <li class="post-copyright-license">
     <strong>版权声明： </strong>本博客所有文章除特别声明外，均采用 <a href="https://creativecommons.org/licenses/by-nc-sa/4.0/deed.zh" rel="noopener" target="_blank"><i class="fab fa-fw fa-creative-commons"></i>BY-NC-SA</a> 许可协议。转载请注明出处！
   </li>
 </ul>
-</div>
-
-          <div class="followme">
-  <span>欢迎关注我的其它发布渠道</span>
-
-  <div class="social-list">
-
-      <div class="social-item">
-        <a target="_blank" class="social-link" href="/atom.xml">
-          <span class="icon">
-            <i class="fa fa-rss"></i>
-          </span>
-
-          <span class="label">RSS</span>
-        </a>
-      </div>
-  </div>
 </div>
 
           <div class="post-tags">
@@ -883,44 +497,17 @@ fi<span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><
 
 
 
-      
-    <div class="comments" id="gitalk-container"></div>
-
-<script>
-  window.addEventListener('tabs:register', () => {
-    let { activeClass } = CONFIG.comments;
-    if (CONFIG.comments.storage) {
-      activeClass = localStorage.getItem('comments_active') || activeClass;
-    }
-    if (activeClass) {
-      const activeTab = document.querySelector(`a[href="#comment-${activeClass}"]`);
-      if (activeTab) {
-        activeTab.click();
-      }
-    }
-  });
-  if (CONFIG.comments.storage) {
-    window.addEventListener('tabs:click', event => {
-      if (!event.target.matches('.tabs-comment .tab-content .tab-pane')) return;
-      const commentClass = event.target.classList[1];
-      localStorage.setItem('comments_active', commentClass);
-    });
-  }
-</script>
-
-    </div>
+    <div class="comments gitalk-container"></div>
+</div>
   </main>
 
   <footer class="footer">
     <div class="footer-inner">
-      
 
-      
 
 <div class="copyright">
-  
   &copy; 2017 – 
-  <span itemprop="copyrightYear">2021</span>
+  <span itemprop="copyrightYear">2022</span>
   <span class="with-love">
     <i class="fa fa-heart"></i>
   </span>
@@ -931,42 +518,29 @@ fi<span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><
     <span class="post-meta-item-icon">
       <i class="fa fa-chart-line"></i>
     </span>
-    <span title="站点总字数">78k</span>
+    <span title="站点总字数">73k</span>
   </span>
   <span class="post-meta-item">
     <span class="post-meta-item-icon">
       <i class="fa fa-coffee"></i>
     </span>
-    <span title="站点阅读时长">2:10</span>
+    <span title="站点阅读时长">2:01</span>
   </span>
 </div>
-  <div class="powered-by">由 <a href="https://hexo.io/" class="theme-link" rel="noopener" target="_blank">Hexo</a> & <a href="https://theme-next.js.org/" class="theme-link" rel="noopener" target="_blank">NexT.Gemini</a> 强力驱动
+  <div class="powered-by">由 <a href="https://hexo.io/" rel="noopener" target="_blank">Hexo</a> & <a href="https://theme-next.js.org/" rel="noopener" target="_blank">NexT.Gemini</a> 强力驱动
   </div>
 
     </div>
   </footer>
 
   
-  <script src="//cdn.jsdelivr.net/npm/animejs@3.2.1/lib/anime.min.js"></script>
-  <script src="//cdn.jsdelivr.net/npm/lozad@1.16.0/dist/lozad.min.js"></script>
-<script src="/js/utils.js"></script><script src="/js/motion.js"></script><script src="/js/next-boot.js"></script><script src="/js/bookmark.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/animejs@3.2.1/lib/anime.min.js" integrity="sha256-XL2inqUJaslATFnHdJOi9GfQ60on8Wx1C2H8DYiN1xY=" crossorigin="anonymous"></script>
+  <script src="https://cdn.jsdelivr.net/npm/lozad@1.16.0/dist/lozad.min.js" integrity="sha256-mOFREFhqmHeQbXpK2lp4nA3qooVgACfh88fpJftLBbc=" crossorigin="anonymous"></script>
+<script src="/js/comments.js"></script><script src="/js/utils.js"></script><script src="/js/motion.js"></script><script src="/js/next-boot.js"></script><script src="/js/bookmark.js"></script>
 
   
-
-
-
-
-  <script src="/js/local-search.js"></script>
-
-
-
-
-
-
-
-
-
-
+<script src="https://cdn.jsdelivr.net/npm/hexo-generator-searchdb@1.4.0/dist/search.js" integrity="sha256-vXZMYLEqsROAXkEw93GGIvaB2ab+QW6w3+1ahD9nXXA=" crossorigin="anonymous"></script>
+<script src="/js/third-party/search/local-search.js"></script>
 
 
 
@@ -974,127 +548,17 @@ fi<span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><
 
   
 
+  <script src="https://cdn.jsdelivr.net/npm/firebase@9.7.0/firebase-app-compat.js" integrity="sha256-kazmBornWCBvhzKX9OvlPP7/4RbDozFe7VyVx4fj/vg=" crossorigin="anonymous"></script>
+  <script src="https://cdn.jsdelivr.net/npm/firebase@9.7.0/firebase-firestore-compat.js" integrity="sha256-JsvvsDGyUIHrfyMHH2FPJrbHRhjv7hOjtg1VdsuxI0s=" crossorigin="anonymous"></script>
+  <script class="next-config" data-name="firestore" type="application/json">{"enable":true,"collection":"articles","apiKey":"AIzaSyAPnpab6t0qB5X8xTX_TZFUTkSFVLNyQdw","projectId":"blog-e5d21"}</script>
+  <script src="/js/third-party/statistics/firestore.js"></script>
 
 
 
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/gitalk@1.7.2/dist/gitalk.css" integrity="sha256-AJnUHL7dBv6PGaeyPQJcgQPDjt/Hn/PvYZde1iqfp8U=" crossorigin="anonymous">
 
-
-<script>
-  (function() {
-    function leancloudSelector(url) {
-      url = encodeURI(url);
-      return document.getElementById(url).querySelector('.leancloud-visitors-count');
-    }
-
-    function addCount(Counter) {
-      const visitors = document.querySelector('.leancloud_visitors');
-      const url = decodeURI(visitors.id);
-      const title = visitors.dataset.flagTitle;
-
-      Counter('get', '/classes/Counter?where=' + encodeURIComponent(JSON.stringify({ url })))
-        .then(response => response.json())
-        .then(({ results }) => {
-          if (results.length > 0) {
-            const counter = results[0];
-            leancloudSelector(url).innerText = counter.time + 1;
-            Counter('put', '/classes/Counter/' + counter.objectId, { time: { '__op': 'Increment', 'amount': 1 } })
-              .catch(error => {
-                console.error('Failed to save visitor count', error);
-              });
-          } else {
-              Counter('post', '/classes/Counter', { title, url, time: 1 })
-                .then(response => response.json())
-                .then(() => {
-                  leancloudSelector(url).innerText = 1;
-                })
-                .catch(error => {
-                  console.error('Failed to create', error);
-                });
-          }
-        })
-        .catch(error => {
-          console.error('LeanCloud Counter Error', error);
-        });
-    }
-
-    function showTime(Counter) {
-      const visitors = document.querySelectorAll('.leancloud_visitors');
-      const entries = [...visitors].map(element => {
-        return decodeURI(element.id);
-      });
-
-      Counter('get', '/classes/Counter?where=' + encodeURIComponent(JSON.stringify({ url: { '$in': entries } })))
-        .then(response => response.json())
-        .then(({ results }) => {
-          for (let url of entries) {
-            const target = results.find(item => item.url === url);
-            leancloudSelector(url).innerText = target ? target.time : 0;
-          }
-        })
-        .catch(error => {
-          console.error('LeanCloud Counter Error', error);
-        });
-    }
-
-    const { app_id, app_key, server_url } = {"enable":true,"app_id":"XtypLwqMgeOwaXKki3a4bC6B-gzGzoHsz","app_key":"a8kiSiniEd0HlNvj4gTSdfsi","server_url":null,"security":false};
-    function fetchData(api_server) {
-      const Counter = (method, url, data) => {
-        return fetch(`${api_server}/1.1${url}`, {
-          method,
-          headers: {
-            'X-LC-Id'     : app_id,
-            'X-LC-Key'    : app_key,
-            'Content-Type': 'application/json',
-          },
-          body: JSON.stringify(data)
-        });
-      };
-      if (CONFIG.page.isPost) {
-        if (CONFIG.hostname !== location.hostname) return;
-        addCount(Counter);
-      } else if (document.querySelectorAll('.post-title-link').length >= 1) {
-        showTime(Counter);
-      }
-    }
-
-    const api_server = app_id.slice(-9) === '-MdYXbMMI' ? `https://${app_id.slice(0, 8).toLowerCase()}.api.lncldglobal.com` : server_url;
-
-    if (api_server) {
-      fetchData(api_server);
-    } else {
-      fetch('https://app-router.leancloud.cn/2/route?appId=' + app_id)
-        .then(response => response.json())
-        .then(({ api_server }) => {
-          fetchData('https://' + api_server);
-        });
-    }
-  })();
-</script>
-
-
-  
-
-  
-
-<link rel="stylesheet" href="//cdn.jsdelivr.net/npm/gitalk@1.7.0/dist/gitalk.css">
-
-<script>
-NexT.utils.loadComments('#gitalk-container', () => {
-  NexT.utils.getScript('//cdn.jsdelivr.net/npm/gitalk@1.7.0/dist/gitalk.min.js', () => {
-    var gitalk = new Gitalk({
-      clientID    : '0027cb40e78eba0adbfe',
-      clientSecret: '133ffa343a0ee4b23fef6d2ea7e36244770c2df9',
-      repo        : 'blog_git_talk',
-      owner       : 'kitdine',
-      admin       : ['kitdine'],
-      id          : '292b33100267f23fc952c3f3e386779f',
-        language: 'zh-CN',
-      distractionFreeMode: true
-    });
-    gitalk.render('gitalk-container');
-  }, window.Gitalk);
-});
-</script>
+<script class="next-config" data-name="gitalk" type="application/json">{"enable":true,"github_id":"kitdine","repo":"blog_git_talk","client_id":"0027cb40e78eba0adbfe","client_secret":"133ffa343a0ee4b23fef6d2ea7e36244770c2df9","admin_user":"kitdine","distraction_free_mode":true,"proxy":"https://cors-anywhere.azm.workers.dev/https://github.com/login/oauth/access_token","language":"zh-CN","js":{"url":"https://cdn.jsdelivr.net/npm/gitalk@1.7.2/dist/gitalk.min.js","integrity":"sha256-Pmj85ojLaPOWwRtlMJwmezB/Qg8BzvJp5eTzvXaYAfA="},"path_md5":"292b33100267f23fc952c3f3e386779f"}</script>
+<script src="/js/third-party/comments/gitalk.js"></script>
 
 </body>
 </html>
