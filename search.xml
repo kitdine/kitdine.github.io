@@ -171,7 +171,7 @@
 <p>这是<code>elastic</code>对于<code>filebeat</code>的官方描述，翻译过来就是<code>filebeat</code>是一个轻量级的用来采集和转发日志数据的组件。将采集的日志封装成<code>event</code>转发给下游的组件，例如<code>elasticsearch</code>、<code>logstash</code>或者<code>kafka</code>。</p>
 <span id="more"></span>
 
-<h1 id="架构设计"><a href="#架构设计" class="headerlink" title="架构设计"></a>架构设计</h1><p><img data-src="https://www.elastic.co/guide/en/beats/filebeat/current/images/filebeat.png" alt="artich"></p>
+<h1 id="架构设计"><a href="#架构设计" class="headerlink" title="架构设计"></a>架构设计</h1><p><img data-src="https://pic.jobshen.com/2022/05/5548112850028340e3d33d4414949959.png" alt="artich"></p>
 <h2 id="Inputs"><a href="#Inputs" class="headerlink" title="Inputs"></a>Inputs</h2><p>该组件的作用就如同名称一样，是用来定义输入源的，简单理解就是定义了你需要采集的数据源是哪些，对于我们最常使用的日志来说就是告诉<code>filebeat</code>需要监听哪些日志文件，当然其<code>inputs</code>类型并不是只有<code>log</code>一种，其支持以下类型：</p>
 <ul>
 <li>Azure Event Hub</li>
@@ -291,15 +291,15 @@
 <figure class="highlight shell"><table><tr><td class="code"><pre><span class="line">tcpdump tcp -s 0  -w ./target.cap</span><br></pre></td></tr></table></figure>
 
 <p>抓取当前网卡下的所有tcp流量，然后使用wireshark进行分析。发现了一个比较奇怪的现象：</p>
-<p><img data-src="https://picture.jobshen.com/blog/tcpdump/client-tcpdump.png" alt="client-tcpdump.png"></p>
-<p><img data-src="https://picture.jobshen.com/blog/tcpdump/nginx-tcpdump.png" alt="nginx-tcpdump.png"></p>
-<p><img data-src="https://picture.jobshen.com/blog/tcpdump/server-tcpdump.png" alt="server-tcpdump.png"></p>
+<p><img data-src="https://pic.jobshen.com/2022/05/18cc9d3566f6d2a9026e86fe92d74f3c.png" alt="client-tcpdump.png"></p>
+<p><img data-src="https://pic.jobshen.com/2022/05/68a3bd4dcd02658b495c96420b9aaaf5.png" alt="nginx-tcpdump.png"></p>
+<p><img data-src="https://pic.jobshen.com/2022/05/7ff4d8ef01b0473e7a0ca8abb9b3586d.png" alt="server-tcpdump.png"></p>
 <p>从上到下三张图片分别是应用程序端、nginx端、服务端的抓包数据，可以发现连接的关闭是由nginx这个节点发起的，应用端和服务端同时收到了来自nginx的<code>FIN ACK</code>包，要求关闭当前连接，并且都开始执行四次握手过程。但是在这个过程中又发生了什么异常导致这个过程并没有正常完成。</p>
 <p>通过观察大量的抓包数据后发现这个情况发生的非常多，但并不是每次都会导致连接的异常关闭，大部分还是能够正常关闭连接并建立新的连接的。</p>
 <p>通过仔细观察发现被异常关闭的连接，都是发生在<code>Seq=1</code>的情况下，这个原因还不是很清楚。</p>
 <p>那为什么<strong>nginx</strong>会主动发起关闭连接呢？</p>
 <h3 id="Nginx-排查"><a href="#Nginx-排查" class="headerlink" title="Nginx 排查"></a>Nginx 排查</h3><p>这时候首先想到的就是nginx的日志，在翻查了nginx的<code>access.log</code>后，发现在相同的时间端，nginx都发生了<code>reload</code>现象：</p>
-<figure class="highlight plaintext"><table><tr><td class="code"><pre><span class="line">backend reload required</span><br><span class="line">ingress backend successfully reloaded</span><br></pre></td></tr></table></figure>
+<figure class="highlight shell"><table><tr><td class="code"><pre><span class="line">backend reload required</span><br><span class="line">ingress backend successfully reloaded</span><br></pre></td></tr></table></figure>
 
 <p>难道是由于nginx的reload导致的问题吗？</p>
 <p>通过查询发现，nginx reload的大致流程为：</p>
@@ -330,11 +330,11 @@
 <span id="more"></span>
 
 <h2 id="注册域名并绑定Github-Page"><a href="#注册域名并绑定Github-Page" class="headerlink" title="注册域名并绑定Github Page"></a>注册域名并绑定Github Page</h2><p>注册Github和域名就不多说了，网上一搜一大推，接着去Github新建一个仓库，名为个人ID加 <strong>github.io</strong>，例如我的就是kitdine.github.io:</p>
-<p><img data-src="https://picture.jobshen.com/blog/hexo_github/snipaste_20170917_185841.png" alt="img"></p>
+<p><img data-src="https://pic.jobshen.com/2022/05/183f9140e36ef699f77be643a57bde4e.png" alt="img"></p>
 <p>然后在该仓库下找到一个文件 <strong>CNAME</strong>， 打开后将里面的值修改为你博客的域名，例如我的 <strong>blog.jobshen.com</strong></p>
-<p><img data-src="https://picture.jobshen.com/blog/hexo_github/snipaste_20170917_191236.png" alt="img"></p>
+<p><img data-src="https://pic.jobshen.com/2022/05/8f1dc53332eea6b04be5c4745ed29360.png" alt="img"></p>
 <p>注册完域名后添加一条CNAME记录，然后解析到github Page的地址，我的域名是在Godaddy上注册，添加一个CNAME指向github.io，像这样：</p>
-<p><img data-src="https://picture.jobshen.com/blog/hexo_github/snipaste_20170917_191445.png" alt="img"></p>
+<p><img data-src="https://pic.jobshen.com/2022/05/9ec00301e8bc48597d49aa5f8ea8f057.png" alt="img"></p>
 <p>这样你就可以通过自己的域名访问GitHub Page了。</p>
 <h2 id="安装Hexo"><a href="#安装Hexo" class="headerlink" title="安装Hexo"></a>安装Hexo</h2><p>之所以选择Hexo是因为Hexo看上去非常简洁而且支持Markdown，符合我的期望，安装也很方便。</p>
 <h3 id="准备工作"><a href="#准备工作" class="headerlink" title="准备工作"></a>准备工作</h3><p>Hexo 需要NodeJ.js和git</p>
@@ -394,7 +394,7 @@
 
 <p>此时即可使用浏览器访问 <code>http://localhost:4000</code>，检查站点是否正确运行。</p>
 <p>当你看到站点的外观与下图所示类似时即说明你已成功安装 NexT 主题。这是 NexT 默认的 Scheme —— Muse</p>
-<p><img data-src="https://picture.jobshen.com/blog/hexo_github/validation-default-scheme-mac.png" alt="img"></p>
+<p><img data-src="https://pic.jobshen.com/2022/05/9d8150ade97e843cd393633de0cc12dd.png" alt="img"></p>
 <p>现在，你已经成功安装并启用了 NexT 主题。下一步我们将要更改一些主题的设定，包括个性化以及集成第三方服务。</p>
 <p>更多配置可以访问<a href="http://theme-next.iissnan.com/">NexT</a>获取。</p>
 <h2 id="写作"><a href="#写作" class="headerlink" title="写作"></a>写作</h2><p>你可以执行下列命令来创建一篇新文章。</p>
@@ -526,7 +526,7 @@
 <li>Key 填写 github-deploy-key.pub 文件内容</li>
 <li>勾选 Allow write access 选项</li>
 </ul>
-<p><img data-src="https://picture.jobshen.com/2022/05/b90404061c4366c0b9049b575ac65d9f.png" alt="image-20220514094036069"></p>
+<p><img data-src="https://pic.jobshen.com/2022/05/b90404061c4366c0b9049b575ac65d9f.png" alt="image-20220514094036069"></p>
 </li>
 <li><p>配置私钥</p>
 </li>
@@ -536,7 +536,7 @@
 <li>Name 填写 HEXO_DEPLOY_PRI。</li>
 <li>Value 填写 github-deploy-key 文件内容。</li>
 </ul>
-<p><img data-src="https://picture.jobshen.com/2022/05/1cd21dd520b6224b8a1d5d1cea8be618.png" alt="image-20220514094119400"></p>
+<p><img data-src="https://pic.jobshen.com/2022/05/1cd21dd520b6224b8a1d5d1cea8be618.png" alt="image-20220514094119400"></p>
 <h3 id="Actions"><a href="#Actions" class="headerlink" title="Actions"></a>Actions</h3><p>在<strong>A</strong>仓库根目录下创建 <code>.github/workflows/deploy.yml</code> 文件，最后的目录结构应该是这样：</p>
 <figure class="highlight shell"><table><tr><td class="code"><pre><span class="line">A (repository)</span><br><span class="line">└── .github</span><br><span class="line">    └── workflows</span><br><span class="line">        └── deploy.yml</span><br></pre></td></tr></table></figure>
 
@@ -568,9 +568,9 @@
 
 <h2 id="分析"><a href="#分析" class="headerlink" title="分析"></a>分析</h2><p>一开始认为是服务器问题，检查了所有相关的应用服务器，应用是否正在运行，发现一切正常，cpu、内存、IO 都是正常的，没有异常；</p>
 <p>然后考虑是否是代码层面问题（数据库问题被排除，因为一旦数据库出问题不可能只有一部分人受影响），于是去检查日志，发现有以下错误信息：</p>
-<p><img data-src="https://picture.jobshen.com/blog/redis/redis-01.png" alt="错误信息"></p>
+<p><img data-src="https://pic.jobshen.com/2022/05/8812fd38a1b9383d9c3a62b7e2f3d5b4.png" alt="错误信息"></p>
 <p>然后登陆redis控制台，一台一台测试，终于发现了有问题的那台机器：</p>
-<p><img data-src="https://picture.jobshen.com/blog/redis/redis-02.png" alt="发现问题"></p>
+<p><img data-src="https://pic.jobshen.com/2022/05/62b4852cc6a7d1c4370529cf0a32f18c.png" alt="发现问题"></p>
 <p>接下来要做的就很简单了，redis是集群部署，并且每个节点都有master-slave，因此直接kill该节点，问题修复，一切正常。</p>
 <h2 id="寻找根本原因"><a href="#寻找根本原因" class="headerlink" title="寻找根本原因"></a>寻找根本原因</h2><p>但是这样做并不能解决根本问题，由于之前部署redis集群时考虑不够周全，没有配置redis日志，因此决定直接修改配置文件，逐个重启redis节点。这也就导致了再次故障，因为那个故障节点又被启动加入集群并且由于所有节点都经历了重启该节点又被设为master了。</p>
 <p>这时去观察该节点redis的日志，终于发现了问题，满屏都是异常信息：</p>
@@ -600,7 +600,8 @@
 <li><p>使用 redis （<strong>set</strong>  <strong>setnx</strong> **setex **） +  <strong>expire</strong> 组合命令：</p>
 <figure class="highlight shell"><table><tr><td class="code"><pre><span class="line"><span class="meta prompt_">&gt; </span><span class="language-bash"><span class="built_in">set</span> |setnx | setex key</span></span><br><span class="line"><span class="meta prompt_">&gt; </span><span class="language-bash">expire key seconds <span class="comment"># 设置失败</span></span></span><br></pre></td></tr></table></figure>
 
-<p>​</p>
+
+
 <p>由于系统中大量使用了第一种方式来防止重复提交，所以这个问题对业务影响还是很大的，redis具体现象为：</p>
 <ul>
 <li>设置incrby 第一次应该返回 <strong>1</strong> </li>
@@ -638,22 +639,22 @@
 <figure class="highlight shell"><table><tr><td class="code"><pre><span class="line">grep &quot;key : 3e9dd73a-fee2-416c-b3c8-5369b2cd4ec8 return : &quot; nohup.out</span><br></pre></td></tr></table></figure>
 
 <p>仔细查看后发现：</p>
-<p><img data-src="https://picture.jobshen.com/blog/redis/redis-03.png" alt="value跳跃"></p>
+<p><img data-src="https://pic.jobshen.com/2022/05/b616d89ac815bebb525b18313621ab74.png" alt="value跳跃"></p>
 <p>直接从 <strong>2698</strong> 跳跃到了 <strong>2700</strong></p>
 <p>然后再筛选日志，发现以下内容：</p>
-<p><img data-src="https://picture.jobshen.com/blog/redis/redis-04.png" alt="重复"></p>
+<p><img data-src="https://pic.jobshen.com/2022/05/124aff5eb3a54aa3c4f52c9a748a1655.png" alt="重复"></p>
 <p>连续执行了两次<strong>incrBy</strong>命令，然后再去查找同一时刻的redis watch记录，发现的确收到了两条<strong>INCRBY  3e9dd73a-fee2-416c-b3c8-5369b2cd4ec8 1</strong>命令，那接下来就要搞清楚为什么会发起两次请求，于是轮到tcpdump了。</p>
 <h3 id="wireshark-分析请求流量"><a href="#wireshark-分析请求流量" class="headerlink" title="wireshark 分析请求流量"></a>wireshark 分析请求流量</h3><p>将tcpdump的文件导入wireshark后，根据筛选条件进行筛选，最终找到了对应的tcp请求（Frame 698961）：</p>
-<p><img data-src="https://picture.jobshen.com/blog/redis/redis-05.png" alt="wireshark"></p>
+<p><img data-src="https://pic.jobshen.com/2022/05/4d290a8c7f8cc6a82e63b814a8b48a64.png" alt="wireshark"></p>
 <p>其中这行引起了我注意：**[Expert Info (Note&#x2F;Sequence): This frame is a (suspected) retransmission]**</p>
 <p>查询资料后发现，这种情况是出现在以下情形：</p>
 <p>​	当tcp请求允许重试的前提下发现当前tcp请求过了<strong>timeout</strong>时间还没收到返回值，那么就发起一次重试，而重试的tcp请求在wireshark中就会被标记为**[Expert Info (Note&#x2F;Sequence): This frame is a (suspected) retransmission]**。</p>
 <p>于是原因很明显了，由于Jedis设置的超时时间过短，导致jedis发起了重试，最终导致了上述redis的异常情况。</p>
 <h2 id="解决方案"><a href="#解决方案" class="headerlink" title="解决方案"></a>解决方案</h2><h3 id="Jedis"><a href="#Jedis" class="headerlink" title="Jedis"></a>Jedis</h3><p>查询jedis配置文件，发现超时时间为500毫秒，</p>
-<p><img data-src="https://picture.jobshen.com/blog/redis/redis-06.png" alt="jedis"></p>
+<p><img data-src="https://pic.jobshen.com/2022/05/216c3edac48fd216cad893e868e17372.png" alt="jedis"></p>
 <p>显然太短了，遂改为15秒，改完以下重新执行了几次测试程序，都没有再发现问题，然后修改线上代码。</p>
 <h3 id="Redis"><a href="#Redis" class="headerlink" title="Redis"></a>Redis</h3><p>导致上述jedis请求超时的原因也有redis cluster的原因。查询发现线上集群存在这key分布不均匀的情况：</p>
-<p><img data-src="https://picture.jobshen.com/blog/redis/redis-07.png" alt="redis-key"></p>
+<p><img data-src="https://pic.jobshen.com/2022/05/25c23bd7e51142a032731d008ca0fc09.png" alt="redis-key"></p>
 <p>可以看出其中一个节点的key数量是其他节点的1.5倍，并且分析这些key发现他们访问的频率也很高，在一定程度上导致了jedis的超时，因此接下来要对redis集群进行优化。</p>
 ]]></content>
       <categories>
