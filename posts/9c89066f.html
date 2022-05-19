@@ -21,17 +21,17 @@
 
 <script class="next-config" data-name="main" type="application/json">{"hostname":"blog.jobshen.com","root":"/","images":"/images","scheme":"Gemini","darkmode":true,"version":"8.11.1","exturl":false,"sidebar":{"position":"left","display":"post","padding":18,"offset":12},"copycode":true,"bookmark":{"enable":true,"color":"#222","save":"auto"},"mediumzoom":false,"lazyload":true,"pangu":false,"comments":{"style":"tabs","active":null,"storage":true,"lazyload":false,"nav":null},"stickytabs":false,"motion":{"enable":true,"async":false,"transition":{"post_block":"fadeIn","post_header":"fadeInDown","post_body":"fadeInDown","coll_header":"fadeInLeft","sidebar":"fadeInUp"}},"prism":false,"i18n":{"placeholder":"搜索...","empty":"没有找到任何搜索结果：${query}","hits_time":"找到 ${hits} 个搜索结果（用时 ${time} 毫秒）","hits":"找到 ${hits} 个搜索结果"},"path":"/search.xml","localsearch":{"enable":true,"trigger":"auto","top_n_per_article":1,"unescape":false,"preload":false}}</script><script src="/js/config.js"></script>
 
-    <meta name="description" content="博客系统小更新记录之前blog一直是通过hexo+GitHub page部署的，那是还没有GitHub actions，每次操作都无比复杂，最近有时间就做个小更新，记录下更改点。">
+    <meta name="description" content="之前blog一直是通过hexo+GitHub page部署的，那是还没有GitHub actions，每次操作都无比复杂，最近有时间就做个小更新，记录下更改点。">
 <meta property="og:type" content="article">
 <meta property="og:title" content="博客小更新记录">
 <meta property="og:url" content="https://blog.jobshen.com/posts/9c89066f.html">
 <meta property="og:site_name" content="一杯咖啡的时间">
-<meta property="og:description" content="博客系统小更新记录之前blog一直是通过hexo+GitHub page部署的，那是还没有GitHub actions，每次操作都无比复杂，最近有时间就做个小更新，记录下更改点。">
+<meta property="og:description" content="之前blog一直是通过hexo+GitHub page部署的，那是还没有GitHub actions，每次操作都无比复杂，最近有时间就做个小更新，记录下更改点。">
 <meta property="og:locale" content="zh_CN">
 <meta property="og:image" content="https://pic.jobshen.com/2022/05/b90404061c4366c0b9049b575ac65d9f.png">
 <meta property="og:image" content="https://pic.jobshen.com/2022/05/1cd21dd520b6224b8a1d5d1cea8be618.png">
 <meta property="article:published_time" content="2022-05-13T10:39:11.000Z">
-<meta property="article:modified_time" content="2022-05-19T02:59:04.045Z">
+<meta property="article:modified_time" content="2022-05-19T03:27:52.062Z">
 <meta property="article:author" content="Job Shen">
 <meta property="article:tag" content="hexo">
 <meta property="article:tag" content="next">
@@ -153,7 +153,7 @@
       <div class="sidebar-panel-container">
         <!--noindex-->
         <div class="post-toc-wrap sidebar-panel">
-            <div class="post-toc animated"><ol class="nav"><li class="nav-item nav-level-1"><a class="nav-link" href="#%E5%8D%9A%E5%AE%A2%E7%B3%BB%E7%BB%9F%E5%B0%8F%E6%9B%B4%E6%96%B0%E8%AE%B0%E5%BD%95"><span class="nav-number">1.</span> <span class="nav-text">博客系统小更新记录</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#Github-Actions"><span class="nav-number">1.1.</span> <span class="nav-text">Github Actions</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#Repos"><span class="nav-number">1.1.1.</span> <span class="nav-text">Repos</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#Keys"><span class="nav-number">1.1.2.</span> <span class="nav-text">Keys</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#Actions"><span class="nav-number">1.1.3.</span> <span class="nav-text">Actions</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#Hexo-deploy"><span class="nav-number">1.1.4.</span> <span class="nav-text">Hexo deploy</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#Hexo-theme-%E6%9B%B4%E6%96%B0"><span class="nav-number">1.2.</span> <span class="nav-text">Hexo theme 更新</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#%E5%88%86%E6%9E%90%E7%BB%9F%E8%AE%A1%E9%85%8D%E7%BD%AE"><span class="nav-number">1.2.1.</span> <span class="nav-text">分析统计配置</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E5%9B%BE%E5%BA%8A%E4%BC%98%E5%8C%96"><span class="nav-number">1.3.</span> <span class="nav-text">图床优化</span></a></li></ol></li></ol></div>
+            <div class="post-toc animated"><ol class="nav"><li class="nav-item nav-level-2"><a class="nav-link" href="#Github-Actions"><span class="nav-number">1.</span> <span class="nav-text">Github Actions</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#Repos"><span class="nav-number">1.1.</span> <span class="nav-text">Repos</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#Keys"><span class="nav-number">1.2.</span> <span class="nav-text">Keys</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#Actions"><span class="nav-number">1.3.</span> <span class="nav-text">Actions</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#Hexo-deploy"><span class="nav-number">1.4.</span> <span class="nav-text">Hexo deploy</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#Hexo-theme-%E6%9B%B4%E6%96%B0"><span class="nav-number">2.</span> <span class="nav-text">Hexo theme 更新</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#%E5%88%86%E6%9E%90%E7%BB%9F%E8%AE%A1%E9%85%8D%E7%BD%AE"><span class="nav-number">2.1.</span> <span class="nav-text">分析统计配置</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E5%9B%BE%E5%BA%8A%E4%BC%98%E5%8C%96"><span class="nav-number">3.</span> <span class="nav-text">图床优化</span></a></li></ol></div>
         </div>
         <!--/noindex-->
 
@@ -264,7 +264,7 @@
         <i class="far fa-calendar-check"></i>
       </span>
       <span class="post-meta-item-text">更新于</span>
-      <time title="修改时间：2022-05-19 10:59:04" itemprop="dateModified" datetime="2022-05-19T10:59:04+08:00">2022-05-19</time>
+      <time title="修改时间：2022-05-19 11:27:52" itemprop="dateModified" datetime="2022-05-19T11:27:52+08:00">2022-05-19</time>
     </span>
     <span class="post-meta-item">
       <span class="post-meta-item-icon">
@@ -308,7 +308,7 @@
     
     
     <div class="post-body" itemprop="articleBody">
-        <h1 id="博客系统小更新记录"><a href="#博客系统小更新记录" class="headerlink" title="博客系统小更新记录"></a>博客系统小更新记录</h1><p>之前blog一直是通过hexo+GitHub page部署的，那是还没有GitHub actions，每次操作都无比复杂，最近有时间就做个小更新，记录下更改点。</p>
+        <p>之前blog一直是通过hexo+GitHub page部署的，那是还没有GitHub actions，每次操作都无比复杂，最近有时间就做个小更新，记录下更改点。</p>
 <span id="more"></span>
 
 <h2 id="Github-Actions"><a href="#Github-Actions" class="headerlink" title="Github Actions"></a>Github Actions</h2><p>这个肯定是这次的重中之重！其实流程也是很简单。</p>
@@ -392,8 +392,8 @@
                 </a>
             </div>
             <div class="post-nav-item">
-                <a href="/posts/37111687.html" rel="next" title="create_spring_boot_application_image">
-                  create_spring_boot_application_image <i class="fa fa-chevron-right"></i>
+                <a href="/posts/37111687.html" rel="next" title="如何更优雅的构建spring boot应用的镜像">
+                  如何更优雅的构建spring boot应用的镜像 <i class="fa fa-chevron-right"></i>
                 </a>
             </div>
           </div>
