@@ -1,325 +1,28 @@
-<!DOCTYPE html>
-<html lang="zh-CN">
-<head>
-  <meta charset="UTF-8">
-<meta name="viewport" content="width=device-width">
-<meta name="theme-color" content="#222" media="(prefers-color-scheme: light)">
-<meta name="theme-color" content="#222" media="(prefers-color-scheme: dark)"><meta name="generator" content="Hexo 6.2.0">
+<!DOCTYPE html><html lang="zh-CN"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1"><title>Filebeat 浅析（一） · Job Shen</title><meta name="description" content="Filebeat 浅析（一），发布于 2021-02-17。Job Shen 的工程实践记录。"><link rel="canonical" href="https://blog.jobshen.com/posts/6bf64646.html"><meta property="og:url" content="https://blog.jobshen.com/posts/6bf64646.html"><meta property="og:title" content="Filebeat 浅析（一） · Job Shen"><meta property="og:description" content="Filebeat 浅析（一），发布于 2021-02-17。Job Shen 的工程实践记录。"><meta property="og:type" content="article"><link rel="icon" href="/images/favicon-32x32.png"><link rel="alternate" type="application/rss+xml" title="Job Shen RSS" href="/rss.xml"><script>try { document.documentElement.dataset.theme = localStorage.getItem('theme') || (matchMedia('(prefers-color-scheme: dark)').matches?'dark':'light'); } catch {}</script><script>(function(){const token = "e4f1ddcf89244291afe53cf196900efe";
 
-
-  <link rel="apple-touch-icon" sizes="180x180" href="/images/apple-touch-icon.png">
-  <link rel="icon" type="image/png" sizes="32x32" href="/images/favicon-32x32.png">
-  <link rel="icon" type="image/png" sizes="16x16" href="/images/favicon-16x16.png">
-  <link rel="mask-icon" href="/images/logo.svg" color="#222">
-
-<link rel="stylesheet" href="/css/main.css">
-
-<link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Noto+Sans+SC:300,300italic,400,400italic,700,700italic%7CCascadia+Code:300,300italic,400,400italic,700,700italic&display=swap&subset=latin,latin-ext">
-
-<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@fortawesome/fontawesome-free@6.1.1/css/all.min.css" integrity="sha256-DfWjNxDkM94fVBWx1H5BMMp0Zq7luBlV8QRcSES7s+0=" crossorigin="anonymous">
-  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/animate.css@3.1.1/animate.min.css" integrity="sha256-PR7ttpcvz8qrF57fur/yAx1qXMFJeJFiA6pSzWi0OIE=" crossorigin="anonymous">
-
-<script class="next-config" data-name="main" type="application/json">{"hostname":"blog.jobshen.com","root":"/","images":"/images","scheme":"Gemini","darkmode":true,"version":"8.11.1","exturl":false,"sidebar":{"position":"left","display":"post","padding":18,"offset":12},"copycode":true,"bookmark":{"enable":true,"color":"#222","save":"auto"},"mediumzoom":false,"lazyload":true,"pangu":false,"comments":{"style":"tabs","active":null,"storage":true,"lazyload":false,"nav":null},"stickytabs":false,"motion":{"enable":true,"async":false,"transition":{"post_block":"fadeIn","post_header":"fadeInDown","post_body":"fadeInDown","coll_header":"fadeInLeft","sidebar":"fadeInUp"}},"prism":false,"i18n":{"placeholder":"搜索...","empty":"没有找到任何搜索结果：${query}","hits_time":"找到 ${hits} 个搜索结果（用时 ${time} 毫秒）","hits":"找到 ${hits} 个搜索结果"},"path":"/search.xml","localsearch":{"enable":true,"trigger":"auto","top_n_per_article":1,"unescape":false,"preload":false}}</script><script src="/js/config.js"></script>
-
-    <meta name="description" content="简介 Filebeat is a lightweight shipper for forwarding and centralizing log data. Installed as an agent on your servers, Filebeat monitors the log files or locations that you specify, collects log events">
-<meta property="og:type" content="article">
-<meta property="og:title" content="Filebeat 浅析（一）">
-<meta property="og:url" content="https://blog.jobshen.com/posts/6bf64646.html">
-<meta property="og:site_name" content="一杯咖啡的时间">
-<meta property="og:description" content="简介 Filebeat is a lightweight shipper for forwarding and centralizing log data. Installed as an agent on your servers, Filebeat monitors the log files or locations that you specify, collects log events">
-<meta property="og:locale" content="zh_CN">
-<meta property="og:image" content="https://pic.jobshen.com/2022/05/5548112850028340e3d33d4414949959.png">
-<meta property="article:published_time" content="2021-02-17T04:22:36.000Z">
-<meta property="article:modified_time" content="2022-08-27T14:34:03.688Z">
-<meta property="article:author" content="Job Shen">
-<meta property="article:tag" content="filebeat">
-<meta name="twitter:card" content="summary">
-<meta name="twitter:image" content="https://pic.jobshen.com/2022/05/5548112850028340e3d33d4414949959.png">
-
-
-<link rel="canonical" href="https://blog.jobshen.com/posts/6bf64646.html">
-
-
-
-<script class="next-config" data-name="page" type="application/json">{"sidebar":"","isHome":false,"isPost":true,"lang":"zh-CN","comments":true,"permalink":"https://blog.jobshen.com/posts/6bf64646.html","path":"posts/6bf64646.html","title":"Filebeat 浅析（一）"}</script>
-
-<script class="next-config" data-name="calendar" type="application/json">""</script>
-<title>Filebeat 浅析（一） | 一杯咖啡的时间</title>
-  
-    <script async src="https://www.googletagmanager.com/gtag/js?id=G-XM4CDTM8RX"></script>
-  <script class="next-config" data-name="google_analytics" type="application/json">{"tracking_id":"G-XM4CDTM8RX","only_pageview":false}</script>
-  <script src="/js/third-party/analytics/google-analytics.js"></script>
-
-
-
-
-
-  <noscript>
-    <link rel="stylesheet" href="/css/noscript.css">
-  </noscript>
-<link rel="alternate" href="/atom.xml" title="一杯咖啡的时间" type="application/atom+xml">
-</head>
-
-<body itemscope itemtype="http://schema.org/WebPage" class="use-motion">
-  <div class="headband"></div>
-
-  <main class="main">
-    <header class="header" itemscope itemtype="http://schema.org/WPHeader">
-      <div class="header-inner"><div class="site-brand-container">
-  <div class="site-nav-toggle">
-    <div class="toggle" aria-label="切换导航栏" role="button">
-        <span class="toggle-line"></span>
-        <span class="toggle-line"></span>
-        <span class="toggle-line"></span>
-    </div>
-  </div>
-
-  <div class="site-meta">
-
-    <a href="/" class="brand" rel="start">
-      <i class="logo-line"></i>
-      <p class="site-title">一杯咖啡的时间</p>
-      <i class="logo-line"></i>
-    </a>
-      <p class="site-subtitle" itemprop="description">苦中作乐</p>
-  </div>
-
-  <div class="site-nav-right">
-    <div class="toggle popup-trigger">
-        <i class="fa fa-search fa-fw fa-lg"></i>
-    </div>
-  </div>
-</div>
-
-
-
-<nav class="site-nav">
-  <ul class="main-menu menu"><li class="menu-item menu-item-home"><a href="/" rel="section"><i class="fa fa-home fa-fw"></i>首页</a></li><li class="menu-item menu-item-about"><a href="/about/" rel="section"><i class="fa fa-user fa-fw"></i>关于</a></li><li class="menu-item menu-item-tags"><a href="/tags/" rel="section"><i class="fa fa-tags fa-fw"></i>标签</a></li><li class="menu-item menu-item-categories"><a href="/categories/" rel="section"><i class="fa fa-th fa-fw"></i>分类</a></li><li class="menu-item menu-item-archives"><a href="/archives/" rel="section"><i class="fa fa-archive fa-fw"></i>归档</a></li><li class="menu-item menu-item-commonweal"><a href="/404/" rel="section"><i class="fa fa-heartbeat fa-fw"></i>公益 404</a></li>
-      <li class="menu-item menu-item-search">
-        <a role="button" class="popup-trigger"><i class="fa fa-search fa-fw"></i>搜索
-        </a>
-      </li>
-  </ul>
-</nav>
-
-
-
-  <div class="search-pop-overlay">
-    <div class="popup search-popup"><div class="search-header">
-  <span class="search-icon">
-    <i class="fa fa-search"></i>
-  </span>
-  <div class="search-input-container">
-    <input autocomplete="off" autocapitalize="off" maxlength="80"
-           placeholder="搜索..." spellcheck="false"
-           type="search" class="search-input">
-  </div>
-  <span class="popup-btn-close" role="button">
-    <i class="fa fa-times-circle"></i>
-  </span>
-</div>
-<div class="search-result-container no-result">
-  <div class="search-result-icon">
-    <i class="fa fa-spinner fa-pulse fa-5x"></i>
-  </div>
-</div>
-
-    </div>
-  </div>
-
-</div>
-        
-  
-  <div class="toggle sidebar-toggle" role="button">
-    <span class="toggle-line"></span>
-    <span class="toggle-line"></span>
-    <span class="toggle-line"></span>
-  </div>
-
-  <aside class="sidebar">
-
-    <div class="sidebar-inner sidebar-nav-active sidebar-toc-active">
-      <ul class="sidebar-nav">
-        <li class="sidebar-nav-toc">
-          文章目录
-        </li>
-        <li class="sidebar-nav-overview">
-          站点概览
-        </li>
-      </ul>
-
-      <div class="sidebar-panel-container">
-        <!--noindex-->
-        <div class="post-toc-wrap sidebar-panel">
-            <div class="post-toc animated"><ol class="nav"><li class="nav-item nav-level-1"><a class="nav-link" href="#%E7%AE%80%E4%BB%8B"><span class="nav-number">1.</span> <span class="nav-text">简介</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#%E6%9E%B6%E6%9E%84%E8%AE%BE%E8%AE%A1"><span class="nav-number">2.</span> <span class="nav-text">架构设计</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#Inputs"><span class="nav-number">2.1.</span> <span class="nav-text">Inputs</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#Harvester"><span class="nav-number">2.2.</span> <span class="nav-text">Harvester</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#Spooler"><span class="nav-number">2.3.</span> <span class="nav-text">Spooler</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#Processor"><span class="nav-number">2.3.1.</span> <span class="nav-text">Processor</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#Internal-Queue"><span class="nav-number">2.3.2.</span> <span class="nav-text">Internal Queue</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#Outputs"><span class="nav-number">2.4.</span> <span class="nav-text">Outputs</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E5%85%B6%E4%BB%96%E7%BB%84%E4%BB%B6"><span class="nav-number">2.5.</span> <span class="nav-text">其他组件</span></a></li></ol></li><li class="nav-item nav-level-1"><a class="nav-link" href="#%E6%80%BB%E7%BB%93"><span class="nav-number">3.</span> <span class="nav-text">总结</span></a></li></ol></div>
-        </div>
-        <!--/noindex-->
-
-        <div class="site-overview-wrap sidebar-panel">
-          <div class="site-author site-overview-item animated" itemprop="author" itemscope itemtype="http://schema.org/Person">
-    <img class="site-author-image" itemprop="image" alt="Job Shen"
-      src="/images/Avatar.png">
-  <p class="site-author-name" itemprop="name">Job Shen</p>
-  <div class="site-description" itemprop="description"></div>
-</div>
-<div class="site-state-wrap site-overview-item animated">
-  <nav class="site-state">
-      <div class="site-state-item site-state-posts">
-        <a href="/archives/">
-          <span class="site-state-item-count">12</span>
-          <span class="site-state-item-name">日志</span>
-        </a>
-      </div>
-      <div class="site-state-item site-state-categories">
-          <a href="/categories/">
-        <span class="site-state-item-count">6</span>
-        <span class="site-state-item-name">分类</span></a>
-      </div>
-      <div class="site-state-item site-state-tags">
-          <a href="/tags/">
-        <span class="site-state-item-count">20</span>
-        <span class="site-state-item-name">标签</span></a>
-      </div>
-  </nav>
-</div>
-  <div class="links-of-author site-overview-item animated">
-      <span class="links-of-author-item">
-        <a href="https://github.com/kitdine" title="GitHub → https:&#x2F;&#x2F;github.com&#x2F;kitdine" rel="noopener" target="_blank"><i class="fab fa-github fa-fw"></i>GitHub</a>
-      </span>
-  </div>
-  <div class="cc-license site-overview-item animated" itemprop="license">
-    <a href="https://creativecommons.org/licenses/by-nc-sa/4.0/deed.zh" class="cc-opacity" rel="noopener" target="_blank"><img src="https://cdn.jsdelivr.net/npm/@creativecommons/vocabulary@2020.11.3/assets/license_badges/small/by_nc_sa.svg" alt="Creative Commons"></a>
-  </div>
-
-
-
-        </div>
-      </div>
-    </div>
-  </aside>
-  <div class="sidebar-dimmer"></div>
-
-
-    </header>
-
-    
-  <div class="back-to-top" role="button" aria-label="返回顶部">
-    <i class="fa fa-arrow-up"></i>
-    <span>0%</span>
-  </div>
-  <div class="reading-progress-bar"></div>
-  <a role="button" class="book-mark-link book-mark-link-fixed"></a>
-
-<noscript>
-  <div class="noscript-warning">Theme NexT works best with JavaScript enabled</div>
-</noscript>
-
-
-    <div class="main-inner post posts-expand">
-
-
-  
-
-
-<div class="post-block">
-  
-  
-
-  <article itemscope itemtype="http://schema.org/Article" class="post-content" lang="zh-CN">
-    <link itemprop="mainEntityOfPage" href="https://blog.jobshen.com/posts/6bf64646.html">
-
-    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
-      <meta itemprop="image" content="/images/Avatar.png">
-      <meta itemprop="name" content="Job Shen">
-    </span>
-
-    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
-      <meta itemprop="name" content="一杯咖啡的时间">
-      <meta itemprop="description" content="">
-    </span>
-
-    <span hidden itemprop="post" itemscope itemtype="http://schema.org/CreativeWork">
-      <meta itemprop="name" content="Filebeat 浅析（一） | 一杯咖啡的时间">
-      <meta itemprop="description" content="">
-    </span>
-      <header class="post-header">
-        <h1 class="post-title" itemprop="name headline">
-          Filebeat 浅析（一）
-        </h1>
-
-        <div class="post-meta-container">
-          <div class="post-meta">
-    <span class="post-meta-item">
-      <span class="post-meta-item-icon">
-        <i class="far fa-calendar"></i>
-      </span>
-      <span class="post-meta-item-text">发表于</span>
-
-      <time title="创建时间：2021-02-17 12:22:36" itemprop="dateCreated datePublished" datetime="2021-02-17T12:22:36+08:00">2021-02-17</time>
-    </span>
-    <span class="post-meta-item">
-      <span class="post-meta-item-icon">
-        <i class="far fa-calendar-check"></i>
-      </span>
-      <span class="post-meta-item-text">更新于</span>
-      <time title="修改时间：2022-08-27 22:34:03" itemprop="dateModified" datetime="2022-08-27T22:34:03+08:00">2022-08-27</time>
-    </span>
-    <span class="post-meta-item">
-      <span class="post-meta-item-icon">
-        <i class="far fa-folder"></i>
-      </span>
-      <span class="post-meta-item-text">分类于</span>
-        <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
-          <a href="/categories/Filebeat/" itemprop="url" rel="index"><span itemprop="name">Filebeat</span></a>
-        </span>
-    </span>
-
-  
-    <span class="post-meta-item" title="阅读次数">
-      <span class="post-meta-item-icon">
-        <i class="far fa-eye"></i>
-      </span>
-      <span class="post-meta-item-text">阅读次数：</span>
-      <span class="firestore-visitors-count"></span>
-    </span>
-    <span class="post-meta-break"></span>
-    <span class="post-meta-item" title="本文字数">
-      <span class="post-meta-item-icon">
-        <i class="far fa-file-word"></i>
-      </span>
-      <span class="post-meta-item-text">本文字数：</span>
-      <span>1.6k</span>
-    </span>
-    <span class="post-meta-item" title="阅读时长">
-      <span class="post-meta-item-icon">
-        <i class="far fa-clock"></i>
-      </span>
-      <span class="post-meta-item-text">阅读时长 &asymp;</span>
-      <span>3 分钟</span>
-    </span>
-</div>
-
-        </div>
-      </header>
-
-    
-    
-    
-    <div class="post-body" itemprop="articleBody">
-        <h1 id="简介"><a href="#简介" class="headerlink" title="简介"></a>简介</h1><blockquote>
-<p>Filebeat is a lightweight shipper for forwarding and centralizing log data. Installed as an agent on your servers, Filebeat monitors the log files or locations that you specify, collects log events, and forwards them either to <a target="_blank" rel="noopener" href="https://www.elastic.co/products/elasticsearch">Elasticsearch</a> or <a target="_blank" rel="noopener" href="https://www.elastic.co/products/logstash">Logstash</a> for indexing.</p>
+  if(location.origin==='https://blog.jobshen.com'){
+    const script=document.createElement('script');
+    script.src='https://static.cloudflareinsights.com/beacon.min.js';
+    script.type='module';
+    script.defer=true;script.dataset.cfBeacon=JSON.stringify({token});
+    document.head.append(script);
+  }
+})();</script><link rel="stylesheet" href="/_astro/Base.CBrFukQE.css"></head><body><a class="skip" href="#main">跳到正文</a><header class="site-header wrap" data-pagefind-ignore><a class="brand" href="/" aria-label="Job Shen 首页"><span class="brand-mark">j.</span><span>Job Shen<span class="brand-sub">工程笔记</span></span></a><nav aria-label="主导航"><a href="/archive/">文章</a><a href="/projects/">项目</a><a href="/tags/">标签</a><a href="/about/">关于</a></nav><div class="header-actions"><a class="icon-button" href="/search/" aria-label="搜索文章"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7"><circle cx="10" cy="10" r="6.5"></circle><path d="m15 15 6 6"></path></svg></a><button id="theme-toggle" class="icon-button" aria-label="切换深浅色" title="切换深浅色">◐</button></div></header><main id="main" class="wrap"><div class="article-top"><a href="/archive/">← 全部文章</a><span>ENGINEERING NOTES</span></div><div class="article-layout"><article data-pagefind-body><header class="article-header"><div class="tag-links" data-pagefind-ignore><a href="/tags/filebeat/">filebeat</a></div><h1 data-pagefind-meta="title">Filebeat 浅析（一）</h1><div class="article-meta"><time datetime="2021-02-17T12:22:36.000Z">2021-02-17</time><span>Job Shen</span><span data-view-count data-pagefind-ignore data-article-id="6bf64646" data-enabled="true" data-writes-enabled="true" data-endpoint="https://blog-view-counter.kitdnie.workers.dev" role="status">改版后访问次数 · 未启用</span><script type="module">var e=e=>Number.isSafeInteger(e)&&e>=0;function t(t,n){return t?.status===`ok`&&t.articleId===n&&t.metric===`visits`&&e(t.newCount)&&t.legacyBaseline===null&&t.total===null&&typeof t.cutover==`string`&&Number.isFinite(Date.parse(t.cutover))&&typeof t.observedAt==`string`&&Number.isFinite(Date.parse(t.observedAt))}function n(e,t=!1){let n=new Date(e.cutover).toISOString().replace(`T`,` `).slice(0,19),r=`改版后访问次数：${e.newCount}（自 ${n} UTC）`;return t?`${r}（缓存，截至 ${e.observedAt.replace(`T`,` `).slice(0,16)} UTC）`:r}async function r(e,r,i={}){if(!r.enabled){e.textContent=`改版后访问次数 · 未启用`;return}let a=i.fetch||globalThis.fetch,o=i.storage,s=e.dataset.articleId,c=`${r.endpoint}/v1/articles/${s}/views`,l=`blog:views:v1:${r.endpoint}:${s}`,u;try{let e=JSON.parse(o?.getItem(l)||`null`);t(e,s)&&(u=e)}catch{}let d=r=>{if(!t(r,s))throw Error(`invalid_counter_response`);u=r,e.textContent=n(r);try{o?.setItem(l,JSON.stringify(r))}catch{}},f=async()=>{let e=await a(c,{credentials:`omit`,signal:AbortSignal.timeout(3e3)});if(!e.ok)throw Error(`counter_unavailable`);d(await e.json())};try{if(r.writesEnabled){let e=`blog:view-event:v1:${r.endpoint}:${s}`,t=Date.now(),n;try{n=JSON.parse(o?.getItem(e)||`null`)}catch{}let l=n&&t>=n.createdAt&&t-n.createdAt<18e5;if(l&&n.acknowledged){await f();return}let u=l&&/^[a-f0-9-]{36}$/i.test(n.eventId)?n:{eventId:(i.randomUUID||(()=>crypto.randomUUID()))(),createdAt:t,acknowledged:!1};try{o?.setItem(e,JSON.stringify(u))}catch{}for(let t=0;t<2;t++)try{let t=await a(c,{method:`POST`,credentials:`omit`,headers:{"Content-Type":`application/json`},body:JSON.stringify({eventId:u.eventId}),signal:AbortSignal.timeout(3e3)});if(!t.ok){if(t.status===429||t.status>=500)break;throw Error(`counter_rejected`)}d(await t.json());try{o?.setItem(e,JSON.stringify({...u,acknowledged:!0}))}catch{}return}catch{if(t===1)break}}await f()}catch{e.textContent=u?n(u,!0):`改版后访问次数暂不可用`}}for(let e of document.querySelectorAll(`[data-view-count]`)){let t;try{t=localStorage}catch{}let n=location.origin===`https://blog.jobshen.com`;r(e,{enabled:n&&e.dataset.enabled===`true`,writesEnabled:n&&e.dataset.writesEnabled===`true`,endpoint:e.dataset.endpoint},{storage:t})}</script></div></header><details class="mobile-toc" data-pagefind-ignore><summary>本文目录</summary><ol><li><a href="#简介">简介</a></li><li><a href="#架构设计">架构设计</a></li><li><a href="#inputs">Inputs</a></li><li><a href="#harvester">Harvester</a></li><li><a href="#spooler">Spooler</a></li><li><a href="#processor">Processor</a></li><li><a href="#internal-queue">Internal Queue</a></li><li><a href="#outputs">Outputs</a></li><li><a href="#其他组件">其他组件</a></li><li><a href="#总结">总结</a></li></ol></details><div class="historical-note" data-pagefind-ignore>历史文章 · 保留写作时的版本与实践记录。</div><div class="prose"><h1 id="简介">简介</h1>
+<blockquote>
+<p>Filebeat is a lightweight shipper for forwarding and centralizing log data. Installed as an agent on your servers, Filebeat monitors the log files or locations that you specify, collects log events, and forwards them either to <a href="https://www.elastic.co/products/elasticsearch">Elasticsearch</a> or <a href="https://www.elastic.co/products/logstash">Logstash</a> for indexing.</p>
 </blockquote>
 <p>这是<code>elastic</code>对于<code>filebeat</code>的官方描述，翻译过来就是<code>filebeat</code>是一个轻量级的用来采集和转发日志数据的组件。将采集的日志封装成<code>event</code>转发给下游的组件，例如<code>elasticsearch</code>、<code>logstash</code>或者<code>kafka</code>。</p>
-<span id="more"></span>
-
-<h1 id="架构设计"><a href="#架构设计" class="headerlink" title="架构设计"></a>架构设计</h1><p><img data-src="https://pic.jobshen.com/2022/05/5548112850028340e3d33d4414949959.png" alt="artich"></p>
-<h2 id="Inputs"><a href="#Inputs" class="headerlink" title="Inputs"></a>Inputs</h2><p>该组件的作用就如同名称一样，是用来定义输入源的，简单理解就是定义了你需要采集的数据源是哪些，对于我们最常使用的日志来说就是告诉<code>filebeat</code>需要监听哪些日志文件，当然其<code>inputs</code>类型并不是只有<code>log</code>一种，其支持以下类型：</p>
+<!-- more -->
+<h1 id="架构设计">架构设计</h1>
+<p><img src="https://pic.jobshen.com/2022/05/5548112850028340e3d33d4414949959.png" alt="artich"></p>
+<h2 id="inputs">Inputs</h2>
+<p>该组件的作用就如同名称一样，是用来定义输入源的，简单理解就是定义了你需要采集的数据源是哪些，对于我们最常使用的日志来说就是告诉<code>filebeat</code>需要监听哪些日志文件，当然其<code>inputs</code>类型并不是只有<code>log</code>一种，其支持以下类型：</p>
 <ul>
 <li>Azure Event Hub</li>
 <li>Cloud Foundry</li>
 <li>Container</li>
 <li>Docker</li>
-<li>Google Pub&#x2F;Sub</li>
+<li>Google Pub/Sub</li>
 <li>HTTP Endpoint</li>
 <li>HTTP JSON</li>
 <li>Kafka</li>
@@ -334,12 +37,17 @@
 <li>TCP</li>
 <li>UDP</li>
 </ul>
-<p>当然最常有的是其中的<code>log</code>类型，使用其来采集我们的应用日志，然后可以对我们的日志信息进行实时&#x2F;离线统计、分析。</p>
-<h2 id="Harvester"><a href="#Harvester" class="headerlink" title="Harvester"></a>Harvester</h2><p>该组件严格意义上来说也是属于<code>inputs</code>的，但是由于其重要性，这里才单独拿出来说，该组件的功能其实很简单–监听需要采集的输入源，将其监听到的所有变更向下进行转发。转发到哪呢，这就会引出下一个组件，<code>Spooler</code>。</p>
-<h2 id="Spooler"><a href="#Spooler" class="headerlink" title="Spooler"></a>Spooler</h2><p><code>spooler</code>其实是一个集合，里面包括很多小组件：<code>porcessor</code>、<code>Internal queue</code>等。</p>
-<h3 id="Processor"><a href="#Processor" class="headerlink" title="Processor"></a>Processor</h3><p>该组件是对<code>harvester</code>发过来的<code>event</code>进行二次处理转化为另一个类型的<code>event</code>。可以把其简单理解为一个<code>filtering</code>的过程，从中将一些不满足你的需求的<code>event</code>过滤调，只将符合条件的<code>event</code>向下传递，进入<code>internal queue</code>。</p>
-<h3 id="Internal-Queue"><a href="#Internal-Queue" class="headerlink" title="Internal Queue"></a>Internal Queue</h3><p>该组件就是<code>filebeat</code>用来存储<code>harvester</code>转发的<code>data event</code>的内部“队列”，其默认实现是一个内存队列，如果对数据完整性要求高可以选择使用磁盘来存储相关队列信息。同时<code>internal queue</code>还会对<code>event</code>进行一次合并（<code>batch</code>）操作，目的是为了减少<code>outputs</code>组件的发送压力。</p>
-<h2 id="Outputs"><a href="#Outputs" class="headerlink" title="Outputs"></a>Outputs</h2><p>该组件就是用来消费<code>internal queue</code>队列中的<code>event</code>的，每次其会从<code>internal queue</code>中取出一个<code>batch</code>的数据，经过编解码、压缩等一系列操作后将其存储到下游系统中。目前<code>filebeat</code>支持的<code>outputs</code>包含：</p>
+<p>当然最常有的是其中的<code>log</code>类型，使用其来采集我们的应用日志，然后可以对我们的日志信息进行实时/离线统计、分析。</p>
+<h2 id="harvester">Harvester</h2>
+<p>该组件严格意义上来说也是属于<code>inputs</code>的，但是由于其重要性，这里才单独拿出来说，该组件的功能其实很简单–监听需要采集的输入源，将其监听到的所有变更向下进行转发。转发到哪呢，这就会引出下一个组件，<code>Spooler</code>。</p>
+<h2 id="spooler">Spooler</h2>
+<p><code>spooler</code>其实是一个集合，里面包括很多小组件：<code>porcessor</code>、<code>Internal queue</code>等。</p>
+<h3 id="processor">Processor</h3>
+<p>该组件是对<code>harvester</code>发过来的<code>event</code>进行二次处理转化为另一个类型的<code>event</code>。可以把其简单理解为一个<code>filtering</code>的过程，从中将一些不满足你的需求的<code>event</code>过滤调，只将符合条件的<code>event</code>向下传递，进入<code>internal queue</code>。</p>
+<h3 id="internal-queue">Internal Queue</h3>
+<p>该组件就是<code>filebeat</code>用来存储<code>harvester</code>转发的<code>data event</code>的内部“队列”，其默认实现是一个内存队列，如果对数据完整性要求高可以选择使用磁盘来存储相关队列信息。同时<code>internal queue</code>还会对<code>event</code>进行一次合并（<code>batch</code>）操作，目的是为了减少<code>outputs</code>组件的发送压力。</p>
+<h2 id="outputs">Outputs</h2>
+<p>该组件就是用来消费<code>internal queue</code>队列中的<code>event</code>的，每次其会从<code>internal queue</code>中取出一个<code>batch</code>的数据，经过编解码、压缩等一系列操作后将其存储到下游系统中。目前<code>filebeat</code>支持的<code>outputs</code>包含：</p>
 <ul>
 <li>Elasticsearch Service</li>
 <li>Elasticsearch</li>
@@ -349,122 +57,8 @@
 <li>File</li>
 <li>Console</li>
 </ul>
-<h2 id="其他组件"><a href="#其他组件" class="headerlink" title="其他组件"></a>其他组件</h2><p>除了上述的几个主要组件之外，<code>filebeat</code>还包括很多其他组件，比如：<code>modules</code>、<code>monitor</code>等。这里暂不进行介绍。可以自己去看<code>Filebeat</code>的<a target="_blank" rel="noopener" href="https://www.elastic.co/guide/en/beats/filebeat/current/filebeat-overview.html">官方文档</a>。</p>
-<h1 id="总结"><a href="#总结" class="headerlink" title="总结"></a>总结</h1><p><code>filebeat</code>的大致流程就是使用<code>inputs</code>组件中定义的<code>type</code>类型的<code>harvester</code>来监听采集相应<code>inputs</code>中产生的事件（<code>event</code>），并将其转发到<code>spooler</code>中，<code>spooler</code>在经过一系列的<code>processor</code>处理后将<code>events</code>合并为一个<code>batch</code>最终存入到<code>queue</code>中，等待<code>outputs</code>来消费，<code>outputs</code>将从<code>queue</code>中拉取到的<code>batch</code>存入对于的下游系统中。</p>
-
-    </div>
-
-    
-    
-    
-
-    <footer class="post-footer">
-          
-
-<div class="post-copyright">
-<ul>
-  <li class="post-copyright-author">
-      <strong>本文作者： </strong>Job Shen
-  </li>
-  <li class="post-copyright-link">
-      <strong>本文链接：</strong>
-      <a href="https://blog.jobshen.com/posts/6bf64646.html" title="Filebeat 浅析（一）">https://blog.jobshen.com/posts/6bf64646.html</a>
-  </li>
-  <li class="post-copyright-license">
-    <strong>版权声明： </strong>本博客所有文章除特别声明外，均采用 <a href="https://creativecommons.org/licenses/by-nc-sa/4.0/deed.zh" rel="noopener" target="_blank"><i class="fab fa-fw fa-creative-commons"></i>BY-NC-SA</a> 许可协议。转载请注明出处！
-  </li>
-</ul>
-</div>
-
-          <div class="post-tags">
-              <a href="/tags/filebeat/" rel="tag"># filebeat</a>
-          </div>
-
-        
-
-          <div class="post-nav">
-            <div class="post-nav-item">
-                <a href="/posts/be21c8ca.html" rel="prev" title="关于Java日志隔离功能的闲谈">
-                  <i class="fa fa-chevron-left"></i> 关于Java日志隔离功能的闲谈
-                </a>
-            </div>
-            <div class="post-nav-item">
-                <a href="/posts/5be0aa9e.html" rel="next" title="Filebeat 浅析（二）">
-                  Filebeat 浅析（二） <i class="fa fa-chevron-right"></i>
-                </a>
-            </div>
-          </div>
-    </footer>
-  </article>
-</div>
-
-
-
-
-
-
-    <div class="comments gitalk-container"></div>
-</div>
-  </main>
-
-  <footer class="footer">
-    <div class="footer-inner">
-
-
-<div class="copyright">
-  &copy; 2017 – 
-  <span itemprop="copyrightYear">2022</span>
-  <span class="with-love">
-    <i class="fa fa-heart"></i>
-  </span>
-  <span class="author" itemprop="copyrightHolder">Job Shen</span>
-</div>
-<div class="wordcount">
-  <span class="post-meta-item">
-    <span class="post-meta-item-icon">
-      <i class="fa fa-chart-line"></i>
-    </span>
-    <span title="站点总字数">79k</span>
-  </span>
-  <span class="post-meta-item">
-    <span class="post-meta-item-icon">
-      <i class="fa fa-coffee"></i>
-    </span>
-    <span title="站点阅读时长">2:11</span>
-  </span>
-</div>
-  <div class="powered-by">由 <a href="https://hexo.io/" rel="noopener" target="_blank">Hexo</a> & <a href="https://theme-next.js.org/" rel="noopener" target="_blank">NexT.Gemini</a> 强力驱动
-  </div>
-
-    </div>
-  </footer>
-
-  
-  <script src="https://cdn.jsdelivr.net/npm/animejs@3.2.1/lib/anime.min.js" integrity="sha256-XL2inqUJaslATFnHdJOi9GfQ60on8Wx1C2H8DYiN1xY=" crossorigin="anonymous"></script>
-  <script src="https://cdn.jsdelivr.net/npm/lozad@1.16.0/dist/lozad.min.js" integrity="sha256-mOFREFhqmHeQbXpK2lp4nA3qooVgACfh88fpJftLBbc=" crossorigin="anonymous"></script>
-<script src="/js/comments.js"></script><script src="/js/utils.js"></script><script src="/js/motion.js"></script><script src="/js/next-boot.js"></script><script src="/js/bookmark.js"></script>
-
-  
-<script src="https://cdn.jsdelivr.net/npm/hexo-generator-searchdb@1.4.0/dist/search.js" integrity="sha256-vXZMYLEqsROAXkEw93GGIvaB2ab+QW6w3+1ahD9nXXA=" crossorigin="anonymous"></script>
-<script src="/js/third-party/search/local-search.js"></script>
-
-
-
-
-
-  
-
-  <script src="https://cdn.jsdelivr.net/npm/firebase@9.7.0/firebase-app-compat.js" integrity="sha256-kazmBornWCBvhzKX9OvlPP7/4RbDozFe7VyVx4fj/vg=" crossorigin="anonymous"></script>
-  <script src="https://cdn.jsdelivr.net/npm/firebase@9.7.0/firebase-firestore-compat.js" integrity="sha256-JsvvsDGyUIHrfyMHH2FPJrbHRhjv7hOjtg1VdsuxI0s=" crossorigin="anonymous"></script>
-  <script class="next-config" data-name="firestore" type="application/json">{"enable":true,"collection":"articles","apiKey":"AIzaSyAPnpab6t0qB5X8xTX_TZFUTkSFVLNyQdw","projectId":"blog-e5d21","authDomain":"blog-e5d21.firebaseapp.com","storageBucket":"blog-e5d21.appspot.com","messagingSenderId":"737761719428","appId":"1:737761719428:web:421786d65c9bc7b7c3bed1","measurementId":"G-4SBB49HYZV"}</script>
-  <script src="/js/third-party/statistics/firestore.js"></script>
-
-
-
-<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/gitalk@1.7.2/dist/gitalk.css" integrity="sha256-AJnUHL7dBv6PGaeyPQJcgQPDjt/Hn/PvYZde1iqfp8U=" crossorigin="anonymous">
-
-<script class="next-config" data-name="gitalk" type="application/json">{"enable":true,"github_id":"kitdine","repo":"blog_git_talk","client_id":"0027cb40e78eba0adbfe","client_secret":"133ffa343a0ee4b23fef6d2ea7e36244770c2df9","admin_user":"kitdine","distraction_free_mode":true,"proxy":"https://cors-anywhere.azm.workers.dev/https://github.com/login/oauth/access_token","language":"zh-CN","js":{"url":"https://cdn.jsdelivr.net/npm/gitalk@1.7.2/dist/gitalk.min.js","integrity":"sha256-Pmj85ojLaPOWwRtlMJwmezB/Qg8BzvJp5eTzvXaYAfA="},"path_md5":"e799355706705fecb25584d182e42887"}</script>
-<script src="/js/third-party/comments/gitalk.js"></script>
-
-</body>
-</html>
+<h2 id="其他组件">其他组件</h2>
+<p>除了上述的几个主要组件之外，<code>filebeat</code>还包括很多其他组件，比如：<code>modules</code>、<code>monitor</code>等。这里暂不进行介绍。可以自己去看<code>Filebeat</code>的<a href="https://www.elastic.co/guide/en/beats/filebeat/current/filebeat-overview.html">官方文档</a>。</p>
+<h1 id="总结">总结</h1>
+<p><code>filebeat</code>的大致流程就是使用<code>inputs</code>组件中定义的<code>type</code>类型的<code>harvester</code>来监听采集相应<code>inputs</code>中产生的事件（<code>event</code>），并将其转发到<code>spooler</code>中，<code>spooler</code>在经过一系列的<code>processor</code>处理后将<code>events</code>合并为一个<code>batch</code>最终存入到<code>queue</code>中，等待<code>outputs</code>来消费，<code>outputs</code>将从<code>queue</code>中拉取到的<code>batch</code>存入对于的下游系统中。</p>
+</div><div class="article-end" data-pagefind-ignore><span>— 文章结束 —</span><a href="/archive/">返回文章归档 ↑</a></div><section class="comment-state" data-comments data-pagefind-ignore data-article-id="6bf64646" data-repo="kitdine/kitdine.github.io" data-repo-id="MDEwOlJlcG9zaXRvcnk4MTcxMDAzNQ==" data-category="Blog comments" data-category-id="DIC_kwDOBN7L084DJUxV" data-read-only="false"><h2>讨论</h2><p data-comment-status role="status">点击后加载 giscus 讨论。登录与发表由你自行操作。</p><button class="load-comments" data-load-comments type="button">加载讨论</button><div class="giscus" data-comment-frame></div><div class="comment-links"><a href="https://github.com/kitdine/kitdine.github.io/discussions/categories/blog-comments">在 GitHub 阅读讨论 ↗</a><a href="https://github.com/kitdine/blog_git_talk/issues">保留的历史评论 ↗</a></div></section><script type="module">function e(e){let t=e.querySelector(`[data-load-comments]`),n=e.querySelector(`[data-comment-frame]`),r=e.querySelector(`[data-comment-status]`),i=e.dataset,a,o;t.addEventListener(`click`,()=>{if(n.childElementCount)return;if(t.disabled=!0,r.textContent=`正在加载讨论…`,i.readOnly!==`true`&&location.origin===`https://blog.jobshen.com`){let e=document.createElement(`script`);e.src=`https://giscus.app/client.js`,e.async=!0,e.crossOrigin=`anonymous`,Object.assign(e.dataset,{repo:i.repo,repoId:i.repoId,category:i.category,categoryId:i.categoryId,mapping:`specific`,term:i.articleId,strict:`1`,reactionsEnabled:`0`,emitMetadata:`0`,inputPosition:`bottom`,lang:`zh-CN`,theme:document.documentElement.dataset.theme===`dark`?`dark`:`light`}),e.onerror=()=>{r.textContent=`讨论暂不可用，可以稍后重试或前往 GitHub 阅读。`},n.append(e),r.textContent=`讨论组件已请求加载。`;return}let e=new URLSearchParams({origin:`${location.origin}${location.pathname}`,repo:i.repo,repoId:i.repoId,category:i.category,categoryId:i.categoryId,term:i.articleId,strict:`1`,session:``,reactionsEnabled:`0`,emitMetadata:`0`,theme:document.documentElement.dataset.theme===`dark`?`dark`:`light`,backLink:`https://blog.jobshen.com/posts/${i.articleId}.html`});a=document.createElement(`iframe`),a.title=`已有讨论（匿名只读预览）`,a.src=`https://giscus.app/zh-CN/widget?${e}`,a.sandbox=`allow-scripts allow-same-origin`,a.referrerPolicy=`no-referrer`,a.credentialless=!0,a.inert=!0,a.tabIndex=-1,a.setAttribute(`aria-hidden`,`true`),a.className=`giscus-readonly`,a.setAttribute(`data-giscus-preview`,``),a.addEventListener(`load`,()=>{clearTimeout(o),r.textContent=`匿名只读预览。此区域不提供登录或发表操作；也可通过下方链接阅读讨论。`}),n.append(a),o=setTimeout(()=>{r.textContent=`讨论加载较慢，正文不受影响；可通过下方链接阅读。`},8e3)}),window.addEventListener(`message`,e=>{if(!a||e.origin!==`https://giscus.app`||e.source!==a.contentWindow)return;let t=e.data?.giscus;Number.isFinite(t?.resizeHeight)&&(a.style.height=`${Math.max(150,Math.min(12e3,t.resizeHeight))}px`),typeof t?.error==`string`&&(clearTimeout(o),r.textContent=t.error.includes(`Discussion not found`)?`这篇文章还没有讨论；只读预览不会创建测试帖。`:`讨论暂不可用，正文不受影响。`)}),new MutationObserver(()=>{(a||n.querySelector(`iframe`))?.contentWindow?.postMessage({giscus:{setConfig:{theme:document.documentElement.dataset.theme===`dark`?`dark`:`light`}}},`https://giscus.app`)}).observe(document.documentElement,{attributes:!0,attributeFilter:[`data-theme`]})}document.querySelectorAll(`[data-comments]`).forEach(e);</script><a class="next-post" href="/posts/be21c8ca.html" data-pagefind-ignore><span>继续阅读 →</span><h3>关于Java日志隔离功能的闲谈</h3></a></article><aside class="desktop-toc" data-pagefind-ignore><span class="eyebrow">ON THIS PAGE</span><h2>本文目录</h2><ol><li class><a href="#简介">简介</a></li><li class><a href="#架构设计">架构设计</a></li><li class><a href="#inputs">Inputs</a></li><li class><a href="#harvester">Harvester</a></li><li class><a href="#spooler">Spooler</a></li><li class="sub"><a href="#processor">Processor</a></li><li class="sub"><a href="#internal-queue">Internal Queue</a></li><li class><a href="#outputs">Outputs</a></li><li class><a href="#其他组件">其他组件</a></li><li class><a href="#总结">总结</a></li></ol><a class="back-top" href="#main">回到顶部 ↑</a></aside></div></main><footer class="site-footer wrap" data-pagefind-ignore><div><a class="footer-name" href="/">Job Shen</a><p>记录问题，也记录解决问题的过程。</p></div><div class="footer-links"><a href="https://github.com/kitdine">GitHub ↗</a><a href="/rss.xml">RSS ↗</a></div></footer><script type="module">document.querySelector(`#theme-toggle`)?.addEventListener(`click`,()=>{let e=document.documentElement.dataset.theme===`dark`?`light`:`dark`;document.documentElement.dataset.theme=e;try{localStorage.setItem(`theme`,e)}catch{}}),document.querySelectorAll(`pre`).forEach(e=>{let t=document.createElement(`button`);t.className=`copy-code`,t.textContent=`复制`,t.setAttribute(`aria-label`,`复制代码`),t.addEventListener(`click`,async()=>{try{await navigator.clipboard.writeText(e.querySelector(`code`)?.textContent||``),t.textContent=`已复制`}catch{t.textContent=`请手动复制`}setTimeout(()=>t.textContent=`复制`,1800)}),e.append(t)});</script></body></html>

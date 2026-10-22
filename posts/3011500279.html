@@ -1,498 +1,116 @@
-<!DOCTYPE html>
-<html lang="zh-CN">
-<head>
-  <meta charset="UTF-8">
-<meta name="viewport" content="width=device-width">
-<meta name="theme-color" content="#222" media="(prefers-color-scheme: light)">
-<meta name="theme-color" content="#222" media="(prefers-color-scheme: dark)"><meta name="generator" content="Hexo 6.2.0">
+<!DOCTYPE html><html lang="zh-CN"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1"><title>Centos 7下常见中间件环境的安装（一） · Job Shen</title><meta name="description" content="Centos 7下常见中间件环境的安装（一），发布于 2017-12-07。Job Shen 的工程实践记录。"><link rel="canonical" href="https://blog.jobshen.com/posts/3011500279.html"><meta property="og:url" content="https://blog.jobshen.com/posts/3011500279.html"><meta property="og:title" content="Centos 7下常见中间件环境的安装（一） · Job Shen"><meta property="og:description" content="Centos 7下常见中间件环境的安装（一），发布于 2017-12-07。Job Shen 的工程实践记录。"><meta property="og:type" content="article"><link rel="icon" href="/images/favicon-32x32.png"><link rel="alternate" type="application/rss+xml" title="Job Shen RSS" href="/rss.xml"><script>try { document.documentElement.dataset.theme = localStorage.getItem('theme') || (matchMedia('(prefers-color-scheme: dark)').matches?'dark':'light'); } catch {}</script><script>(function(){const token = "e4f1ddcf89244291afe53cf196900efe";
 
-
-  <link rel="apple-touch-icon" sizes="180x180" href="/images/apple-touch-icon.png">
-  <link rel="icon" type="image/png" sizes="32x32" href="/images/favicon-32x32.png">
-  <link rel="icon" type="image/png" sizes="16x16" href="/images/favicon-16x16.png">
-  <link rel="mask-icon" href="/images/logo.svg" color="#222">
-
-<link rel="stylesheet" href="/css/main.css">
-
-<link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Noto+Sans+SC:300,300italic,400,400italic,700,700italic%7CCascadia+Code:300,300italic,400,400italic,700,700italic&display=swap&subset=latin,latin-ext">
-
-<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@fortawesome/fontawesome-free@6.1.1/css/all.min.css" integrity="sha256-DfWjNxDkM94fVBWx1H5BMMp0Zq7luBlV8QRcSES7s+0=" crossorigin="anonymous">
-  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/animate.css@3.1.1/animate.min.css" integrity="sha256-PR7ttpcvz8qrF57fur/yAx1qXMFJeJFiA6pSzWi0OIE=" crossorigin="anonymous">
-
-<script class="next-config" data-name="main" type="application/json">{"hostname":"blog.jobshen.com","root":"/","images":"/images","scheme":"Gemini","darkmode":true,"version":"8.11.1","exturl":false,"sidebar":{"position":"left","display":"post","padding":18,"offset":12},"copycode":true,"bookmark":{"enable":true,"color":"#222","save":"auto"},"mediumzoom":false,"lazyload":true,"pangu":false,"comments":{"style":"tabs","active":null,"storage":true,"lazyload":false,"nav":null},"stickytabs":false,"motion":{"enable":true,"async":false,"transition":{"post_block":"fadeIn","post_header":"fadeInDown","post_body":"fadeInDown","coll_header":"fadeInLeft","sidebar":"fadeInUp"}},"prism":false,"i18n":{"placeholder":"搜索...","empty":"没有找到任何搜索结果：${query}","hits_time":"找到 ${hits} 个搜索结果（用时 ${time} 毫秒）","hits":"找到 ${hits} 个搜索结果"},"path":"/search.xml","localsearch":{"enable":true,"trigger":"auto","top_n_per_article":1,"unescape":false,"preload":false}}</script><script src="/js/config.js"></script>
-
-    <meta name="description" content="​	最近由于公司要切换IDC机房，新机房的服务器集群需要重新部署生产环境，于是又趁着这次机会把一些常用的中间件又重新部署了一次，版本有更新，部署方式也会有小变动，于是就有了这一系列的文档。整个系列主要是java运行环境下的中间件部署，也含有少量其他中间件的部署，像 Redis、 TiDB 等。">
-<meta property="og:type" content="article">
-<meta property="og:title" content="Centos 7下常见中间件环境的安装（一）">
-<meta property="og:url" content="https://blog.jobshen.com/posts/3011500279.html">
-<meta property="og:site_name" content="一杯咖啡的时间">
-<meta property="og:description" content="​	最近由于公司要切换IDC机房，新机房的服务器集群需要重新部署生产环境，于是又趁着这次机会把一些常用的中间件又重新部署了一次，版本有更新，部署方式也会有小变动，于是就有了这一系列的文档。整个系列主要是java运行环境下的中间件部署，也含有少量其他中间件的部署，像 Redis、 TiDB 等。">
-<meta property="og:locale" content="zh_CN">
-<meta property="article:published_time" content="2017-12-07T12:54:37.000Z">
-<meta property="article:modified_time" content="2022-08-27T14:34:03.688Z">
-<meta property="article:author" content="Job Shen">
-<meta property="article:tag" content="Centos">
-<meta property="article:tag" content="jdk">
-<meta property="article:tag" content="zookeeper">
-<meta name="twitter:card" content="summary">
-
-
-<link rel="canonical" href="https://blog.jobshen.com/posts/3011500279.html">
-
-
-
-<script class="next-config" data-name="page" type="application/json">{"sidebar":"","isHome":false,"isPost":true,"lang":"zh-CN","comments":true,"permalink":"https://blog.jobshen.com/posts/3011500279.html","path":"posts/3011500279.html","title":"Centos 7下常见中间件环境的安装（一）"}</script>
-
-<script class="next-config" data-name="calendar" type="application/json">""</script>
-<title>Centos 7下常见中间件环境的安装（一） | 一杯咖啡的时间</title>
-  
-    <script async src="https://www.googletagmanager.com/gtag/js?id=G-XM4CDTM8RX"></script>
-  <script class="next-config" data-name="google_analytics" type="application/json">{"tracking_id":"G-XM4CDTM8RX","only_pageview":false}</script>
-  <script src="/js/third-party/analytics/google-analytics.js"></script>
-
-
-
-
-
-  <noscript>
-    <link rel="stylesheet" href="/css/noscript.css">
-  </noscript>
-<link rel="alternate" href="/atom.xml" title="一杯咖啡的时间" type="application/atom+xml">
-</head>
-
-<body itemscope itemtype="http://schema.org/WebPage" class="use-motion">
-  <div class="headband"></div>
-
-  <main class="main">
-    <header class="header" itemscope itemtype="http://schema.org/WPHeader">
-      <div class="header-inner"><div class="site-brand-container">
-  <div class="site-nav-toggle">
-    <div class="toggle" aria-label="切换导航栏" role="button">
-        <span class="toggle-line"></span>
-        <span class="toggle-line"></span>
-        <span class="toggle-line"></span>
-    </div>
-  </div>
-
-  <div class="site-meta">
-
-    <a href="/" class="brand" rel="start">
-      <i class="logo-line"></i>
-      <p class="site-title">一杯咖啡的时间</p>
-      <i class="logo-line"></i>
-    </a>
-      <p class="site-subtitle" itemprop="description">苦中作乐</p>
-  </div>
-
-  <div class="site-nav-right">
-    <div class="toggle popup-trigger">
-        <i class="fa fa-search fa-fw fa-lg"></i>
-    </div>
-  </div>
-</div>
-
-
-
-<nav class="site-nav">
-  <ul class="main-menu menu"><li class="menu-item menu-item-home"><a href="/" rel="section"><i class="fa fa-home fa-fw"></i>首页</a></li><li class="menu-item menu-item-about"><a href="/about/" rel="section"><i class="fa fa-user fa-fw"></i>关于</a></li><li class="menu-item menu-item-tags"><a href="/tags/" rel="section"><i class="fa fa-tags fa-fw"></i>标签</a></li><li class="menu-item menu-item-categories"><a href="/categories/" rel="section"><i class="fa fa-th fa-fw"></i>分类</a></li><li class="menu-item menu-item-archives"><a href="/archives/" rel="section"><i class="fa fa-archive fa-fw"></i>归档</a></li><li class="menu-item menu-item-commonweal"><a href="/404/" rel="section"><i class="fa fa-heartbeat fa-fw"></i>公益 404</a></li>
-      <li class="menu-item menu-item-search">
-        <a role="button" class="popup-trigger"><i class="fa fa-search fa-fw"></i>搜索
-        </a>
-      </li>
-  </ul>
-</nav>
-
-
-
-  <div class="search-pop-overlay">
-    <div class="popup search-popup"><div class="search-header">
-  <span class="search-icon">
-    <i class="fa fa-search"></i>
-  </span>
-  <div class="search-input-container">
-    <input autocomplete="off" autocapitalize="off" maxlength="80"
-           placeholder="搜索..." spellcheck="false"
-           type="search" class="search-input">
-  </div>
-  <span class="popup-btn-close" role="button">
-    <i class="fa fa-times-circle"></i>
-  </span>
-</div>
-<div class="search-result-container no-result">
-  <div class="search-result-icon">
-    <i class="fa fa-spinner fa-pulse fa-5x"></i>
-  </div>
-</div>
-
-    </div>
-  </div>
-
-</div>
-        
-  
-  <div class="toggle sidebar-toggle" role="button">
-    <span class="toggle-line"></span>
-    <span class="toggle-line"></span>
-    <span class="toggle-line"></span>
-  </div>
-
-  <aside class="sidebar">
-
-    <div class="sidebar-inner sidebar-nav-active sidebar-toc-active">
-      <ul class="sidebar-nav">
-        <li class="sidebar-nav-toc">
-          文章目录
-        </li>
-        <li class="sidebar-nav-overview">
-          站点概览
-        </li>
-      </ul>
-
-      <div class="sidebar-panel-container">
-        <!--noindex-->
-        <div class="post-toc-wrap sidebar-panel">
-            <div class="post-toc animated"><ol class="nav"><li class="nav-item nav-level-2"><a class="nav-link" href="#JDK-%E5%AE%89%E8%A3%85"><span class="nav-number">1.</span> <span class="nav-text">JDK 安装</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#jdk%E4%B8%8B%E8%BD%BD"><span class="nav-number">1.1.</span> <span class="nav-text">jdk下载</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E5%AE%89%E8%A3%85"><span class="nav-number">1.2.</span> <span class="nav-text">安装</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E9%85%8D%E7%BD%AE%E7%8E%AF%E5%A2%83%E5%8F%98%E9%87%8F"><span class="nav-number">1.3.</span> <span class="nav-text">配置环境变量</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#Zookeeper-%E9%9B%86%E7%BE%A4%E5%AE%89%E8%A3%85"><span class="nav-number">2.</span> <span class="nav-text">Zookeeper 集群安装</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#%E9%9B%86%E7%BE%A4%E6%9C%BA%E5%99%A8%E4%BF%A1%E6%81%AF"><span class="nav-number">2.1.</span> <span class="nav-text">集群机器信息</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E4%B8%8B%E8%BD%BD"><span class="nav-number">2.2.</span> <span class="nav-text">下载</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E8%A7%A3%E5%8E%8B"><span class="nav-number">2.3.</span> <span class="nav-text">解压</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E6%96%B0%E5%BB%BAzoo-cfg"><span class="nav-number">2.4.</span> <span class="nav-text">新建zoo.cfg</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E6%96%B0%E5%BB%BAmyid"><span class="nav-number">2.5.</span> <span class="nav-text">新建myid</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E5%88%B6%E4%BD%9CSystemd%E8%84%9A%E6%9C%AC"><span class="nav-number">2.6.</span> <span class="nav-text">制作Systemd脚本</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E5%90%AF%E5%8A%A8zk%E9%9B%86%E7%BE%A4"><span class="nav-number">2.7.</span> <span class="nav-text">启动zk集群</span></a></li></ol></li></ol></div>
-        </div>
-        <!--/noindex-->
-
-        <div class="site-overview-wrap sidebar-panel">
-          <div class="site-author site-overview-item animated" itemprop="author" itemscope itemtype="http://schema.org/Person">
-    <img class="site-author-image" itemprop="image" alt="Job Shen"
-      src="/images/Avatar.png">
-  <p class="site-author-name" itemprop="name">Job Shen</p>
-  <div class="site-description" itemprop="description"></div>
-</div>
-<div class="site-state-wrap site-overview-item animated">
-  <nav class="site-state">
-      <div class="site-state-item site-state-posts">
-        <a href="/archives/">
-          <span class="site-state-item-count">12</span>
-          <span class="site-state-item-name">日志</span>
-        </a>
-      </div>
-      <div class="site-state-item site-state-categories">
-          <a href="/categories/">
-        <span class="site-state-item-count">6</span>
-        <span class="site-state-item-name">分类</span></a>
-      </div>
-      <div class="site-state-item site-state-tags">
-          <a href="/tags/">
-        <span class="site-state-item-count">20</span>
-        <span class="site-state-item-name">标签</span></a>
-      </div>
-  </nav>
-</div>
-  <div class="links-of-author site-overview-item animated">
-      <span class="links-of-author-item">
-        <a href="https://github.com/kitdine" title="GitHub → https:&#x2F;&#x2F;github.com&#x2F;kitdine" rel="noopener" target="_blank"><i class="fab fa-github fa-fw"></i>GitHub</a>
-      </span>
-  </div>
-  <div class="cc-license site-overview-item animated" itemprop="license">
-    <a href="https://creativecommons.org/licenses/by-nc-sa/4.0/deed.zh" class="cc-opacity" rel="noopener" target="_blank"><img src="https://cdn.jsdelivr.net/npm/@creativecommons/vocabulary@2020.11.3/assets/license_badges/small/by_nc_sa.svg" alt="Creative Commons"></a>
-  </div>
-
-
-
-        </div>
-      </div>
-    </div>
-  </aside>
-  <div class="sidebar-dimmer"></div>
-
-
-    </header>
-
-    
-  <div class="back-to-top" role="button" aria-label="返回顶部">
-    <i class="fa fa-arrow-up"></i>
-    <span>0%</span>
-  </div>
-  <div class="reading-progress-bar"></div>
-  <a role="button" class="book-mark-link book-mark-link-fixed"></a>
-
-<noscript>
-  <div class="noscript-warning">Theme NexT works best with JavaScript enabled</div>
-</noscript>
-
-
-    <div class="main-inner post posts-expand">
-
-
-  
-
-
-<div class="post-block">
-  
-  
-
-  <article itemscope itemtype="http://schema.org/Article" class="post-content" lang="zh-CN">
-    <link itemprop="mainEntityOfPage" href="https://blog.jobshen.com/posts/3011500279.html">
-
-    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
-      <meta itemprop="image" content="/images/Avatar.png">
-      <meta itemprop="name" content="Job Shen">
-    </span>
-
-    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
-      <meta itemprop="name" content="一杯咖啡的时间">
-      <meta itemprop="description" content="">
-    </span>
-
-    <span hidden itemprop="post" itemscope itemtype="http://schema.org/CreativeWork">
-      <meta itemprop="name" content="Centos 7下常见中间件环境的安装（一） | 一杯咖啡的时间">
-      <meta itemprop="description" content="">
-    </span>
-      <header class="post-header">
-        <h1 class="post-title" itemprop="name headline">
-          Centos 7下常见中间件环境的安装（一）
-        </h1>
-
-        <div class="post-meta-container">
-          <div class="post-meta">
-    <span class="post-meta-item">
-      <span class="post-meta-item-icon">
-        <i class="far fa-calendar"></i>
-      </span>
-      <span class="post-meta-item-text">发表于</span>
-
-      <time title="创建时间：2017-12-07 20:54:37" itemprop="dateCreated datePublished" datetime="2017-12-07T20:54:37+08:00">2017-12-07</time>
-    </span>
-    <span class="post-meta-item">
-      <span class="post-meta-item-icon">
-        <i class="far fa-calendar-check"></i>
-      </span>
-      <span class="post-meta-item-text">更新于</span>
-      <time title="修改时间：2022-08-27 22:34:03" itemprop="dateModified" datetime="2022-08-27T22:34:03+08:00">2022-08-27</time>
-    </span>
-    <span class="post-meta-item">
-      <span class="post-meta-item-icon">
-        <i class="far fa-folder"></i>
-      </span>
-      <span class="post-meta-item-text">分类于</span>
-        <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
-          <a href="/categories/centos7/" itemprop="url" rel="index"><span itemprop="name">centos7</span></a>
-        </span>
-    </span>
-
-  
-    <span class="post-meta-item" title="阅读次数">
-      <span class="post-meta-item-icon">
-        <i class="far fa-eye"></i>
-      </span>
-      <span class="post-meta-item-text">阅读次数：</span>
-      <span class="firestore-visitors-count"></span>
-    </span>
-    <span class="post-meta-break"></span>
-    <span class="post-meta-item" title="本文字数">
-      <span class="post-meta-item-icon">
-        <i class="far fa-file-word"></i>
-      </span>
-      <span class="post-meta-item-text">本文字数：</span>
-      <span>3.2k</span>
-    </span>
-    <span class="post-meta-item" title="阅读时长">
-      <span class="post-meta-item-icon">
-        <i class="far fa-clock"></i>
-      </span>
-      <span class="post-meta-item-text">阅读时长 &asymp;</span>
-      <span>5 分钟</span>
-    </span>
-</div>
-
-        </div>
-      </header>
-
-    
-    
-    
-    <div class="post-body" itemprop="articleBody">
-        <p>​	最近由于公司要切换IDC机房，新机房的服务器集群需要重新部署生产环境，于是又趁着这次机会把一些常用的中间件又重新部署了一次，版本有更新，部署方式也会有小变动，于是就有了这一系列的文档。整个系列主要是java运行环境下的中间件部署，也含有少量其他中间件的部署，像 <strong>Redis</strong>、 <strong>TiDB</strong> 等。</p>
-<span id="more"></span>
-
-<h2 id="JDK-安装"><a href="#JDK-安装" class="headerlink" title="JDK 安装"></a>JDK 安装</h2><p>jdk当然是必不可少的，任何java程序允许都不能脱离JVM环境，而通过jdk安装jvm是最常见的方式，由于一些原因，公司在生产环境并没有使用 <em>open-jdk</em> 而是仍然使用了 <em>oralce-jdk</em> ，因此就不能通过 <code>yum install open-jdk</code>的方式来安装了，只能通过下载 <em>rpm</em> 文件来进行安装。</p>
-<h3 id="jdk下载"><a href="#jdk下载" class="headerlink" title="jdk下载"></a>jdk下载</h3><figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">jobshen@JobShen-PC:/mnt/d/download/softwares$ wget --no-cookies --no-check-certificate --header &quot;Cookie: gpw_e24=http%3A%2F%2Fwww.oracle.com%2F; oraclelicense=accept-securebackup-cookie&quot; &quot;http://download.oracle.com/otn-pub/java/jdk/8u151-b12/e758a0de34e24606bca991d704f6dcbf/jdk-8u151-linux-x64.rpm&quot;</span><br></pre></td></tr></table></figure>
-
-<h3 id="安装"><a href="#安装" class="headerlink" title="安装"></a>安装</h3><figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">jobshen@JobShen-PC:/mnt/d/download/softwares$ rpm -ivh jdk-8u151-linux-x64.rpm</span><br></pre></td></tr></table></figure>
-
-<h3 id="配置环境变量"><a href="#配置环境变量" class="headerlink" title="配置环境变量"></a>配置环境变量</h3><figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line">jobshen@JobShen-PC:/mnt/d/download/softwares$ vim /etc/profile</span><br><span class="line">// 在末尾添加以下内容</span><br><span class="line">export JAVA_HOME=/usr/java/latest</span><br><span class="line">export PATH=$JAVA_HOME/bin:$PATH</span><br><span class="line">export CLASSPATH=.:$JAVA_HOME/lib/dt.jar:$JAVA_HOME/lib/tools.jar</span><br><span class="line">// 保存 使其生效</span><br><span class="line">jobshen@JobShen-PC:/mnt/d/download/softwares$ source /etc/profile</span><br></pre></td></tr></table></figure>
-
-<h2 id="Zookeeper-集群安装"><a href="#Zookeeper-集群安装" class="headerlink" title="Zookeeper 集群安装"></a>Zookeeper 集群安装</h2><h3 id="集群机器信息"><a href="#集群机器信息" class="headerlink" title="集群机器信息"></a>集群机器信息</h3><table>
+  if(location.origin==='https://blog.jobshen.com'){
+    const script=document.createElement('script');
+    script.src='https://static.cloudflareinsights.com/beacon.min.js';
+    script.type='module';
+    script.defer=true;script.dataset.cfBeacon=JSON.stringify({token});
+    document.head.append(script);
+  }
+})();</script><link rel="stylesheet" href="/_astro/Base.CBrFukQE.css"></head><body><a class="skip" href="#main">跳到正文</a><header class="site-header wrap" data-pagefind-ignore><a class="brand" href="/" aria-label="Job Shen 首页"><span class="brand-mark">j.</span><span>Job Shen<span class="brand-sub">工程笔记</span></span></a><nav aria-label="主导航"><a href="/archive/">文章</a><a href="/projects/">项目</a><a href="/tags/">标签</a><a href="/about/">关于</a></nav><div class="header-actions"><a class="icon-button" href="/search/" aria-label="搜索文章"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7"><circle cx="10" cy="10" r="6.5"></circle><path d="m15 15 6 6"></path></svg></a><button id="theme-toggle" class="icon-button" aria-label="切换深浅色" title="切换深浅色">◐</button></div></header><main id="main" class="wrap"><div class="article-top"><a href="/archive/">← 全部文章</a><span>ENGINEERING NOTES</span></div><div class="article-layout"><article data-pagefind-body><header class="article-header"><div class="tag-links" data-pagefind-ignore><a href="/tags/Centos/">Centos</a><a href="/tags/jdk/">jdk</a><a href="/tags/zookeeper/">zookeeper</a></div><h1 data-pagefind-meta="title">Centos 7下常见中间件环境的安装（一）</h1><div class="article-meta"><time datetime="2017-12-07T20:54:37.000Z">2017-12-07</time><span>Job Shen</span><span data-view-count data-pagefind-ignore data-article-id="3011500279" data-enabled="true" data-writes-enabled="true" data-endpoint="https://blog-view-counter.kitdnie.workers.dev" role="status">改版后访问次数 · 未启用</span><script type="module">var e=e=>Number.isSafeInteger(e)&&e>=0;function t(t,n){return t?.status===`ok`&&t.articleId===n&&t.metric===`visits`&&e(t.newCount)&&t.legacyBaseline===null&&t.total===null&&typeof t.cutover==`string`&&Number.isFinite(Date.parse(t.cutover))&&typeof t.observedAt==`string`&&Number.isFinite(Date.parse(t.observedAt))}function n(e,t=!1){let n=new Date(e.cutover).toISOString().replace(`T`,` `).slice(0,19),r=`改版后访问次数：${e.newCount}（自 ${n} UTC）`;return t?`${r}（缓存，截至 ${e.observedAt.replace(`T`,` `).slice(0,16)} UTC）`:r}async function r(e,r,i={}){if(!r.enabled){e.textContent=`改版后访问次数 · 未启用`;return}let a=i.fetch||globalThis.fetch,o=i.storage,s=e.dataset.articleId,c=`${r.endpoint}/v1/articles/${s}/views`,l=`blog:views:v1:${r.endpoint}:${s}`,u;try{let e=JSON.parse(o?.getItem(l)||`null`);t(e,s)&&(u=e)}catch{}let d=r=>{if(!t(r,s))throw Error(`invalid_counter_response`);u=r,e.textContent=n(r);try{o?.setItem(l,JSON.stringify(r))}catch{}},f=async()=>{let e=await a(c,{credentials:`omit`,signal:AbortSignal.timeout(3e3)});if(!e.ok)throw Error(`counter_unavailable`);d(await e.json())};try{if(r.writesEnabled){let e=`blog:view-event:v1:${r.endpoint}:${s}`,t=Date.now(),n;try{n=JSON.parse(o?.getItem(e)||`null`)}catch{}let l=n&&t>=n.createdAt&&t-n.createdAt<18e5;if(l&&n.acknowledged){await f();return}let u=l&&/^[a-f0-9-]{36}$/i.test(n.eventId)?n:{eventId:(i.randomUUID||(()=>crypto.randomUUID()))(),createdAt:t,acknowledged:!1};try{o?.setItem(e,JSON.stringify(u))}catch{}for(let t=0;t<2;t++)try{let t=await a(c,{method:`POST`,credentials:`omit`,headers:{"Content-Type":`application/json`},body:JSON.stringify({eventId:u.eventId}),signal:AbortSignal.timeout(3e3)});if(!t.ok){if(t.status===429||t.status>=500)break;throw Error(`counter_rejected`)}d(await t.json());try{o?.setItem(e,JSON.stringify({...u,acknowledged:!0}))}catch{}return}catch{if(t===1)break}}await f()}catch{e.textContent=u?n(u,!0):`改版后访问次数暂不可用`}}for(let e of document.querySelectorAll(`[data-view-count]`)){let t;try{t=localStorage}catch{}let n=location.origin===`https://blog.jobshen.com`;r(e,{enabled:n&&e.dataset.enabled===`true`,writesEnabled:n&&e.dataset.writesEnabled===`true`,endpoint:e.dataset.endpoint},{storage:t})}</script></div></header><details class="mobile-toc" data-pagefind-ignore><summary>本文目录</summary><ol><li><a href="#jdk-安装">JDK 安装</a></li><li><a href="#jdk下载">jdk下载</a></li><li><a href="#安装">安装</a></li><li><a href="#配置环境变量">配置环境变量</a></li><li><a href="#zookeeper-集群安装">Zookeeper 集群安装</a></li><li><a href="#集群机器信息">集群机器信息</a></li><li><a href="#下载">下载</a></li><li><a href="#解压">解压</a></li><li><a href="#新建zoocfg">新建zoo.cfg</a></li><li><a href="#新建myid">新建myid</a></li><li><a href="#制作systemd脚本">制作Systemd脚本</a></li><li><a href="#启动zk集群">启动zk集群</a></li></ol></details><div class="historical-note" data-pagefind-ignore>历史文章 · 保留写作时的版本与实践记录。</div><div class="prose"><p>​	最近由于公司要切换IDC机房，新机房的服务器集群需要重新部署生产环境，于是又趁着这次机会把一些常用的中间件又重新部署了一次，版本有更新，部署方式也会有小变动，于是就有了这一系列的文档。整个系列主要是java运行环境下的中间件部署，也含有少量其他中间件的部署，像 <strong>Redis</strong>、 <strong>TiDB</strong> 等。</p>
+<!-- more -->
+<h2 id="jdk-安装">JDK 安装</h2>
+<p>jdk当然是必不可少的，任何java程序允许都不能脱离JVM环境，而通过jdk安装jvm是最常见的方式，由于一些原因，公司在生产环境并没有使用 <em>open-jdk</em> 而是仍然使用了 <em>oralce-jdk</em> ，因此就不能通过 <code>yum install open-jdk</code>的方式来安装了，只能通过下载 <em>rpm</em> 文件来进行安装。</p>
+<h3 id="jdk下载">jdk下载</h3>
+<pre class="astro-code astro-code-themes github-light github-dark" style="background-color:#fff;--shiki-dark-bg:#24292e;color:#24292e;--shiki-dark:#e1e4e8; overflow-x: auto;" tabindex="0" data-language="shell"><code><span class="line"><span style="color:#6F42C1;--shiki-dark:#B392F0">jobshen@JobShen-PC:/mnt/d/download/softwares$</span><span style="color:#032F62;--shiki-dark:#9ECBFF"> wget</span><span style="color:#005CC5;--shiki-dark:#79B8FF"> --no-cookies</span><span style="color:#005CC5;--shiki-dark:#79B8FF"> --no-check-certificate</span><span style="color:#005CC5;--shiki-dark:#79B8FF"> --header</span><span style="color:#032F62;--shiki-dark:#9ECBFF"> "Cookie: gpw_e24=http%3A%2F%2Fwww.oracle.com%2F; oraclelicense=accept-securebackup-cookie"</span><span style="color:#032F62;--shiki-dark:#9ECBFF"> "http://download.oracle.com/otn-pub/java/jdk/8u151-b12/e758a0de34e24606bca991d704f6dcbf/jdk-8u151-linux-x64.rpm"</span></span></code></pre>
+<h3 id="安装">安装</h3>
+<pre class="astro-code astro-code-themes github-light github-dark" style="background-color:#fff;--shiki-dark-bg:#24292e;color:#24292e;--shiki-dark:#e1e4e8; overflow-x: auto;" tabindex="0" data-language="shell"><code><span class="line"><span style="color:#6F42C1;--shiki-dark:#B392F0">jobshen@JobShen-PC:/mnt/d/download/softwares$</span><span style="color:#032F62;--shiki-dark:#9ECBFF"> rpm</span><span style="color:#005CC5;--shiki-dark:#79B8FF"> -ivh</span><span style="color:#032F62;--shiki-dark:#9ECBFF"> jdk-8u151-linux-x64.rpm</span></span></code></pre>
+<h3 id="配置环境变量">配置环境变量</h3>
+<pre class="astro-code astro-code-themes github-light github-dark" style="background-color:#fff;--shiki-dark-bg:#24292e;color:#24292e;--shiki-dark:#e1e4e8; overflow-x: auto;" tabindex="0" data-language="shell"><code><span class="line"><span style="color:#6F42C1;--shiki-dark:#B392F0">jobshen@JobShen-PC:/mnt/d/download/softwares$</span><span style="color:#032F62;--shiki-dark:#9ECBFF"> vim</span><span style="color:#032F62;--shiki-dark:#9ECBFF"> /etc/profile</span></span>
+<span class="line"><span style="color:#6F42C1;--shiki-dark:#B392F0">//</span><span style="color:#032F62;--shiki-dark:#9ECBFF"> 在末尾添加以下内容</span></span>
+<span class="line"><span style="color:#D73A49;--shiki-dark:#F97583">export</span><span style="color:#24292E;--shiki-dark:#E1E4E8"> JAVA_HOME</span><span style="color:#D73A49;--shiki-dark:#F97583">=</span><span style="color:#24292E;--shiki-dark:#E1E4E8">/usr/java/latest</span></span>
+<span class="line"><span style="color:#D73A49;--shiki-dark:#F97583">export</span><span style="color:#24292E;--shiki-dark:#E1E4E8"> PATH</span><span style="color:#D73A49;--shiki-dark:#F97583">=</span><span style="color:#24292E;--shiki-dark:#E1E4E8">$JAVA_HOME/bin:$PATH</span></span>
+<span class="line"><span style="color:#D73A49;--shiki-dark:#F97583">export</span><span style="color:#24292E;--shiki-dark:#E1E4E8"> CLASSPATH</span><span style="color:#D73A49;--shiki-dark:#F97583">=</span><span style="color:#24292E;--shiki-dark:#E1E4E8">.:$JAVA_HOME/lib/dt.jar:$JAVA_HOME/lib/tools.jar</span></span>
+<span class="line"><span style="color:#6F42C1;--shiki-dark:#B392F0">//</span><span style="color:#032F62;--shiki-dark:#9ECBFF"> 保存</span><span style="color:#032F62;--shiki-dark:#9ECBFF"> 使其生效</span></span>
+<span class="line"><span style="color:#6F42C1;--shiki-dark:#B392F0">jobshen@JobShen-PC:/mnt/d/download/softwares$</span><span style="color:#032F62;--shiki-dark:#9ECBFF"> source</span><span style="color:#032F62;--shiki-dark:#9ECBFF"> /etc/profile</span></span></code></pre>
+<h2 id="zookeeper-集群安装">Zookeeper 集群安装</h2>
+<h3 id="集群机器信息">集群机器信息</h3>
+<table>
 <thead>
 <tr>
-<th align="center">IP</th>
-<th align="center">Port</th>
-<th align="center">myid</th>
+<th style="text-align: center">IP</th>
+<th style="text-align: center">Port</th>
+<th style="text-align: center">myid</th>
 </tr>
 </thead>
-<tbody><tr>
-<td align="center">10.100.1.11</td>
-<td align="center">2181 2888 3888</td>
-<td align="center">1</td>
+<tbody>
+<tr>
+<td style="text-align: center">10.100.1.11</td>
+<td style="text-align: center">2181 2888 3888</td>
+<td style="text-align: center">1</td>
 </tr>
 <tr>
-<td align="center">10.100.1.12</td>
-<td align="center">2181 2888 3888</td>
-<td align="center">2</td>
+<td style="text-align: center">10.100.1.12</td>
+<td style="text-align: center">2181 2888 3888</td>
+<td style="text-align: center">2</td>
 </tr>
 <tr>
-<td align="center">10.100.1.13</td>
-<td align="center">2181 2888 3888</td>
-<td align="center">3</td>
+<td style="text-align: center">10.100.1.13</td>
+<td style="text-align: center">2181 2888 3888</td>
+<td style="text-align: center">3</td>
 </tr>
 <tr>
-<td align="center">10.100.1.14</td>
-<td align="center">2181 2888 3888</td>
-<td align="center">4</td>
+<td style="text-align: center">10.100.1.14</td>
+<td style="text-align: center">2181 2888 3888</td>
+<td style="text-align: center">4</td>
 </tr>
 <tr>
-<td align="center">10.100.1.15</td>
-<td align="center">2181 2888 3888</td>
-<td align="center">5</td>
+<td style="text-align: center">10.100.1.15</td>
+<td style="text-align: center">2181 2888 3888</td>
+<td style="text-align: center">5</td>
 </tr>
-</tbody></table>
-<h3 id="下载"><a href="#下载" class="headerlink" title="下载"></a>下载</h3><figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">jobshen@JobShen-PC:/mnt/d/download/softwares$ curl -O https://mirrors.tuna.tsinghua.edu.cn/apache/zookeeper/stable/zookeeper-3.4.10.tar.gz</span><br></pre></td></tr></table></figure>
-
-<h3 id="解压"><a href="#解压" class="headerlink" title="解压"></a>解压</h3><figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">jobshen@JobShen-PC:/mnt/d/download/softwares$ tar -zxf zookeeper-3.4.10.tar.gz -C /usr/local</span><br><span class="line">jobshen@JobShen-PC:/usr/lcoal$ mkdir -p zk_data/zookeeper zk_data/zoo-logs</span><br></pre></td></tr></table></figure>
-
-<h3 id="新建zoo-cfg"><a href="#新建zoo-cfg" class="headerlink" title="新建zoo.cfg"></a>新建zoo.cfg</h3><figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">jobshen@JobShen-PC:/usr/lcoal$ vim zookeeper-3.4.10/conf/zoo.cfg</span><br></pre></td></tr></table></figure>
-
-<figure class="highlight properties"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br></pre></td><td class="code"><pre><span class="line"><span class="attr">tickTime</span>=<span class="string">2000</span></span><br><span class="line"><span class="attr">initLimit</span>=<span class="string">20</span></span><br><span class="line"><span class="attr">syncLimit</span>=<span class="string">10</span></span><br><span class="line"><span class="attr">dataDir</span>=<span class="string">/usr/local/zk_data/zookeeper</span></span><br><span class="line"><span class="attr">dataLogDir</span>=<span class="string">/usr/local/zk_data/zoo-logs</span></span><br><span class="line"><span class="attr">clientPort</span>=<span class="string">2181</span></span><br><span class="line"><span class="attr">server.1</span>=<span class="string">10.100.1.11:2888:3888</span></span><br><span class="line"><span class="attr">server.2</span>=<span class="string">10.100.1.12:2888:3888</span></span><br><span class="line"><span class="attr">server.3</span>=<span class="string">10.100.1.13:2888:3888</span></span><br><span class="line"><span class="attr">server.4</span>=<span class="string">10.100.1.14:2888:3888</span></span><br><span class="line"><span class="attr">server.5</span>=<span class="string">10.100.1.15:2888:3888</span></span><br></pre></td></tr></table></figure>
-
-<h3 id="新建myid"><a href="#新建myid" class="headerlink" title="新建myid"></a>新建myid</h3><p>分别在各台机器上，新建对于<em>myid</em>值的<code>myid</code>文件</p>
-<figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line">jobshen@10.100.1.11:/usr/lcoal$ echo &quot;1&quot; &gt; /usr/local/zk_data/zookeeper/myid</span><br><span class="line">jobshen@10.100.1.12:/usr/lcoal$ echo &quot;2&quot; &gt; /usr/local/zk_data/zookeeper/myid</span><br><span class="line">jobshen@10.100.1.13:/usr/lcoal$ echo &quot;3&quot; &gt; /usr/local/zk_data/zookeeper/myid</span><br><span class="line">jobshen@10.100.1.14:/usr/lcoal$ echo &quot;4&quot; &gt; /usr/local/zk_data/zookeeper/myid</span><br><span class="line">jobshen@10.100.1.15:/usr/lcoal$ echo &quot;5&quot; &gt; /usr/local/zk_data/zookeeper/myid</span><br></pre></td></tr></table></figure>
-
-<h3 id="制作Systemd脚本"><a href="#制作Systemd脚本" class="headerlink" title="制作Systemd脚本"></a>制作Systemd脚本</h3><figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">jobshen@10.100.1.11:/usr/lcoal$ vim /lib/systemd/system/zookeeper.service</span><br></pre></td></tr></table></figure>
-
-<figure class="highlight properties"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br></pre></td><td class="code"><pre><span class="line"><span class="attr">[Unit]</span></span><br><span class="line"><span class="attr">Description</span>=<span class="string">zookeeper</span></span><br><span class="line"><span class="attr">After</span>=<span class="string">network.target</span></span><br><span class="line"></span><br><span class="line"><span class="attr">[Service]</span></span><br><span class="line"><span class="attr">Environment</span>=<span class="string">JAVA_HOME=/usr/java/default</span></span><br><span class="line"><span class="attr">PIDFile</span>=<span class="string">/usr/local/zk_data/zookeeper/zookeeper_server.pid</span></span><br><span class="line"><span class="attr">ExecStart</span>=<span class="string">/usr/local/zookeeper-3.4.10/bin/zkServer.sh start</span></span><br><span class="line"><span class="attr">ExecStop</span>=<span class="string">/usr/local/zookeeper-3.4.10/bin/zkServer.sh stop</span></span><br><span class="line"></span><br><span class="line"><span class="attr">[Install]</span></span><br><span class="line"><span class="attr">WantedBy</span>=<span class="string">multi-user.target</span></span><br></pre></td></tr></table></figure>
-
-<figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">jobshen@10.100.1.11:/usr/lcoal$ ln -s /etc/systemd/system/zookeeper.service /lib/systemd/system/zookeeper.service</span><br><span class="line">jobshen@10.100.1.11:/usr/lcoal$ systemctl daemon-reload</span><br></pre></td></tr></table></figure>
-
-<h3 id="启动zk集群"><a href="#启动zk集群" class="headerlink" title="启动zk集群"></a>启动zk集群</h3><p>在各个节点上分别启动zk：</p>
-<figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">jobshen@10.100.1.11:/usr/lcoal$ systemctl start zookeeper</span><br></pre></td></tr></table></figure>
-
+</tbody>
+</table>
+<h3 id="下载">下载</h3>
+<pre class="astro-code astro-code-themes github-light github-dark" style="background-color:#fff;--shiki-dark-bg:#24292e;color:#24292e;--shiki-dark:#e1e4e8; overflow-x: auto;" tabindex="0" data-language="shell"><code><span class="line"><span style="color:#6F42C1;--shiki-dark:#B392F0">jobshen@JobShen-PC:/mnt/d/download/softwares$</span><span style="color:#032F62;--shiki-dark:#9ECBFF"> curl</span><span style="color:#005CC5;--shiki-dark:#79B8FF"> -O</span><span style="color:#032F62;--shiki-dark:#9ECBFF"> https://mirrors.tuna.tsinghua.edu.cn/apache/zookeeper/stable/zookeeper-3.4.10.tar.gz</span></span></code></pre>
+<h3 id="解压">解压</h3>
+<pre class="astro-code astro-code-themes github-light github-dark" style="background-color:#fff;--shiki-dark-bg:#24292e;color:#24292e;--shiki-dark:#e1e4e8; overflow-x: auto;" tabindex="0" data-language="shell"><code><span class="line"><span style="color:#6F42C1;--shiki-dark:#B392F0">jobshen@JobShen-PC:/mnt/d/download/softwares$</span><span style="color:#032F62;--shiki-dark:#9ECBFF"> tar</span><span style="color:#005CC5;--shiki-dark:#79B8FF"> -zxf</span><span style="color:#032F62;--shiki-dark:#9ECBFF"> zookeeper-3.4.10.tar.gz</span><span style="color:#005CC5;--shiki-dark:#79B8FF"> -C</span><span style="color:#032F62;--shiki-dark:#9ECBFF"> /usr/local</span></span>
+<span class="line"><span style="color:#6F42C1;--shiki-dark:#B392F0">jobshen@JobShen-PC:/usr/lcoal$</span><span style="color:#032F62;--shiki-dark:#9ECBFF"> mkdir</span><span style="color:#005CC5;--shiki-dark:#79B8FF"> -p</span><span style="color:#032F62;--shiki-dark:#9ECBFF"> zk_data/zookeeper</span><span style="color:#032F62;--shiki-dark:#9ECBFF"> zk_data/zoo-logs</span></span></code></pre>
+<h3 id="新建zoocfg">新建zoo.cfg</h3>
+<pre class="astro-code astro-code-themes github-light github-dark" style="background-color:#fff;--shiki-dark-bg:#24292e;color:#24292e;--shiki-dark:#e1e4e8; overflow-x: auto;" tabindex="0" data-language="shell"><code><span class="line"><span style="color:#6F42C1;--shiki-dark:#B392F0">jobshen@JobShen-PC:/usr/lcoal$</span><span style="color:#032F62;--shiki-dark:#9ECBFF"> vim</span><span style="color:#032F62;--shiki-dark:#9ECBFF"> zookeeper-3.4.10/conf/zoo.cfg</span></span></code></pre>
+<pre class="astro-code astro-code-themes github-light github-dark" style="background-color:#fff;--shiki-dark-bg:#24292e;color:#24292e;--shiki-dark:#e1e4e8; overflow-x: auto;" tabindex="0" data-language="properties"><code><span class="line"><span style="color:#D73A49;--shiki-dark:#F97583">tickTime</span><span style="color:#24292E;--shiki-dark:#E1E4E8">=2000</span></span>
+<span class="line"><span style="color:#D73A49;--shiki-dark:#F97583">initLimit</span><span style="color:#24292E;--shiki-dark:#E1E4E8">=20</span></span>
+<span class="line"><span style="color:#D73A49;--shiki-dark:#F97583">syncLimit</span><span style="color:#24292E;--shiki-dark:#E1E4E8">=10</span></span>
+<span class="line"><span style="color:#D73A49;--shiki-dark:#F97583">dataDir</span><span style="color:#24292E;--shiki-dark:#E1E4E8">=/usr/local/zk_data/zookeeper</span></span>
+<span class="line"><span style="color:#D73A49;--shiki-dark:#F97583">dataLogDir</span><span style="color:#24292E;--shiki-dark:#E1E4E8">=/usr/local/zk_data/zoo-logs</span></span>
+<span class="line"><span style="color:#D73A49;--shiki-dark:#F97583">clientPort</span><span style="color:#24292E;--shiki-dark:#E1E4E8">=2181</span></span>
+<span class="line"><span style="color:#D73A49;--shiki-dark:#F97583">server.1</span><span style="color:#24292E;--shiki-dark:#E1E4E8">=10.100.1.11:2888:3888</span></span>
+<span class="line"><span style="color:#D73A49;--shiki-dark:#F97583">server.2</span><span style="color:#24292E;--shiki-dark:#E1E4E8">=10.100.1.12:2888:3888</span></span>
+<span class="line"><span style="color:#D73A49;--shiki-dark:#F97583">server.3</span><span style="color:#24292E;--shiki-dark:#E1E4E8">=10.100.1.13:2888:3888</span></span>
+<span class="line"><span style="color:#D73A49;--shiki-dark:#F97583">server.4</span><span style="color:#24292E;--shiki-dark:#E1E4E8">=10.100.1.14:2888:3888</span></span>
+<span class="line"><span style="color:#D73A49;--shiki-dark:#F97583">server.5</span><span style="color:#24292E;--shiki-dark:#E1E4E8">=10.100.1.15:2888:3888</span></span></code></pre>
+<h3 id="新建myid">新建myid</h3>
+<p>分别在各台机器上，新建对于<em>myid</em>值的<code>myid</code>文件</p>
+<pre class="astro-code astro-code-themes github-light github-dark" style="background-color:#fff;--shiki-dark-bg:#24292e;color:#24292e;--shiki-dark:#e1e4e8; overflow-x: auto;" tabindex="0" data-language="shell"><code><span class="line"><span style="color:#6F42C1;--shiki-dark:#B392F0">jobshen@10.100.1.11:/usr/lcoal$</span><span style="color:#032F62;--shiki-dark:#9ECBFF"> echo</span><span style="color:#032F62;--shiki-dark:#9ECBFF"> "1"</span><span style="color:#D73A49;--shiki-dark:#F97583"> &gt;</span><span style="color:#032F62;--shiki-dark:#9ECBFF"> /usr/local/zk_data/zookeeper/myid</span></span>
+<span class="line"><span style="color:#6F42C1;--shiki-dark:#B392F0">jobshen@10.100.1.12:/usr/lcoal$</span><span style="color:#032F62;--shiki-dark:#9ECBFF"> echo</span><span style="color:#032F62;--shiki-dark:#9ECBFF"> "2"</span><span style="color:#D73A49;--shiki-dark:#F97583"> &gt;</span><span style="color:#032F62;--shiki-dark:#9ECBFF"> /usr/local/zk_data/zookeeper/myid</span></span>
+<span class="line"><span style="color:#6F42C1;--shiki-dark:#B392F0">jobshen@10.100.1.13:/usr/lcoal$</span><span style="color:#032F62;--shiki-dark:#9ECBFF"> echo</span><span style="color:#032F62;--shiki-dark:#9ECBFF"> "3"</span><span style="color:#D73A49;--shiki-dark:#F97583"> &gt;</span><span style="color:#032F62;--shiki-dark:#9ECBFF"> /usr/local/zk_data/zookeeper/myid</span></span>
+<span class="line"><span style="color:#6F42C1;--shiki-dark:#B392F0">jobshen@10.100.1.14:/usr/lcoal$</span><span style="color:#032F62;--shiki-dark:#9ECBFF"> echo</span><span style="color:#032F62;--shiki-dark:#9ECBFF"> "4"</span><span style="color:#D73A49;--shiki-dark:#F97583"> &gt;</span><span style="color:#032F62;--shiki-dark:#9ECBFF"> /usr/local/zk_data/zookeeper/myid</span></span>
+<span class="line"><span style="color:#6F42C1;--shiki-dark:#B392F0">jobshen@10.100.1.15:/usr/lcoal$</span><span style="color:#032F62;--shiki-dark:#9ECBFF"> echo</span><span style="color:#032F62;--shiki-dark:#9ECBFF"> "5"</span><span style="color:#D73A49;--shiki-dark:#F97583"> &gt;</span><span style="color:#032F62;--shiki-dark:#9ECBFF"> /usr/local/zk_data/zookeeper/myid</span></span></code></pre>
+<h3 id="制作systemd脚本">制作Systemd脚本</h3>
+<pre class="astro-code astro-code-themes github-light github-dark" style="background-color:#fff;--shiki-dark-bg:#24292e;color:#24292e;--shiki-dark:#e1e4e8; overflow-x: auto;" tabindex="0" data-language="shell"><code><span class="line"><span style="color:#6F42C1;--shiki-dark:#B392F0">jobshen@10.100.1.11:/usr/lcoal$</span><span style="color:#032F62;--shiki-dark:#9ECBFF"> vim</span><span style="color:#032F62;--shiki-dark:#9ECBFF"> /lib/systemd/system/zookeeper.service</span></span></code></pre>
+<pre class="astro-code astro-code-themes github-light github-dark" style="background-color:#fff;--shiki-dark-bg:#24292e;color:#24292e;--shiki-dark:#e1e4e8; overflow-x: auto;" tabindex="0" data-language="properties"><code><span class="line"><span style="color:#6F42C1;--shiki-dark:#B392F0">[Unit]</span></span>
+<span class="line"><span style="color:#D73A49;--shiki-dark:#F97583">Description</span><span style="color:#24292E;--shiki-dark:#E1E4E8">=zookeeper</span></span>
+<span class="line"><span style="color:#D73A49;--shiki-dark:#F97583">After</span><span style="color:#24292E;--shiki-dark:#E1E4E8">=network.target</span></span>
+<span class="line"></span>
+<span class="line"><span style="color:#6F42C1;--shiki-dark:#B392F0">[Service]</span></span>
+<span class="line"><span style="color:#D73A49;--shiki-dark:#F97583">Environment</span><span style="color:#24292E;--shiki-dark:#E1E4E8">=</span><span style="color:#D73A49;--shiki-dark:#F97583">JAVA_HOME</span><span style="color:#24292E;--shiki-dark:#E1E4E8">=/usr/java/default</span></span>
+<span class="line"><span style="color:#D73A49;--shiki-dark:#F97583">PIDFile</span><span style="color:#24292E;--shiki-dark:#E1E4E8">=/usr/local/zk_data/zookeeper/zookeeper_server.pid</span></span>
+<span class="line"><span style="color:#D73A49;--shiki-dark:#F97583">ExecStart</span><span style="color:#24292E;--shiki-dark:#E1E4E8">=/usr/local/zookeeper-3.4.10/bin/zkServer.sh start</span></span>
+<span class="line"><span style="color:#D73A49;--shiki-dark:#F97583">ExecStop</span><span style="color:#24292E;--shiki-dark:#E1E4E8">=/usr/local/zookeeper-3.4.10/bin/zkServer.sh stop</span></span>
+<span class="line"></span>
+<span class="line"><span style="color:#6F42C1;--shiki-dark:#B392F0">[Install]</span></span>
+<span class="line"><span style="color:#D73A49;--shiki-dark:#F97583">WantedBy</span><span style="color:#24292E;--shiki-dark:#E1E4E8">=multi-user.target</span></span></code></pre>
+<pre class="astro-code astro-code-themes github-light github-dark" style="background-color:#fff;--shiki-dark-bg:#24292e;color:#24292e;--shiki-dark:#e1e4e8; overflow-x: auto;" tabindex="0" data-language="shell"><code><span class="line"><span style="color:#6F42C1;--shiki-dark:#B392F0">jobshen@10.100.1.11:/usr/lcoal$</span><span style="color:#032F62;--shiki-dark:#9ECBFF"> ln</span><span style="color:#005CC5;--shiki-dark:#79B8FF"> -s</span><span style="color:#032F62;--shiki-dark:#9ECBFF"> /etc/systemd/system/zookeeper.service</span><span style="color:#032F62;--shiki-dark:#9ECBFF"> /lib/systemd/system/zookeeper.service</span></span>
+<span class="line"><span style="color:#6F42C1;--shiki-dark:#B392F0">jobshen@10.100.1.11:/usr/lcoal$</span><span style="color:#032F62;--shiki-dark:#9ECBFF"> systemctl</span><span style="color:#032F62;--shiki-dark:#9ECBFF"> daemon-reload</span></span></code></pre>
+<h3 id="启动zk集群">启动zk集群</h3>
+<p>在各个节点上分别启动zk：</p>
+<pre class="astro-code astro-code-themes github-light github-dark" style="background-color:#fff;--shiki-dark-bg:#24292e;color:#24292e;--shiki-dark:#e1e4e8; overflow-x: auto;" tabindex="0" data-language="shell"><code><span class="line"><span style="color:#6F42C1;--shiki-dark:#B392F0">jobshen@10.100.1.11:/usr/lcoal$</span><span style="color:#032F62;--shiki-dark:#9ECBFF"> systemctl</span><span style="color:#032F62;--shiki-dark:#9ECBFF"> start</span><span style="color:#032F62;--shiki-dark:#9ECBFF"> zookeeper</span></span></code></pre>
 <p>检查zk是否启动成功</p>
-<figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">jobshen@10.100.1.11:/usr/lcoal$ cd zookeeper-3.4.10/bin</span><br><span class="line">jobshen@10.100.1.11:/usr/lcoal/zookeeper-3.4.10/bin$ ./zkServer.sh status</span><br></pre></td></tr></table></figure>
-
+<pre class="astro-code astro-code-themes github-light github-dark" style="background-color:#fff;--shiki-dark-bg:#24292e;color:#24292e;--shiki-dark:#e1e4e8; overflow-x: auto;" tabindex="0" data-language="shell"><code><span class="line"><span style="color:#6F42C1;--shiki-dark:#B392F0">jobshen@10.100.1.11:/usr/lcoal$</span><span style="color:#032F62;--shiki-dark:#9ECBFF"> cd</span><span style="color:#032F62;--shiki-dark:#9ECBFF"> zookeeper-3.4.10/bin</span></span>
+<span class="line"><span style="color:#6F42C1;--shiki-dark:#B392F0">jobshen@10.100.1.11:/usr/lcoal/zookeeper-3.4.10/bin$</span><span style="color:#032F62;--shiki-dark:#9ECBFF"> ./zkServer.sh</span><span style="color:#032F62;--shiki-dark:#9ECBFF"> status</span></span></code></pre>
 <p>输出以下内容即代表启动成功：</p>
-<figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">ZooKeeper JMX enabled by default</span><br><span class="line">Using config: /usr/local/zookeeper-3.4.10/bin/../conf/zoo.cfg</span><br><span class="line">Mode: follower(master)</span><br></pre></td></tr></table></figure>
-
+<pre class="astro-code astro-code-themes github-light github-dark" style="background-color:#fff;--shiki-dark-bg:#24292e;color:#24292e;--shiki-dark:#e1e4e8; overflow-x: auto;" tabindex="0" data-language="shell"><code><span class="line"><span style="color:#6F42C1;--shiki-dark:#B392F0">ZooKeeper</span><span style="color:#032F62;--shiki-dark:#9ECBFF"> JMX</span><span style="color:#032F62;--shiki-dark:#9ECBFF"> enabled</span><span style="color:#032F62;--shiki-dark:#9ECBFF"> by</span><span style="color:#032F62;--shiki-dark:#9ECBFF"> default</span></span>
+<span class="line"><span style="color:#6F42C1;--shiki-dark:#B392F0">Using</span><span style="color:#032F62;--shiki-dark:#9ECBFF"> config:</span><span style="color:#032F62;--shiki-dark:#9ECBFF"> /usr/local/zookeeper-3.4.10/bin/../conf/zoo.cfg</span></span>
+<span class="line"><span style="color:#6F42C1;--shiki-dark:#B392F0">Mode:</span><span style="color:#032F62;--shiki-dark:#9ECBFF"> follower</span><span style="color:#24292E;--shiki-dark:#E1E4E8">(</span><span style="color:#6F42C1;--shiki-dark:#B392F0">master</span><span style="color:#24292E;--shiki-dark:#E1E4E8">)</span></span></code></pre>
 <p>下篇文章将继续介绍 <em>RocketMQ</em>、 <em>Redis</em> 等集群的安装</p>
-
-    </div>
-
-    
-    
-    
-
-    <footer class="post-footer">
-          
-
-<div class="post-copyright">
-<ul>
-  <li class="post-copyright-author">
-      <strong>本文作者： </strong>Job Shen
-  </li>
-  <li class="post-copyright-link">
-      <strong>本文链接：</strong>
-      <a href="https://blog.jobshen.com/posts/3011500279.html" title="Centos 7下常见中间件环境的安装（一）">https://blog.jobshen.com/posts/3011500279.html</a>
-  </li>
-  <li class="post-copyright-license">
-    <strong>版权声明： </strong>本博客所有文章除特别声明外，均采用 <a href="https://creativecommons.org/licenses/by-nc-sa/4.0/deed.zh" rel="noopener" target="_blank"><i class="fab fa-fw fa-creative-commons"></i>BY-NC-SA</a> 许可协议。转载请注明出处！
-  </li>
-</ul>
-</div>
-
-          <div class="post-tags">
-              <a href="/tags/Centos/" rel="tag"># Centos</a>
-              <a href="/tags/jdk/" rel="tag"># jdk</a>
-              <a href="/tags/zookeeper/" rel="tag"># zookeeper</a>
-          </div>
-
-        
-
-          <div class="post-nav">
-            <div class="post-nav-item">
-                <a href="/posts/1461710894.html" rel="prev" title="记一次线上Redis故障恢复和分析（二）">
-                  <i class="fa fa-chevron-left"></i> 记一次线上Redis故障恢复和分析（二）
-                </a>
-            </div>
-            <div class="post-nav-item">
-                <a href="/posts/2345740436.html" rel="next" title="Centos-7下常见中间件环境的安装（二）">
-                  Centos-7下常见中间件环境的安装（二） <i class="fa fa-chevron-right"></i>
-                </a>
-            </div>
-          </div>
-    </footer>
-  </article>
-</div>
-
-
-
-
-
-
-    <div class="comments gitalk-container"></div>
-</div>
-  </main>
-
-  <footer class="footer">
-    <div class="footer-inner">
-
-
-<div class="copyright">
-  &copy; 2017 – 
-  <span itemprop="copyrightYear">2022</span>
-  <span class="with-love">
-    <i class="fa fa-heart"></i>
-  </span>
-  <span class="author" itemprop="copyrightHolder">Job Shen</span>
-</div>
-<div class="wordcount">
-  <span class="post-meta-item">
-    <span class="post-meta-item-icon">
-      <i class="fa fa-chart-line"></i>
-    </span>
-    <span title="站点总字数">79k</span>
-  </span>
-  <span class="post-meta-item">
-    <span class="post-meta-item-icon">
-      <i class="fa fa-coffee"></i>
-    </span>
-    <span title="站点阅读时长">2:11</span>
-  </span>
-</div>
-  <div class="powered-by">由 <a href="https://hexo.io/" rel="noopener" target="_blank">Hexo</a> & <a href="https://theme-next.js.org/" rel="noopener" target="_blank">NexT.Gemini</a> 强力驱动
-  </div>
-
-    </div>
-  </footer>
-
-  
-  <script src="https://cdn.jsdelivr.net/npm/animejs@3.2.1/lib/anime.min.js" integrity="sha256-XL2inqUJaslATFnHdJOi9GfQ60on8Wx1C2H8DYiN1xY=" crossorigin="anonymous"></script>
-  <script src="https://cdn.jsdelivr.net/npm/lozad@1.16.0/dist/lozad.min.js" integrity="sha256-mOFREFhqmHeQbXpK2lp4nA3qooVgACfh88fpJftLBbc=" crossorigin="anonymous"></script>
-<script src="/js/comments.js"></script><script src="/js/utils.js"></script><script src="/js/motion.js"></script><script src="/js/next-boot.js"></script><script src="/js/bookmark.js"></script>
-
-  
-<script src="https://cdn.jsdelivr.net/npm/hexo-generator-searchdb@1.4.0/dist/search.js" integrity="sha256-vXZMYLEqsROAXkEw93GGIvaB2ab+QW6w3+1ahD9nXXA=" crossorigin="anonymous"></script>
-<script src="/js/third-party/search/local-search.js"></script>
-
-
-
-
-
-  
-
-  <script src="https://cdn.jsdelivr.net/npm/firebase@9.7.0/firebase-app-compat.js" integrity="sha256-kazmBornWCBvhzKX9OvlPP7/4RbDozFe7VyVx4fj/vg=" crossorigin="anonymous"></script>
-  <script src="https://cdn.jsdelivr.net/npm/firebase@9.7.0/firebase-firestore-compat.js" integrity="sha256-JsvvsDGyUIHrfyMHH2FPJrbHRhjv7hOjtg1VdsuxI0s=" crossorigin="anonymous"></script>
-  <script class="next-config" data-name="firestore" type="application/json">{"enable":true,"collection":"articles","apiKey":"AIzaSyAPnpab6t0qB5X8xTX_TZFUTkSFVLNyQdw","projectId":"blog-e5d21","authDomain":"blog-e5d21.firebaseapp.com","storageBucket":"blog-e5d21.appspot.com","messagingSenderId":"737761719428","appId":"1:737761719428:web:421786d65c9bc7b7c3bed1","measurementId":"G-4SBB49HYZV"}</script>
-  <script src="/js/third-party/statistics/firestore.js"></script>
-
-
-
-<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/gitalk@1.7.2/dist/gitalk.css" integrity="sha256-AJnUHL7dBv6PGaeyPQJcgQPDjt/Hn/PvYZde1iqfp8U=" crossorigin="anonymous">
-
-<script class="next-config" data-name="gitalk" type="application/json">{"enable":true,"github_id":"kitdine","repo":"blog_git_talk","client_id":"0027cb40e78eba0adbfe","client_secret":"133ffa343a0ee4b23fef6d2ea7e36244770c2df9","admin_user":"kitdine","distraction_free_mode":true,"proxy":"https://cors-anywhere.azm.workers.dev/https://github.com/login/oauth/access_token","language":"zh-CN","js":{"url":"https://cdn.jsdelivr.net/npm/gitalk@1.7.2/dist/gitalk.min.js","integrity":"sha256-Pmj85ojLaPOWwRtlMJwmezB/Qg8BzvJp5eTzvXaYAfA="},"path_md5":"b1865b6440c0811d4c77253c261c070a"}</script>
-<script src="/js/third-party/comments/gitalk.js"></script>
-
-</body>
-</html>
+</div><div class="article-end" data-pagefind-ignore><span>— 文章结束 —</span><a href="/archive/">返回文章归档 ↑</a></div><section class="comment-state" data-comments data-pagefind-ignore data-article-id="3011500279" data-repo="kitdine/kitdine.github.io" data-repo-id="MDEwOlJlcG9zaXRvcnk4MTcxMDAzNQ==" data-category="Blog comments" data-category-id="DIC_kwDOBN7L084DJUxV" data-read-only="false"><h2>讨论</h2><p data-comment-status role="status">点击后加载 giscus 讨论。登录与发表由你自行操作。</p><button class="load-comments" data-load-comments type="button">加载讨论</button><div class="giscus" data-comment-frame></div><div class="comment-links"><a href="https://github.com/kitdine/kitdine.github.io/discussions/categories/blog-comments">在 GitHub 阅读讨论 ↗</a><a href="https://github.com/kitdine/blog_git_talk/issues">保留的历史评论 ↗</a></div></section><script type="module">function e(e){let t=e.querySelector(`[data-load-comments]`),n=e.querySelector(`[data-comment-frame]`),r=e.querySelector(`[data-comment-status]`),i=e.dataset,a,o;t.addEventListener(`click`,()=>{if(n.childElementCount)return;if(t.disabled=!0,r.textContent=`正在加载讨论…`,i.readOnly!==`true`&&location.origin===`https://blog.jobshen.com`){let e=document.createElement(`script`);e.src=`https://giscus.app/client.js`,e.async=!0,e.crossOrigin=`anonymous`,Object.assign(e.dataset,{repo:i.repo,repoId:i.repoId,category:i.category,categoryId:i.categoryId,mapping:`specific`,term:i.articleId,strict:`1`,reactionsEnabled:`0`,emitMetadata:`0`,inputPosition:`bottom`,lang:`zh-CN`,theme:document.documentElement.dataset.theme===`dark`?`dark`:`light`}),e.onerror=()=>{r.textContent=`讨论暂不可用，可以稍后重试或前往 GitHub 阅读。`},n.append(e),r.textContent=`讨论组件已请求加载。`;return}let e=new URLSearchParams({origin:`${location.origin}${location.pathname}`,repo:i.repo,repoId:i.repoId,category:i.category,categoryId:i.categoryId,term:i.articleId,strict:`1`,session:``,reactionsEnabled:`0`,emitMetadata:`0`,theme:document.documentElement.dataset.theme===`dark`?`dark`:`light`,backLink:`https://blog.jobshen.com/posts/${i.articleId}.html`});a=document.createElement(`iframe`),a.title=`已有讨论（匿名只读预览）`,a.src=`https://giscus.app/zh-CN/widget?${e}`,a.sandbox=`allow-scripts allow-same-origin`,a.referrerPolicy=`no-referrer`,a.credentialless=!0,a.inert=!0,a.tabIndex=-1,a.setAttribute(`aria-hidden`,`true`),a.className=`giscus-readonly`,a.setAttribute(`data-giscus-preview`,``),a.addEventListener(`load`,()=>{clearTimeout(o),r.textContent=`匿名只读预览。此区域不提供登录或发表操作；也可通过下方链接阅读讨论。`}),n.append(a),o=setTimeout(()=>{r.textContent=`讨论加载较慢，正文不受影响；可通过下方链接阅读。`},8e3)}),window.addEventListener(`message`,e=>{if(!a||e.origin!==`https://giscus.app`||e.source!==a.contentWindow)return;let t=e.data?.giscus;Number.isFinite(t?.resizeHeight)&&(a.style.height=`${Math.max(150,Math.min(12e3,t.resizeHeight))}px`),typeof t?.error==`string`&&(clearTimeout(o),r.textContent=t.error.includes(`Discussion not found`)?`这篇文章还没有讨论；只读预览不会创建测试帖。`:`讨论暂不可用，正文不受影响。`)}),new MutationObserver(()=>{(a||n.querySelector(`iframe`))?.contentWindow?.postMessage({giscus:{setConfig:{theme:document.documentElement.dataset.theme===`dark`?`dark`:`light`}}},`https://giscus.app`)}).observe(document.documentElement,{attributes:!0,attributeFilter:[`data-theme`]})}document.querySelectorAll(`[data-comments]`).forEach(e);</script><a class="next-post" href="/posts/1461710894.html" data-pagefind-ignore><span>继续阅读 →</span><h3>记一次线上Redis故障恢复和分析（二）</h3></a></article><aside class="desktop-toc" data-pagefind-ignore><span class="eyebrow">ON THIS PAGE</span><h2>本文目录</h2><ol><li class><a href="#jdk-安装">JDK 安装</a></li><li class="sub"><a href="#jdk下载">jdk下载</a></li><li class="sub"><a href="#安装">安装</a></li><li class="sub"><a href="#配置环境变量">配置环境变量</a></li><li class><a href="#zookeeper-集群安装">Zookeeper 集群安装</a></li><li class="sub"><a href="#集群机器信息">集群机器信息</a></li><li class="sub"><a href="#下载">下载</a></li><li class="sub"><a href="#解压">解压</a></li><li class="sub"><a href="#新建zoocfg">新建zoo.cfg</a></li><li class="sub"><a href="#新建myid">新建myid</a></li><li class="sub"><a href="#制作systemd脚本">制作Systemd脚本</a></li><li class="sub"><a href="#启动zk集群">启动zk集群</a></li></ol><a class="back-top" href="#main">回到顶部 ↑</a></aside></div></main><footer class="site-footer wrap" data-pagefind-ignore><div><a class="footer-name" href="/">Job Shen</a><p>记录问题，也记录解决问题的过程。</p></div><div class="footer-links"><a href="https://github.com/kitdine">GitHub ↗</a><a href="/rss.xml">RSS ↗</a></div></footer><script type="module">document.querySelector(`#theme-toggle`)?.addEventListener(`click`,()=>{let e=document.documentElement.dataset.theme===`dark`?`light`:`dark`;document.documentElement.dataset.theme=e;try{localStorage.setItem(`theme`,e)}catch{}}),document.querySelectorAll(`pre`).forEach(e=>{let t=document.createElement(`button`);t.className=`copy-code`,t.textContent=`复制`,t.setAttribute(`aria-label`,`复制代码`),t.addEventListener(`click`,async()=>{try{await navigator.clipboard.writeText(e.querySelector(`code`)?.textContent||``),t.textContent=`已复制`}catch{t.textContent=`请手动复制`}setTimeout(()=>t.textContent=`复制`,1800)}),e.append(t)});</script></body></html>
