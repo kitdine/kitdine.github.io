@@ -1,3 +1,0 @@
-User-agent: *
-Allow: /
-Sitemap: https://blog.jobshen.com/sitemap-index.xml
