@@ -1,11 +1,18 @@
 <!DOCTYPE html><html lang="zh-CN"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1"><title>搜索 · Job Shen</title><meta name="description" content="Job Shen 的技术博客：记录后端开发、中间件与工程实践。"><link rel="canonical" href="https://blog.jobshen.com/search/"><meta property="og:url" content="https://blog.jobshen.com/search/"><meta property="og:title" content="搜索 · Job Shen"><meta property="og:description" content="Job Shen 的技术博客：记录后端开发、中间件与工程实践。"><meta property="og:type" content="website"><link rel="icon" href="/images/favicon-32x32.png"><link rel="alternate" type="application/rss+xml" title="Job Shen RSS" href="/rss.xml"><script>try { document.documentElement.dataset.theme = localStorage.getItem('theme') || (matchMedia('(prefers-color-scheme: dark)').matches?'dark':'light'); } catch {}</script><script>(function(){const token = "e4f1ddcf89244291afe53cf196900efe";
 
   if(location.origin==='https://blog.jobshen.com'){
-    const script=document.createElement('script');
-    script.src='https://static.cloudflareinsights.com/beacon.min.js';
-    script.type='module';
-    script.defer=true;script.dataset.cfBeacon=JSON.stringify({token});
-    document.head.append(script);
+    const installBeacon=()=>{
+      // Cloudflare can append its own beacon at the end of the HTML response.
+      // Wait for parsing to finish, then avoid recording each visit twice.
+      if([...document.querySelectorAll('script[data-cf-beacon]')].some(s=>s.src.startsWith('https://static.cloudflareinsights.com/')))return;
+      const script=document.createElement('script');
+      script.src='https://static.cloudflareinsights.com/beacon.min.js';
+      script.type='module';
+      script.defer=true;script.dataset.cfBeacon=JSON.stringify({token});
+      document.head.append(script);
+    };
+    if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',installBeacon,{once:true});
+    else installBeacon();
   }
 })();</script><link rel="stylesheet" href="/_astro/Base.CBrFukQE.css"></head><body><a class="skip" href="#main">跳到正文</a><header class="site-header wrap" data-pagefind-ignore><a class="brand" href="/" aria-label="Job Shen 首页"><span class="brand-mark">j.</span><span>Job Shen<span class="brand-sub">工程笔记</span></span></a><nav aria-label="主导航"><a href="/archive/">文章</a><a href="/projects/">项目</a><a href="/tags/">标签</a><a href="/about/">关于</a></nav><div class="header-actions"><a class="icon-button" href="/search/" aria-label="搜索文章"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7"><circle cx="10" cy="10" r="6.5"></circle><path d="m15 15 6 6"></path></svg></a><button id="theme-toggle" class="icon-button" aria-label="切换深浅色" title="切换深浅色">◐</button></div></header><main id="main" class="wrap"><div class="page-intro"><span class="eyebrow">FIND A NOTE</span><h1>搜索工程笔记</h1><p>试试「故障」「日志」「Redis」或「Filebeat」。</p></div><form id="search-form" role="search"><label for="query">关键词</label><div class="search-box"><input id="query" name="q" type="search" placeholder="搜索文章内容…" autocomplete="off"><button type="submit">搜索 ↗</button></div></form><p id="search-status" role="status">输入关键词，搜索全部 12 篇文章。</p><div id="search-results" class="search-results"></div><script type="module">
  const form=document.querySelector('#search-form'),input=document.querySelector('#query'),status=document.querySelector('#search-status'),results=document.querySelector('#search-results');let seq=0,timer;

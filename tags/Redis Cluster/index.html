@@ -1,10 +1,17 @@
 <!DOCTYPE html><html lang="zh-CN"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1"><title>Redis Cluster · Job Shen</title><meta name="description" content="Job Shen 的技术博客：记录后端开发、中间件与工程实践。"><link rel="canonical" href="https://blog.jobshen.com/tags/Redis%20Cluster/"><meta property="og:url" content="https://blog.jobshen.com/tags/Redis%20Cluster/"><meta property="og:title" content="Redis Cluster · Job Shen"><meta property="og:description" content="Job Shen 的技术博客：记录后端开发、中间件与工程实践。"><meta property="og:type" content="website"><link rel="icon" href="/images/favicon-32x32.png"><link rel="alternate" type="application/rss+xml" title="Job Shen RSS" href="/rss.xml"><script>try { document.documentElement.dataset.theme = localStorage.getItem('theme') || (matchMedia('(prefers-color-scheme: dark)').matches?'dark':'light'); } catch {}</script><script>(function(){const token = "e4f1ddcf89244291afe53cf196900efe";
 
   if(location.origin==='https://blog.jobshen.com'){
-    const script=document.createElement('script');
-    script.src='https://static.cloudflareinsights.com/beacon.min.js';
-    script.type='module';
-    script.defer=true;script.dataset.cfBeacon=JSON.stringify({token});
-    document.head.append(script);
+    const installBeacon=()=>{
+      // Cloudflare can append its own beacon at the end of the HTML response.
+      // Wait for parsing to finish, then avoid recording each visit twice.
+      if([...document.querySelectorAll('script[data-cf-beacon]')].some(s=>s.src.startsWith('https://static.cloudflareinsights.com/')))return;
+      const script=document.createElement('script');
+      script.src='https://static.cloudflareinsights.com/beacon.min.js';
+      script.type='module';
+      script.defer=true;script.dataset.cfBeacon=JSON.stringify({token});
+      document.head.append(script);
+    };
+    if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',installBeacon,{once:true});
+    else installBeacon();
   }
 })();</script><link rel="stylesheet" href="/_astro/Base.CBrFukQE.css"></head><body><a class="skip" href="#main">跳到正文</a><header class="site-header wrap" data-pagefind-ignore><a class="brand" href="/" aria-label="Job Shen 首页"><span class="brand-mark">j.</span><span>Job Shen<span class="brand-sub">工程笔记</span></span></a><nav aria-label="主导航"><a href="/archive/">文章</a><a href="/projects/">项目</a><a href="/tags/" aria-current="page">标签</a><a href="/about/">关于</a></nav><div class="header-actions"><a class="icon-button" href="/search/" aria-label="搜索文章"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7"><circle cx="10" cy="10" r="6.5"></circle><path d="m15 15 6 6"></path></svg></a><button id="theme-toggle" class="icon-button" aria-label="切换深浅色" title="切换深浅色">◐</button></div></header><main id="main" class="wrap"><div class="page-intro"><a href="/tags/">← 全部标签</a><h1>Redis Cluster</h1><p>2 篇相关笔记</p></div><div class="post-list"><a class="post-row" href="/posts/3335490502.html"><time datetime="2017-12-17">2017-12-17</time><div><h3>Centos-7下常见中间件环境的安装（三）</h3><p>Redis / Redis Cluster</p></div><span class="row-arrow" aria-hidden="true">↗</span></a><a class="post-row" href="/posts/1461710894.html"><time datetime="2017-09-21">2017-09-21</time><div><h3>记一次线上Redis故障恢复和分析（二）</h3><p>Redis / Jedis / Redis Cluster / Wireshark</p></div><span class="row-arrow" aria-hidden="true">↗</span></a></div></main><footer class="site-footer wrap" data-pagefind-ignore><div><a class="footer-name" href="/">Job Shen</a><p>记录问题，也记录解决问题的过程。</p></div><div class="footer-links"><a href="https://github.com/kitdine">GitHub ↗</a><a href="/rss.xml">RSS ↗</a></div></footer><script type="module">document.querySelector(`#theme-toggle`)?.addEventListener(`click`,()=>{let e=document.documentElement.dataset.theme===`dark`?`light`:`dark`;document.documentElement.dataset.theme=e;try{localStorage.setItem(`theme`,e)}catch{}}),document.querySelectorAll(`pre`).forEach(e=>{let t=document.createElement(`button`);t.className=`copy-code`,t.textContent=`复制`,t.setAttribute(`aria-label`,`复制代码`),t.addEventListener(`click`,async()=>{try{await navigator.clipboard.writeText(e.querySelector(`code`)?.textContent||``),t.textContent=`已复制`}catch{t.textContent=`请手动复制`}setTimeout(()=>t.textContent=`复制`,1800)}),e.append(t)});</script></body></html>
