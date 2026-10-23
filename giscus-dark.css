@@ -1,0 +1,130 @@
+/* Job Shen giscus dark theme. Palette matches src/styles/global.css.
+ * Loaded inside the giscus iframe using its documented custom-theme URL API.
+ * Keep shared rules in giscus-light.css and giscus-dark.css in sync; no imports
+ * or remote fonts are needed. Do not hide authentication or discussion controls.
+ */
+:root { color-scheme: dark; }
+main {
+  --color-fg-default: #e5e9df;
+  --color-fg-muted: #a2ab9e;
+  --color-fg-subtle: #a2ab9e;
+  --color-canvas-default: #161a17;
+  --color-canvas-overlay: #161a17;
+  --color-canvas-inset: #202621;
+  --color-canvas-subtle: #202621;
+  --color-border-default: #343d34;
+  --color-border-muted: #343d34;
+  --color-neutral-muted: #202621;
+  --color-accent-fg: #a5c892;
+  --color-accent-emphasis: #a5c892;
+  --color-accent-muted: #343d34;
+  --color-accent-subtle: #28382a;
+  --color-success-fg: #a5c892;
+  --color-attention-fg: #d6bb79;
+  --color-attention-muted: #343d34;
+  --color-attention-subtle: #202621;
+  --color-danger-fg: #ee9b94;
+  --color-danger-muted: #343d34;
+  --color-danger-subtle: #202621;
+  --color-btn-text: #e5e9df;
+  --color-btn-bg: #202621;
+  --color-btn-border: #343d34;
+  --color-btn-shadow: none;
+  --color-btn-inset-shadow: none;
+  --color-btn-hover-bg: #28382a;
+  --color-btn-hover-border: #a2ab9e;
+  --color-btn-active-bg: #28382a;
+  --color-btn-active-border: #a2ab9e;
+  --color-btn-selected-bg: #28382a;
+  --color-btn-primary-text: #161a17;
+  --color-btn-primary-bg: #a5c892;
+  --color-btn-primary-border: #a5c892;
+  --color-btn-primary-shadow: none;
+  --color-btn-primary-inset-shadow: none;
+  --color-btn-primary-hover-bg: #b4d5a3;
+  --color-btn-primary-hover-border: #b4d5a3;
+  --color-btn-primary-selected-bg: #a5c892;
+  --color-btn-primary-selected-shadow: none;
+  --color-btn-primary-disabled-text: #a2ab9e;
+  --color-btn-primary-disabled-bg: #202621;
+  --color-btn-primary-disabled-border: #343d34;
+  --color-action-list-item-default-hover-bg: #28382a;
+  --color-segmented-control-bg: #202621;
+  --color-segmented-control-button-bg: #161a17;
+  --color-segmented-control-button-selected-border: #343d34;
+  --color-primer-shadow-inset: none;
+  --color-scale-gray-7: #202621;
+  --color-scale-blue-8: #28382a;
+  --color-social-reaction-bg-hover: #202621;
+  --color-social-reaction-bg-reacted-hover: #28382a;
+  --color-prettylights-syntax-comment: #a2ab9e;
+  --color-prettylights-syntax-constant: #a5c892;
+  --color-prettylights-syntax-entity: #a5c892;
+  --color-prettylights-syntax-storage-modifier-import: #e5e9df;
+  --color-prettylights-syntax-entity-tag: #a5c892;
+  --color-prettylights-syntax-keyword: #dab39a;
+  --color-prettylights-syntax-string: #a5c892;
+  --color-prettylights-syntax-variable: #dab39a;
+  --color-prettylights-syntax-brackethighlighter-unmatched: #ee9b94;
+  --color-prettylights-syntax-invalid-illegal-text: #e5e9df;
+  --color-prettylights-syntax-invalid-illegal-bg: #202621;
+  --color-prettylights-syntax-carriage-return-text: #e5e9df;
+  --color-prettylights-syntax-carriage-return-bg: #202621;
+  --color-prettylights-syntax-string-regexp: #a5c892;
+  --color-prettylights-syntax-markup-list: #dab39a;
+  --color-prettylights-syntax-markup-heading: #a5c892;
+  --color-prettylights-syntax-markup-italic: #e5e9df;
+  --color-prettylights-syntax-markup-bold: #e5e9df;
+  --color-prettylights-syntax-markup-deleted-text: #ee9b94;
+  --color-prettylights-syntax-markup-deleted-bg: #202621;
+  --color-prettylights-syntax-markup-inserted-text: #a5c892;
+  --color-prettylights-syntax-markup-inserted-bg: #28382a;
+  --color-prettylights-syntax-markup-changed-text: #d6bb79;
+  --color-prettylights-syntax-markup-changed-bg: #202621;
+  --color-prettylights-syntax-markup-ignored-text: #a2ab9e;
+  --color-prettylights-syntax-markup-ignored-bg: #202621;
+  --color-prettylights-syntax-meta-diff-range: #dab39a;
+  --color-prettylights-syntax-brackethighlighter-angle: #a2ab9e;
+  --color-prettylights-syntax-sublimelinter-gutter-mark: #343d34;
+  --color-prettylights-syntax-constant-other-reference-link: #a5c892;
+}
+
+/* Preserve giscus controls and content; only presentation changes below. */
+html, body { background: transparent; }
+body, main, button, input, textarea {
+  font-family: Inter, -apple-system, BlinkMacSystemFont, 'Segoe UI', 'PingFang SC', 'Microsoft YaHei', sans-serif;
+}
+main { font-size: 14px; line-height: 1.8; }
+a { text-underline-offset: 3px; }
+.gsc-main { min-width: 0; max-width: 100%; }
+.gsc-header { font-size: 13px; padding-bottom: 12px; }
+.gsc-comment > div { border-color: var(--color-border-default) !important; box-shadow: none; }
+.gsc-comment-header, .gsc-comment-footer { font-size: 12px; }
+.gsc-comment-author { min-width: 0; flex-wrap: wrap; row-gap: 4px; }
+.gsc-comment-author .color-box-border-info { border-color: var(--color-border-default); color: var(--color-fg-muted); }
+.gsc-comment-content { font-size: 14px; line-height: 1.85; overflow-wrap: anywhere; }
+.gsc-comment-content h1 { font-size: 23px; }
+.gsc-comment-content h2 { font-size: 20px; }
+.gsc-comment-content h3 { font-size: 17px; }
+.gsc-comment-content h1, .gsc-comment-content h2, .gsc-comment-content h3 { font-weight: 550; line-height: 1.6; }
+.gsc-comment-content h1, .gsc-comment-content h2 { border-bottom-color: var(--color-border-muted); }
+.gsc-comment-content pre { font-size: 12px; border: 1px solid var(--color-border-muted); border-radius: 4px; }
+.gsc-comment-content code { font-family: ui-monospace, SFMono-Regular, Menlo, monospace; }
+.gsc-comment-box { border-radius: 5px; box-shadow: none; }
+.gsc-comment-box-tabs { background: var(--color-canvas-subtle); }
+.gsc-comment-box-textarea, .gsc-comment-box-preview { font-size: 14px; line-height: 1.8; }
+.gsc-comment-box-textarea { min-height: 120px; }
+.gsc-comment-box-textarea:focus { border-color: var(--color-accent-fg); box-shadow: 0 0 0 2px var(--color-accent-subtle); }
+.gsc-comment-box-bottom { gap: 12px; flex-wrap: wrap; }
+.gsc-comment-box .btn { border-radius: 4px; }
+.gsc-reply-box, .gsc-replies { background: var(--color-canvas-subtle); }
+.gsc-reply-box button { background: var(--color-canvas-default); }
+.gsc-social-reaction-summary-item, .gsc-upvote-button { border-radius: 20px; }
+:focus-visible { outline: 2px solid var(--color-accent-fg); outline-offset: 3px; }
+@media (max-width: 600px) {
+  main, .gsc-comment-content { font-size: 13px; }
+  .gsc-header { font-size: 12px; flex-wrap: wrap; gap: 12px; }
+  .gsc-comment-header, .gsc-comment-content, .gsc-comment-footer { padding-left: 12px; padding-right: 12px; }
+  .gsc-comment-box-textarea, .gsc-comment-box-preview { font-size: 16px; }
+  .gsc-comment-box-bottom { padding: 12px; }
+}
