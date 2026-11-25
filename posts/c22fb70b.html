@@ -1,0 +1,514 @@
+<!DOCTYPE html><html lang="zh-CN"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1"><title>BRIN 摘要在 PostgreSQL 19 上：汇总行为没变，autovacuum 变了 · Job Shen</title><meta name="description" content="BRIN 摘要在 PostgreSQL 19 上：汇总行为没变，autovacuum 变了，发布于 2026-11-25。Job Shen 的工程实践记录。"><link rel="canonical" href="https://blog.jobshen.com/posts/c22fb70b.html"><meta property="og:url" content="https://blog.jobshen.com/posts/c22fb70b.html"><meta property="og:title" content="BRIN 摘要在 PostgreSQL 19 上：汇总行为没变，autovacuum 变了 · Job Shen"><meta property="og:description" content="BRIN 摘要在 PostgreSQL 19 上：汇总行为没变，autovacuum 变了，发布于 2026-11-25。Job Shen 的工程实践记录。"><meta property="og:type" content="article"><link rel="icon" href="/images/favicon-32x32.png"><link rel="alternate" type="application/rss+xml" title="Job Shen RSS" href="/rss.xml"><script>try { document.documentElement.dataset.theme = localStorage.getItem('theme') || (matchMedia('(prefers-color-scheme: dark)').matches?'dark':'light'); } catch {}</script><script>(function(){const token = "e4f1ddcf89244291afe53cf196900efe";
+
+  if(location.origin==='https://blog.jobshen.com'){
+    const installBeacon=()=>{
+      // Cloudflare can append its own beacon at the end of the HTML response.
+      // Wait for parsing to finish, then avoid recording each visit twice.
+      if([...document.querySelectorAll('script[data-cf-beacon]')].some(s=>s.src.startsWith('https://static.cloudflareinsights.com/')))return;
+      const script=document.createElement('script');
+      script.src='https://static.cloudflareinsights.com/beacon.min.js';
+      script.type='module';
+      script.defer=true;script.dataset.cfBeacon=JSON.stringify({token});
+      document.head.append(script);
+    };
+    if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',installBeacon,{once:true});
+    else installBeacon();
+  }
+})();</script><link rel="stylesheet" href="/_astro/Base.CbqvdiJ7.css"></head><body><a class="skip" href="#main">跳到正文</a><header class="site-header wrap" data-pagefind-ignore><a class="brand" href="/" aria-label="Job Shen 首页"><span class="brand-mark">j.</span><span>Job Shen<span class="brand-sub">工程笔记</span></span></a><nav aria-label="主导航"><a href="/archive/">文章</a><a href="/projects/">项目</a><a href="/tags/">标签</a><a href="/about/">关于</a></nav><div class="header-actions"><a class="icon-button" href="/search/" aria-label="搜索文章"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7"><circle cx="10" cy="10" r="6.5"></circle><path d="m15 15 6 6"></path></svg></a><button id="theme-toggle" class="icon-button" aria-label="切换深浅色" title="切换深浅色">◐</button></div></header><main id="main" class="wrap"><div class="article-top"><a href="/archive/">← 全部文章</a><span>ENGINEERING NOTES</span></div><div class="article-layout"><article data-pagefind-body><header class="article-header"><div class="tag-links" data-pagefind-ignore><a href="/tags/PostgreSQL/">PostgreSQL</a><a href="/tags/%E7%B4%A2%E5%BC%95/">索引</a><a href="/tags/%E6%97%B6%E5%BA%8F%E6%95%B0%E6%8D%AE/">时序数据</a></div><h1 data-pagefind-meta="title">BRIN 摘要在 PostgreSQL 19 上：汇总行为没变，autovacuum 变了</h1><div class="article-meta"><time datetime="2026-11-25T12:00:00.000Z">2026-11-25</time><span>Job Shen</span><span data-view-count data-pagefind-ignore data-article-id="c22fb70b" data-enabled="true" data-writes-enabled="true" data-endpoint="https://blog-view-counter.kitdnie.workers.dev" role="status">改版后访问次数 · 未启用</span><script type="module">var e=e=>Number.isSafeInteger(e)&&e>=0;function t(t,n){return t?.status===`ok`&&t.articleId===n&&t.metric===`visits`&&e(t.newCount)&&t.legacyBaseline===null&&t.total===null&&typeof t.cutover==`string`&&Number.isFinite(Date.parse(t.cutover))&&typeof t.observedAt==`string`&&Number.isFinite(Date.parse(t.observedAt))}function n(e,t=!1){let n=new Date(e.cutover).toISOString().replace(`T`,` `).slice(0,19),r=`改版后访问次数：${e.newCount}（自 ${n} UTC）`;return t?`${r}（缓存，截至 ${e.observedAt.replace(`T`,` `).slice(0,16)} UTC）`:r}async function r(e,r,i={}){if(!r.enabled){e.textContent=`改版后访问次数 · 未启用`;return}let a=i.fetch||globalThis.fetch,o=i.storage,s=e.dataset.articleId,c=`${r.endpoint}/v1/articles/${s}/views`,l=`blog:views:v1:${r.endpoint}:${s}`,u;try{let e=JSON.parse(o?.getItem(l)||`null`);t(e,s)&&(u=e)}catch{}let d=r=>{if(!t(r,s))throw Error(`invalid_counter_response`);u=r,e.textContent=n(r);try{o?.setItem(l,JSON.stringify(r))}catch{}},f=async()=>{let e=await a(c,{credentials:`omit`,signal:AbortSignal.timeout(3e3)});if(!e.ok)throw Error(`counter_unavailable`);d(await e.json())};try{if(r.writesEnabled){let e=`blog:view-event:v1:${r.endpoint}:${s}`,t=Date.now(),n;try{n=JSON.parse(o?.getItem(e)||`null`)}catch{}let l=n&&t>=n.createdAt&&t-n.createdAt<18e5;if(l&&n.acknowledged){await f();return}let u=l&&/^[a-f0-9-]{36}$/i.test(n.eventId)?n:{eventId:(i.randomUUID||(()=>crypto.randomUUID()))(),createdAt:t,acknowledged:!1};try{o?.setItem(e,JSON.stringify(u))}catch{}for(let t=0;t<2;t++)try{let t=await a(c,{method:`POST`,credentials:`omit`,headers:{"Content-Type":`application/json`},body:JSON.stringify({eventId:u.eventId}),signal:AbortSignal.timeout(3e3)});if(!t.ok){if(t.status===429||t.status>=500)break;throw Error(`counter_rejected`)}d(await t.json());try{o?.setItem(e,JSON.stringify({...u,acknowledged:!0}))}catch{}return}catch{if(t===1)break}}await f()}catch{e.textContent=u?n(u,!0):`改版后访问次数暂不可用`}}for(let e of document.querySelectorAll(`[data-view-count]`)){let t;try{t=localStorage}catch{}let n=location.origin===`https://blog.jobshen.com`;r(e,{enabled:n&&e.dataset.enabled===`true`,writesEnabled:n&&e.dataset.writesEnabled===`true`,endpoint:e.dataset.endpoint},{storage:t})}</script></div></header><details class="mobile-toc" data-pagefind-ignore><summary>本文目录</summary><ol><li><a href="#怎么比的">怎么比的</a></li><li><a href="#没变的部分">没变的部分</a></li><li><a href="#实测">实测</a></li><li><a href="#源码">源码</a></li><li><a href="#变了的插入触发-autovacuum-的阈值">变了的：插入触发 autovacuum 的阈值</a></li><li><a href="#实测同样追加一天16-和-19-差多少">实测：同样追加一天，16 和 19 差多少</a></li><li><a href="#冻结比例从哪来">冻结比例从哪来</a></li><li><a href="#怎么看怎么调">怎么看、怎么调</a></li><li><a href="#完整代码">完整代码</a></li><li><a href="#编译和建实例">编译和建实例</a></li><li><a href="#00_coveragesql还有多少范围没摘要">00_coverage.sql：还有多少范围没摘要</a></li><li><a href="#10_av_setupsql建表决定历史数据冻不冻结">10_av_setup.sql：建表，决定历史数据冻不冻结</a></li><li><a href="#gen_appendpy生成追加一天的-sql每条-insert-后取样">gen_append.py：生成追加一天的 SQL，每条 INSERT 后取样</a></li><li><a href="#run_avsh建一次性实例跑一轮清理">run_av.sh：建一次性实例，跑一轮，清理</a></li><li><a href="#11_insert_thresholdsql18-及以上算当前的插入阈值">11_insert_threshold.sql：18 及以上算当前的插入阈值</a></li><li><a href="#小结">小结</a></li></ol></details><div class="prose"><p><a href="/posts/ba262449.html">前一篇</a> 讲了时序表上 BRIN 索引 “没汇总的尾巴”：新写入的块范围默认没有摘要，对任何查询都算命中，查最近 10 分钟要读 3985 页而不是 128 页；VACUUM 会补摘要但跳过最后一个不满的范围，<code>autosummarize</code> 的请求放在内存里，重启会丢。那篇的数字都是在 PostgreSQL 16 上测的。</p>
+<p>PostgreSQL 19 已经在 2026 年 11 月 19 日发布（<a href="https://www.postgresql.org/about/news/postgresql-19-released-3449/">官方公告</a>），离 16 隔了三个大版本。我把前一篇的全部脚本原样搬到 19.0 上重跑，又对照了两版的源码和 17、18、19 的 release notes。结论先放这里：</p>
+<ul>
+<li>**前一篇测的汇总行为，两版一致。**每一个页数、每一次汇总、<code>autosummarize</code> 丢请求的过程，逐项相同。BRIN 并不是哪儿都没动：17 加了并行建索引，在本文的一个测试里让 minmax-multi 索引大了一页，但它不影响汇总。</li>
+<li>**变的是 autovacuum 什么时候来。**从 18 开始，插入触发 autovacuum 的阈值只按表里 “没冻结的部分” 算。只追加的时序表，历史数据一旦冻结，autovacuum 就会频繁地来，顺手把 BRIN 汇总了。同样追加一天数据，16 上 autovacuum 一次都没来，尾巴积了 32 个范围；19 上来了 19 次，每条 <code>INSERT</code> 后取样，没汇总的范围最多看到 6 个。</li>
+</ul>
+<p>下面先交代怎么比的，再讲没变的部分，最后把变了的这一点讲透：公式怎么变的、实测差多少、冻结比例从哪来、该怎么利用。</p>
+<h2 id="怎么比的">怎么比的</h2>
+<p>两版都用同一台机器、同一个编译器从源码编译：16 用 <code>REL_16_15</code> 标签（16.15），19 用 <code>REL_19_0</code> 标签（19.0），gcc 13.3、<code>-O2</code>。机器和前一篇一样是 4 核 Intel Xeon 2.10GHz，配置只改了 <code>shared_buffers=1GB</code>，其余都是默认值。</p>
+<p>有一处默认值两版不同，会影响后面的结果：<strong>18 起 <code>initdb</code> 默认打开数据校验和</strong>（<code>--no-data-checksums</code> 才关），16 默认关。我按各自的默认值建实例，需要区分时另建了一个关掉校验和的 19 实例做对照。</p>
+<p>所有实验都在只为测试建的实例上跑，不碰任何在用的库。autovacuum 那组实验要改实例级参数，所以它的脚本每次自己 <code>initdb</code> 一个一次性实例，跑完不论成败都停掉、删掉（见文末 <code>run_av.sh</code>）。</p>
+<p>前一篇用的是 Ubuntu 的 16.15 发行版包，这次换成自己编译的 16.15，所有页数和 WAL 量与前一篇完全相同，耗时相近，说明换编译方式不影响结论。</p>
+<h2 id="没变的部分">没变的部分</h2>
+<h3 id="实测">实测</h3>
+<p>前一篇 “完整代码” 一节的 9 个 SQL 脚本和 Go 维护程序，一个字没改，在两版上各跑一遍：</p>
+<table>
+<thead>
+<tr>
+<th>项目</th>
+<th>16.15</th>
+<th>19.0</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>追加一天后，查最近 10 分钟读的页</td>
+<td>3985</td>
+<td>3985</td>
+</tr>
+<tr>
+<td>追加一天后，查一周前 10 分钟读的页</td>
+<td>4113</td>
+<td>4113</td>
+</tr>
+<tr>
+<td><code>VACUUM</code> 后有摘要的范围 / 总范围</td>
+<td>473 / 474</td>
+<td>473 / 474</td>
+</tr>
+<tr>
+<td><code>VACUUM</code> 后查最近 10 分钟读的页</td>
+<td>145</td>
+<td>145</td>
+</tr>
+<tr>
+<td><code>brin_summarize_new_values</code> 补上的范围</td>
+<td>1（尾巴）</td>
+<td>1（尾巴）</td>
+</tr>
+<tr>
+<td><code>autosummarize</code>：带着积压请求重启后，永远没摘要的范围</td>
+<td>4</td>
+<td>4</td>
+</tr>
+<tr>
+<td>写放大 WAL：从不汇总 / 连尾巴汇总 / 只汇总尾巴之前</td>
+<td>207 / 247 / 207 MB</td>
+<td>207 / 247 / 207 MB</td>
+</tr>
+<tr>
+<td>补传打乱顺序后，minmax / minmax-multi 读的页</td>
+<td>5075 / 128</td>
+<td>5075 / 128</td>
+</tr>
+<tr>
+<td>非属主调用 <code>brin_summarize_range</code></td>
+<td><code>must be owner of index</code></td>
+<td>同左</td>
+</tr>
+<tr>
+<td><code>ALTER INDEX ... OWNER TO</code></td>
+<td>只给警告，不改</td>
+<td>同左</td>
+</tr>
+<tr>
+<td>Go 程序的 3 个边界测试</td>
+<td>全部通过</td>
+<td>全部通过</td>
+</tr>
+</tbody>
+</table>
+<p>写放大测试的耗时（各跑 4 遍）：</p>
+<table>
+<thead>
+<tr>
+<th>策略</th>
+<th>16.15</th>
+<th>19.0</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>A：从不汇总</td>
+<td>2.61 ～ 3.07 秒</td>
+<td>2.17 ～ 2.69 秒</td>
+</tr>
+<tr>
+<td>B：连尾巴一起汇总</td>
+<td>3.71 ～ 4.05 秒</td>
+<td>3.18 ～ 3.73 秒</td>
+</tr>
+<tr>
+<td>C：只汇总尾巴之前的范围</td>
+<td>3.08 ～ 3.10 秒</td>
+<td>2.52 ～ 2.84 秒</td>
+</tr>
+</tbody>
+</table>
+<p>19 整体快一些，但 B 比 A 慢三成多、多写 40 MB WAL 的结论两版一样。开不开校验和对这个测试没影响：关掉校验和的 19 实例上 WAL 也是 207 / 247 / 207 MB，耗时在同一范围。</p>
+<p>唯一看得见的差别是一个索引大小：补传测试里 minmax-multi 索引在 16 上 64 kB，在 19 上 72 kB。原因是 17 加入的 BRIN 并行建索引：<code>SET max_parallel_maintenance_workers = 0</code> 串行建，19 上也是 64 kB。多出的 8 kB 是一个页，和汇总行为无关。</p>
+<h3 id="源码">源码</h3>
+<p>数字一致不奇怪，因为决定这些行为的代码在 16.15 和 19.0 之间没有改：</p>
+<ul>
+<li><code>bringetbitmap</code> 里那段注释还在：revmap 读到无效指针的范围，“Pages in those ranges need to be returned regardless of scan keys”。</li>
+<li><code>brinvacuumcleanup</code> 调 <code>brinsummarize</code> 时 <code>include_partial</code> 仍是 <code>false</code>，<code>brin_summarize_range</code> 仍是 <code>true</code>；判断尾巴的条件仍是 <code>startBlk + pagesPerRange &gt; heapNumBlocks</code>。</li>
+<li><code>brininsert</code> 里触发 <code>autosummarize</code> 的条件一样：开了选项、写在新范围第一页的第一个位置、前一个范围没摘要。</li>
+<li><code>autovacuum.c</code> 里存工作项的数组 <code>NUM_WORKITEMS</code> 仍是 256，放在共享内存里。</li>
+<li><code>brin_summarize_range</code> 仍然要求是索引属主，仍然在表上拿 SHARE UPDATE EXCLUSIVE 锁。</li>
+</ul>
+<p>17、18、19 三版 release notes 里和 BRIN 有关的条目只有一条：17 允许并行建 BRIN 索引。18 和 19 的 release notes 里没有提到 BRIN。</p>
+<h2 id="变了的插入触发-autovacuum-的阈值">变了的：插入触发 autovacuum 的阈值</h2>
+<p>前一篇说 “只靠 autovacuum 不够”，理由是只插入的表要等新插入的行数超过总行数的 20% 才会触发 VACUUM，表越大间隔越长，存满一年的演示表要等约 73 天。这一条在 18 以后要打折扣，打多少折取决于表里有多少页已经冻结。</p>
+<p>16 的公式（<a href="https://www.postgresql.org/docs/16/routine-vacuuming.html#AUTOVACUUM">16 的文档</a>）：</p>
+<pre class="astro-code astro-code-themes github-light github-dark" style="background-color:#fff;--shiki-dark-bg:#24292e;color:#24292e;--shiki-dark:#e1e4e8; overflow-x: auto;" tabindex="0" data-language="text"><code><span class="line"><span>vacuum insert threshold = vacuum base insert threshold + vacuum insert scale factor * number of tuples</span></span></code></pre>
+<p>19 的公式（<a href="https://www.postgresql.org/docs/19/routine-vacuuming.html#AUTOVACUUM">19 的文档</a>）多乘了一项：</p>
+<pre class="astro-code astro-code-themes github-light github-dark" style="background-color:#fff;--shiki-dark-bg:#24292e;color:#24292e;--shiki-dark:#e1e4e8; overflow-x: auto;" tabindex="0" data-language="text"><code><span class="line"><span>vacuum insert threshold = vacuum base insert threshold + vacuum insert scale factor * number of tuples * percent of table not frozen</span></span></code></pre>
+<p>其中 “percent of table not frozen” 是 <code>1 - pg_class.relallfrozen / pg_class.relpages</code>。<code>relallfrozen</code> 是 18 新加的 <code>pg_class</code> 列，记录可见性映射里标成 all-frozen 的页数。</p>
+<p>这个改动是 18.0 进来的，提交是 <a href="https://postgr.es/c/06eae9e62">06eae9e62</a>，标题 “Trigger more frequent autovacuums with relallfrozen”。18.0 自带的文档还是旧公式，我对照了 18.0 和 18.7 两个标签：代码在 18.0 就已经乘了未冻结比例，文档是后来的小版本才补上的。所以 <strong>18 和 19 的行为相同</strong>，19 上额外多了一个观察用的视图（见下文）。</p>
+<p>19 的 <code>autovacuum.c</code> 里对应的代码：</p>
+<pre class="astro-code astro-code-themes github-light github-dark" style="background-color:#fff;--shiki-dark-bg:#24292e;color:#24292e;--shiki-dark:#e1e4e8; overflow-x: auto;" tabindex="0" data-language="c"><code><span class="line"><span style="color:#D73A49;--shiki-dark:#F97583">if</span><span style="color:#24292E;--shiki-dark:#E1E4E8"> (relpages </span><span style="color:#D73A49;--shiki-dark:#F97583">&gt;</span><span style="color:#005CC5;--shiki-dark:#79B8FF"> 0</span><span style="color:#D73A49;--shiki-dark:#F97583"> &amp;&amp;</span><span style="color:#24292E;--shiki-dark:#E1E4E8"> relallfrozen </span><span style="color:#D73A49;--shiki-dark:#F97583">&gt;</span><span style="color:#005CC5;--shiki-dark:#79B8FF"> 0</span><span style="color:#24292E;--shiki-dark:#E1E4E8">)</span></span>
+<span class="line"><span style="color:#24292E;--shiki-dark:#E1E4E8">{</span></span>
+<span class="line"><span style="color:#24292E;--shiki-dark:#E1E4E8">    relallfrozen </span><span style="color:#D73A49;--shiki-dark:#F97583">=</span><span style="color:#6F42C1;--shiki-dark:#B392F0"> Min</span><span style="color:#24292E;--shiki-dark:#E1E4E8">(relallfrozen, relpages);</span></span>
+<span class="line"><span style="color:#24292E;--shiki-dark:#E1E4E8">    pcnt_unfrozen </span><span style="color:#D73A49;--shiki-dark:#F97583">=</span><span style="color:#005CC5;--shiki-dark:#79B8FF"> 1</span><span style="color:#D73A49;--shiki-dark:#F97583"> -</span><span style="color:#24292E;--shiki-dark:#E1E4E8"> ((float4) relallfrozen </span><span style="color:#D73A49;--shiki-dark:#F97583">/</span><span style="color:#24292E;--shiki-dark:#E1E4E8"> relpages);</span></span>
+<span class="line"><span style="color:#24292E;--shiki-dark:#E1E4E8">}</span></span>
+<span class="line"><span style="color:#24292E;--shiki-dark:#E1E4E8">...</span></span>
+<span class="line"><span style="color:#24292E;--shiki-dark:#E1E4E8">vacinsthresh </span><span style="color:#D73A49;--shiki-dark:#F97583">=</span><span style="color:#24292E;--shiki-dark:#E1E4E8"> (float4) vac_ins_base_thresh </span><span style="color:#D73A49;--shiki-dark:#F97583">+</span></span>
+<span class="line"><span style="color:#24292E;--shiki-dark:#E1E4E8">    vac_ins_scale_factor </span><span style="color:#D73A49;--shiki-dark:#F97583">*</span><span style="color:#24292E;--shiki-dark:#E1E4E8"> reltuples </span><span style="color:#D73A49;--shiki-dark:#F97583">*</span><span style="color:#24292E;--shiki-dark:#E1E4E8"> pcnt_unfrozen;</span></span></code></pre>
+<p>数据页大致一样满时，<code>reltuples × 未冻结比例</code> 约等于 “没冻结的那些页里的行数”。所以 18 以后的规则可以这样记：</p>
+<blockquote>
+<p>自上次 VACUUM 以来插入的行数，超过 1000 + 20% × 表里还没冻结的行数，就触发。</p>
+</blockquote>
+<p>对只追加的表，冻结的总是旧数据，没冻结的是最近写入的那一段。表再大，阈值也只跟最近这一段有关。</p>
+<p>两个边界值得注意：<code>relallfrozen</code> 为 0 时这一项按 1 算，和 16 完全一样；整张表都冻结时这一项为 0，阈值退化成基础值 1000 行。</p>
+<h2 id="实测同样追加一天16-和-19-差多少">实测：同样追加一天，16 和 19 差多少</h2>
+<p>前一篇的追加实验里表级 autovacuum 是关着的，所以看不出这个变化。这次把它打开：</p>
+<ol>
+<li>建同样的 14 天、604.8 万行的表和 BRIN 索引，表级 autovacuum 先关着。</li>
+<li>执行 <code>VACUUM ANALYZE</code>，或者 <code>VACUUM (FREEZE, ANALYZE)</code> 模拟一张跑了很久、历史数据都已冻结的表。</li>
+<li>打开表级 autovacuum，追加 11-15 一整天：1440 条 <code>INSERT</code>，每条是一分钟的数据（300 行），像采集程序一样逐条提交。</li>
+<li>每条 <code>INSERT</code> 之后取样一次，记下没摘要的范围数和 autovacuum 次数，一天共 1440 个样本。</li>
+</ol>
+<p>真等一天太久，所以按 600 倍速写：每条 <code>INSERT</code> 之后停 0.1 秒，两分半写完一天；<code>autovacuum_naptime</code> 相应调成 1 秒，相当于每 10 分钟的数据检查一次。这是压缩时间的模拟，和真实情况不严格等价：默认的 naptime 是 1 分钟，对应的是 1 分钟的数据，检查得更细；真实实例上还有别的表争抢 autovacuum worker、有锁冲突。所以下面的次数和峰值只用来看两版的差别和大致量级，不能当成线上的预测。“触发不触发” 这件事本身只取决于插入计数有没有超过阈值，和时间快慢无关，这一点不受压缩影响。</p>
+<p>没摘要的范围只会在 <code>INSERT</code> 把表写进一个新范围时增加，在两次 <code>INSERT</code> 之间只可能被 autovacuum 汇总而减少。所以每条 <code>INSERT</code> 之后取一次样，能看到几乎每一次增加；唯一可能漏掉的，是某次 <code>INSERT</code> 进行中恰好有 autovacuum 汇总了前面的范围，这种一闪而过的值。下文的 “最多” 都是指 “这 1440 个样本里看到的最大值”。</p>
+<p>结果（代码见文末 “完整代码”；“结束时” 是写完后再等 3 秒查的值）：</p>
+<table>
+<thead>
+<tr>
+<th>版本</th>
+<th>历史数据</th>
+<th>一开始冻结的页</th>
+<th>autovacuum 次数</th>
+<th>没摘要的范围（最多 / 结束时）</th>
+<th>期间 WAL</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>16.15</td>
+<td>不冻结</td>
+<td>0</td>
+<td>0</td>
+<td>32 / 32</td>
+<td>44 MB</td>
+</tr>
+<tr>
+<td>16.15</td>
+<td>全部冻结</td>
+<td>56524（全部）</td>
+<td>0</td>
+<td>32 / 32</td>
+<td>44 MB</td>
+</tr>
+<tr>
+<td>19.0</td>
+<td>不冻结</td>
+<td>15936</td>
+<td>0</td>
+<td>32 / 32</td>
+<td>44 MB</td>
+</tr>
+<tr>
+<td>19.0</td>
+<td>全部冻结</td>
+<td>56524（全部）</td>
+<td>19</td>
+<td>6 / 2</td>
+<td>47 MB</td>
+</tr>
+<tr>
+<td>19.0</td>
+<td>全部冻结，表级 <code>autovacuum_freeze_min_age = 0</code>（实验对照）</td>
+<td>56524（全部）</td>
+<td>135</td>
+<td>2 / 1</td>
+<td>46 MB</td>
+</tr>
+</tbody>
+</table>
+<p>19.0 的后两行各跑了两遍：第二遍 “全部冻结” 是 19 次、最多 6 个、WAL 49 MB；第二遍 <code>autovacuum_freeze_min_age = 0</code> 是 137 次、最多 2 个、WAL 46 MB。表里是第一遍。</p>
+<p>几点解读：</p>
+<p>**16 上冻不冻结都一样。**公式里没有冻结这一项，阈值是 1000 + 0.2 × 604.8 万 ≈ 121 万行，一天只插 43.2 万行，autovacuum 不会来，32 个范围原样积着。这一条只取决于插入行数够不够阈值，和上面说的时间压缩无关。</p>
+<p>**19 上历史数据冻结后，autovacuum 一天来了 19 次。**一开始阈值只有 1000 行，在前 20 分钟的数据里就触发了第一次。之后间隔越来越长，因为新写入的页 VACUUM 时大多只标 all-visible、不冻结（这些行的事务号还很新），未冻结的部分越积越多，阈值随之变大。按小时看（第一遍）：</p>
+<table>
+<thead>
+<tr>
+<th>时刻</th>
+<th>第 1 小时</th>
+<th>第 6 小时</th>
+<th>第 12 小时</th>
+<th>第 18 小时</th>
+<th>第 24 小时</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>到整点时累计 autovacuum 次数</td>
+<td>4</td>
+<td>11</td>
+<td>15</td>
+<td>17</td>
+<td>19</td>
+</tr>
+<tr>
+<td>这一小时内样本的最大值</td>
+<td>1</td>
+<td>3</td>
+<td>4</td>
+<td>3</td>
+<td>6</td>
+</tr>
+<tr>
+<td>整点时没摘要的范围</td>
+<td>1</td>
+<td>2</td>
+<td>2</td>
+<td>3</td>
+<td>2</td>
+</tr>
+</tbody>
+</table>
+<p>到一天结束时，阈值约为 1000 + 0.2 × 43 万 ≈ 8.7 万行，也就是不到 5 小时的数据，所以后半天没摘要的范围在 1 到 6 之间来回，6 只出现在最后一次 autovacuum 之前约 12 分钟的数据里。两遍的最大值都是 6，出现的时刻也一样。我早先跑同一实验时打开过 <code>log_autovacuum_min_duration = 0</code>，日志里每次 autovacuum 只扫新写入的几十到几百个页，耗时 0.02 秒左右。整天的 WAL 是 47 和 49 MB，16 上是 44 MB；两边校验和的设置不同，这几 MB 不全是 VACUUM 带来的。</p>
+<p>**<code>autovacuum_freeze_min_age = 0</code> 让它几乎每次检查都来。**这个表级参数让 autovacuum 把扫到的页直接冻结，于是每次 VACUUM 后整张表又是全冻结，阈值又回到 1000 行。一天来了 135 和 137 次，样本里没摘要的范围最多 2 个；这一张表、这份合成负载上，WAL 也没有变多（46 MB）。19 的文档在讲插入阈值时也提到了这个参数：“it may be beneficial to lower the table’s autovacuum_freeze_min_age”。这一行是为了看清机制的实验对照，设成 0 并不是推荐值，下文再说怎么用。</p>
+<p>**19 上不冻结历史数据时也有一点区别。**表里的行都刚写入，按理一页都不该冻结，可一开始的 <code>VACUUM ANALYZE</code> 在 19 上冻结了 15936 页，约 28%（这张表上我前后跑了多次，在 19% 到 36% 之间）。原因在校验和：VACUUM 设置提示位时，如果这个页自上次检查点以来还没写过整页镜像（FPI），开了校验和就要写一个；19 的 <code>pruneheap.c</code> 里 <code>heap_page_will_freeze</code> 判断 “反正已经写了 FPI”，就顺手把整页冻结。用 <code>--no-data-checksums</code> 建的 19 实例上，同样的步骤冻结 0 页，之后同样是 0 次 autovacuum、32 个范围；16 打开校验和也是 0 页。这一点冻结让阈值从约 121 万行降到约 87 万行，一天的写入仍然够不着，所以结果和 16 一样。</p>
+<h2 id="冻结比例从哪来">冻结比例从哪来</h2>
+<p>上面的实验用 <code>VACUUM FREEZE</code> 一步到位，线上的表要靠时间慢慢冻结。几条途径：</p>
+<ul>
+<li><strong>行的年龄超过 <code>vacuum_freeze_min_age</code></strong>（默认 5000 万个事务）。之后任何一次 VACUUM 扫到这些页，都会冻结它们。</li>
+<li><strong>表的年龄接近 <code>autovacuum_freeze_max_age</code></strong>（默认 2 亿个事务）时，autovacuum 做一次全表冻结。</li>
+<li><strong>18 加入的 “eager scanning”</strong>：普通 VACUUM 也会去扫一部分 all-visible 但没冻结的页，能冻就冻。扫了却冻不了的页占到全表的 <code>vacuum_max_eager_freeze_failure_rate</code>（默认 3%）就停；冻成功的页，每次最多是 “all-visible 但没冻结” 那些页的 20%（见 <a href="https://www.postgresql.org/docs/19/runtime-config-vacuum.html">19 的参数文档</a>）。</li>
+<li><strong>上面说的顺手冻结</strong>：开了校验和、本来就要写 FPI 的页。</li>
+</ul>
+<p>事务号是整个实例共用的，所以一张时序表的旧数据多快被冻结，取决于整个实例消耗事务号的速度，不只取决于这张表。按前一篇存满一年、约 1.58 亿行的演示表算，不同冻结比例下需要插入多少行才会触发（按公式计算，不是实测）：</p>
+<table>
+<thead>
+<tr>
+<th>冻结比例</th>
+<th>阈值（行）</th>
+<th>相当于几天的数据</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>0%（16 上永远是这样）</td>
+<td>3154 万</td>
+<td>73 天</td>
+</tr>
+<tr>
+<td>50%</td>
+<td>1577 万</td>
+<td>36.5 天</td>
+</tr>
+<tr>
+<td>90%</td>
+<td>316 万</td>
+<td>7.3 天</td>
+</tr>
+<tr>
+<td>99%</td>
+<td>32 万</td>
+<td>0.73 天</td>
+</tr>
+</tbody>
+</table>
+<p>旧数据冻得越彻底，autovacuum 来得越勤。一个繁忙实例上跑了一年的时序表，大部分旧页很可能早已冻结，但到底是多少要看自己的库。</p>
+<h2 id="怎么看怎么调">怎么看、怎么调</h2>
+<p>**看现在的阈值。**18 以后可以直接用 <code>pg_class.relallfrozen</code> 套公式（文末 <code>11_insert_threshold.sql</code>）。19 还新加了视图 <code>pg_stat_autovacuum_scores</code>，其中 <code>vacuum_insert_score</code> 是 “自上次 VACUUM 以来插入的行数 ÷ 插入阈值”，再乘以权重 <code>autovacuum_vacuum_insert_score_weight</code>（默认 1）。默认权重下，它超过 1 表示已经满足插入触发的条件；下一轮检查是否真的执行，还要看有没有空闲的 worker、能不能拿到表锁等（见 <a href="https://www.postgresql.org/docs/19/monitoring-stats.html#MONITORING-PG-STAT-AUTOVACUUM-SCORES">19 的统计视图文档</a>）。我在早先一遍 “历史数据全部冻结” 实验结束时查到的一行：</p>
+<pre class="astro-code astro-code-themes github-light github-dark" style="background-color:#fff;--shiki-dark-bg:#24292e;color:#24292e;--shiki-dark:#e1e4e8; overflow-x: auto;" tabindex="0" data-language="text"><code><span class="line"><span>relname             | positions_av</span></span>
+<span class="line"><span>vacuum_insert_score | 0.9934763875244556</span></span>
+<span class="line"><span>do_vacuum           | f</span></span></code></pre>
+<p>这个视图本身是 19 的 “打分系统” 的一部分：autovacuum 按分数决定先处理哪张表。它改变的是处理顺序，不改变触发条件。</p>
+<p>**降低表级 <code>autovacuum_freeze_min_age</code> 能让 autovacuum 来得更勤，但值得先在自己的负载上验证。**上面设成 0 是为了看清机制的实验对照，不是推荐值。对只追加、不更新的时序表，新行早冻晚冻都一样，提前冻结只是提前做了迟早要做的事；可 VACUUM 次数会成倍增加，每次都要扫页、改可见性映射、写 WAL。本文这一张表、合成的负载上看不出明显代价，不等于别的库上也看不出来。要用的话，挑一个比默认 5000 万小、但不是 0 的值，对比调整前后的 vacuum 次数、I/O 和 WAL 再定。表上还有不少 UPDATE 或 DELETE 的，过早冻结的工作会白做，更要谨慎。</p>
+<p>**前一篇的建议在 19 上仍然成立，只是兜底任务更少有事可做。**几个原因：</p>
+<ul>
+<li>VACUUM 仍然不汇总尾巴，<code>autosummarize</code> 也不汇总，尾巴最多让查询多读一个范围，这一点两版一样。</li>
+<li>autovacuum 什么时候来取决于冻结比例，而冻结比例取决于实例上所有表的事务量，你不能直接控制它。</li>
+<li>全局 <code>autovacuum = off</code>、长时间持有冲突锁的操作、带着积压请求重启，这些会让汇总落空的情况在 19 上一个也没少。</li>
+</ul>
+<p>所以推荐做法是：索引开 <code>autosummarize = on</code>；用前一篇的维护程序定期补齐 “最后一个已分配页所在范围之前” 的范围；在 18 及以上，可以评估调低这类表的 <code>autovacuum_freeze_min_age</code>，确认多出来的 vacuum 次数和 I/O 能接受之后，让 autovacuum 顺带完成更多汇总。前一篇里 “只靠 autovacuum 不够” 和 “约 73 天” 这两处，在 16、17 上原样成立；在 18 及以上，只在表里一页都没冻结时成立。</p>
+<h2 id="完整代码">完整代码</h2>
+<h3 id="编译和建实例">编译和建实例</h3>
+<pre class="astro-code astro-code-themes github-light github-dark" style="background-color:#fff;--shiki-dark-bg:#24292e;color:#24292e;--shiki-dark:#e1e4e8; overflow-x: auto;" tabindex="0" data-language="bash"><code><span class="line"><span style="color:#6A737D;--shiki-dark:#6A737D"># 两个版本各编译一份，装到不同目录。需要 gcc、make、bison、flex 和 zlib 开发包</span></span>
+<span class="line"><span style="color:#D73A49;--shiki-dark:#F97583">for</span><span style="color:#24292E;--shiki-dark:#E1E4E8"> tag </span><span style="color:#D73A49;--shiki-dark:#F97583">in</span><span style="color:#032F62;--shiki-dark:#9ECBFF"> REL_16_15</span><span style="color:#032F62;--shiki-dark:#9ECBFF"> REL_19_0</span><span style="color:#24292E;--shiki-dark:#E1E4E8">; </span><span style="color:#D73A49;--shiki-dark:#F97583">do</span></span>
+<span class="line"><span style="color:#24292E;--shiki-dark:#E1E4E8">  v</span><span style="color:#D73A49;--shiki-dark:#F97583">=</span><span style="color:#24292E;--shiki-dark:#E1E4E8">${tag</span><span style="color:#D73A49;--shiki-dark:#F97583">#</span><span style="color:#24292E;--shiki-dark:#E1E4E8">REL_}; v</span><span style="color:#D73A49;--shiki-dark:#F97583">=</span><span style="color:#24292E;--shiki-dark:#E1E4E8">${v</span><span style="color:#D73A49;--shiki-dark:#F97583">%%</span><span style="color:#24292E;--shiki-dark:#E1E4E8">_</span><span style="color:#D73A49;--shiki-dark:#F97583">*</span><span style="color:#24292E;--shiki-dark:#E1E4E8">}            </span><span style="color:#6A737D;--shiki-dark:#6A737D"># 16 或 19</span></span>
+<span class="line"><span style="color:#6F42C1;--shiki-dark:#B392F0">  git</span><span style="color:#032F62;--shiki-dark:#9ECBFF"> clone</span><span style="color:#005CC5;--shiki-dark:#79B8FF"> --depth</span><span style="color:#005CC5;--shiki-dark:#79B8FF"> 1</span><span style="color:#005CC5;--shiki-dark:#79B8FF"> --branch</span><span style="color:#032F62;--shiki-dark:#9ECBFF"> "</span><span style="color:#24292E;--shiki-dark:#E1E4E8">$tag</span><span style="color:#032F62;--shiki-dark:#9ECBFF">"</span><span style="color:#032F62;--shiki-dark:#9ECBFF"> https://github.com/postgres/postgres.git</span><span style="color:#032F62;--shiki-dark:#9ECBFF"> "pg</span><span style="color:#24292E;--shiki-dark:#E1E4E8">$v</span><span style="color:#032F62;--shiki-dark:#9ECBFF">"</span></span>
+<span class="line"><span style="color:#24292E;--shiki-dark:#E1E4E8">  (</span><span style="color:#005CC5;--shiki-dark:#79B8FF">cd</span><span style="color:#032F62;--shiki-dark:#9ECBFF"> "pg</span><span style="color:#24292E;--shiki-dark:#E1E4E8">$v</span><span style="color:#032F62;--shiki-dark:#9ECBFF">"</span><span style="color:#24292E;--shiki-dark:#E1E4E8"> &amp;&amp;</span></span>
+<span class="line"><span style="color:#6F42C1;--shiki-dark:#B392F0">   ./configure</span><span style="color:#005CC5;--shiki-dark:#79B8FF"> --prefix=</span><span style="color:#032F62;--shiki-dark:#9ECBFF">"/opt/pg</span><span style="color:#24292E;--shiki-dark:#E1E4E8">$v</span><span style="color:#032F62;--shiki-dark:#9ECBFF">"</span><span style="color:#005CC5;--shiki-dark:#79B8FF"> --without-icu</span><span style="color:#005CC5;--shiki-dark:#79B8FF"> --without-readline</span><span style="color:#24292E;--shiki-dark:#E1E4E8"> &amp;&amp;</span></span>
+<span class="line"><span style="color:#6F42C1;--shiki-dark:#B392F0">   make</span><span style="color:#005CC5;--shiki-dark:#79B8FF"> -j4</span><span style="color:#24292E;--shiki-dark:#E1E4E8"> &amp;&amp; </span><span style="color:#6F42C1;--shiki-dark:#B392F0">make</span><span style="color:#032F62;--shiki-dark:#9ECBFF"> install</span><span style="color:#24292E;--shiki-dark:#E1E4E8"> &amp;&amp;</span></span>
+<span class="line"><span style="color:#6F42C1;--shiki-dark:#B392F0">   make</span><span style="color:#005CC5;--shiki-dark:#79B8FF"> -C</span><span style="color:#032F62;--shiki-dark:#9ECBFF"> contrib/pageinspect</span><span style="color:#032F62;--shiki-dark:#9ECBFF"> install</span><span style="color:#24292E;--shiki-dark:#E1E4E8"> &amp;&amp;</span></span>
+<span class="line"><span style="color:#6F42C1;--shiki-dark:#B392F0">   make</span><span style="color:#005CC5;--shiki-dark:#79B8FF"> -C</span><span style="color:#032F62;--shiki-dark:#9ECBFF"> contrib/pg_visibility</span><span style="color:#032F62;--shiki-dark:#9ECBFF"> install</span><span style="color:#24292E;--shiki-dark:#E1E4E8">)</span></span>
+<span class="line"><span style="color:#D73A49;--shiki-dark:#F97583">done</span></span></code></pre>
+<p>“没变的部分” 用的就是前一篇 “完整代码” 一节的脚本和 Go 程序，在两个版本的测试实例上原样执行。下面是这篇新加的 autovacuum 实验，四个文件放在同一目录，入口是 <code>run_av.sh</code>：它自己建实例、自己清理，不需要也不允许指向已有的实例。</p>
+<h3 id="00_coveragesql还有多少范围没摘要">00_coverage.sql：还有多少范围没摘要</h3>
+<p>和前一篇相同，为了这篇能单独运行再贴一次。</p>
+<pre class="astro-code astro-code-themes github-light github-dark" style="background-color:#fff;--shiki-dark-bg:#24292e;color:#24292e;--shiki-dark:#e1e4e8; overflow-x: auto;" tabindex="0" data-language="sql"><code><span class="line"><span style="color:#6A737D;--shiki-dark:#6A737D">-- 需要超级用户：pageinspect 能直接读索引页</span></span>
+<span class="line"><span style="color:#D73A49;--shiki-dark:#F97583">CREATE</span><span style="color:#24292E;--shiki-dark:#E1E4E8"> EXTENSION </span><span style="color:#D73A49;--shiki-dark:#F97583">IF</span><span style="color:#D73A49;--shiki-dark:#F97583"> NOT</span><span style="color:#D73A49;--shiki-dark:#F97583"> EXISTS</span><span style="color:#24292E;--shiki-dark:#E1E4E8"> pageinspect;</span></span>
+<span class="line"></span>
+<span class="line"><span style="color:#6A737D;--shiki-dark:#6A737D">-- 统计一个 BRIN 索引覆盖了多少个块范围、其中多少个还没有汇总。</span></span>
+<span class="line"><span style="color:#6A737D;--shiki-dark:#6A737D">-- 依据是 revmap：每个块范围一格，存着摘要元组的 TID。</span></span>
+<span class="line"><span style="color:#6A737D;--shiki-dark:#6A737D">-- 块号 0 是元数据页、4294967295 是无效块号，两者都表示这个范围没有摘要。</span></span>
+<span class="line"><span style="color:#D73A49;--shiki-dark:#F97583">CREATE OR REPLACE</span><span style="color:#D73A49;--shiki-dark:#F97583"> FUNCTION</span><span style="color:#6F42C1;--shiki-dark:#B392F0"> brin_coverage</span><span style="color:#24292E;--shiki-dark:#E1E4E8">(idx regclass)</span></span>
+<span class="line"><span style="color:#D73A49;--shiki-dark:#F97583">RETURNS</span><span style="color:#D73A49;--shiki-dark:#F97583"> TABLE</span><span style="color:#24292E;--shiki-dark:#E1E4E8"> (ranges </span><span style="color:#D73A49;--shiki-dark:#F97583">bigint</span><span style="color:#24292E;--shiki-dark:#E1E4E8">, summarized </span><span style="color:#D73A49;--shiki-dark:#F97583">bigint</span><span style="color:#24292E;--shiki-dark:#E1E4E8">, unsummarized </span><span style="color:#D73A49;--shiki-dark:#F97583">bigint</span><span style="color:#24292E;--shiki-dark:#E1E4E8">)</span></span>
+<span class="line"><span style="color:#D73A49;--shiki-dark:#F97583">LANGUAGE</span><span style="color:#D73A49;--shiki-dark:#F97583"> sql</span><span style="color:#D73A49;--shiki-dark:#F97583"> AS</span><span style="color:#24292E;--shiki-dark:#E1E4E8"> $$</span></span>
+<span class="line"><span style="color:#D73A49;--shiki-dark:#F97583">WITH</span><span style="color:#24292E;--shiki-dark:#E1E4E8"> meta </span><span style="color:#D73A49;--shiki-dark:#F97583">AS</span><span style="color:#24292E;--shiki-dark:#E1E4E8"> (</span></span>
+<span class="line"><span style="color:#D73A49;--shiki-dark:#F97583">    SELECT</span><span style="color:#005CC5;--shiki-dark:#79B8FF"> m</span><span style="color:#24292E;--shiki-dark:#E1E4E8">.</span><span style="color:#005CC5;--shiki-dark:#79B8FF">pagesperrange</span><span style="color:#24292E;--shiki-dark:#E1E4E8">, </span><span style="color:#005CC5;--shiki-dark:#79B8FF">m</span><span style="color:#24292E;--shiki-dark:#E1E4E8">.</span><span style="color:#005CC5;--shiki-dark:#79B8FF">lastrevmappage</span><span style="color:#24292E;--shiki-dark:#E1E4E8">,</span></span>
+<span class="line"><span style="color:#24292E;--shiki-dark:#E1E4E8">           ceil((pg_relation_size(</span><span style="color:#005CC5;--shiki-dark:#79B8FF">i</span><span style="color:#24292E;--shiki-dark:#E1E4E8">.</span><span style="color:#005CC5;--shiki-dark:#79B8FF">indrelid</span><span style="color:#24292E;--shiki-dark:#E1E4E8">) </span><span style="color:#D73A49;--shiki-dark:#F97583">/</span><span style="color:#24292E;--shiki-dark:#E1E4E8"> current_setting(</span><span style="color:#032F62;--shiki-dark:#9ECBFF">'block_size'</span><span style="color:#24292E;--shiki-dark:#E1E4E8">)::</span><span style="color:#D73A49;--shiki-dark:#F97583">int</span><span style="color:#24292E;--shiki-dark:#E1E4E8">)::</span><span style="color:#D73A49;--shiki-dark:#F97583">numeric</span></span>
+<span class="line"><span style="color:#D73A49;--shiki-dark:#F97583">                /</span><span style="color:#005CC5;--shiki-dark:#79B8FF"> m</span><span style="color:#24292E;--shiki-dark:#E1E4E8">.</span><span style="color:#005CC5;--shiki-dark:#79B8FF">pagesperrange</span><span style="color:#24292E;--shiki-dark:#E1E4E8">)::</span><span style="color:#D73A49;--shiki-dark:#F97583">bigint</span><span style="color:#D73A49;--shiki-dark:#F97583"> AS</span><span style="color:#24292E;--shiki-dark:#E1E4E8"> ranges</span></span>
+<span class="line"><span style="color:#D73A49;--shiki-dark:#F97583">    FROM</span><span style="color:#24292E;--shiki-dark:#E1E4E8"> brin_metapage_info(get_raw_page(idx::</span><span style="color:#D73A49;--shiki-dark:#F97583">text</span><span style="color:#24292E;--shiki-dark:#E1E4E8">, </span><span style="color:#005CC5;--shiki-dark:#79B8FF">0</span><span style="color:#24292E;--shiki-dark:#E1E4E8">)) </span><span style="color:#D73A49;--shiki-dark:#F97583">AS</span><span style="color:#24292E;--shiki-dark:#E1E4E8"> m, pg_index </span><span style="color:#D73A49;--shiki-dark:#F97583">AS</span><span style="color:#24292E;--shiki-dark:#E1E4E8"> i</span></span>
+<span class="line"><span style="color:#D73A49;--shiki-dark:#F97583">    WHERE</span><span style="color:#005CC5;--shiki-dark:#79B8FF"> i</span><span style="color:#24292E;--shiki-dark:#E1E4E8">.</span><span style="color:#005CC5;--shiki-dark:#79B8FF">indexrelid</span><span style="color:#D73A49;--shiki-dark:#F97583"> =</span><span style="color:#24292E;--shiki-dark:#E1E4E8"> idx</span></span>
+<span class="line"><span style="color:#24292E;--shiki-dark:#E1E4E8">),</span></span>
+<span class="line"><span style="color:#24292E;--shiki-dark:#E1E4E8">slots </span><span style="color:#D73A49;--shiki-dark:#F97583">AS</span><span style="color:#24292E;--shiki-dark:#E1E4E8"> (</span></span>
+<span class="line"><span style="color:#D73A49;--shiki-dark:#F97583">    SELECT</span><span style="color:#005CC5;--shiki-dark:#79B8FF"> row_number</span><span style="color:#24292E;--shiki-dark:#E1E4E8">() </span><span style="color:#D73A49;--shiki-dark:#F97583">OVER</span><span style="color:#24292E;--shiki-dark:#E1E4E8"> (</span><span style="color:#D73A49;--shiki-dark:#F97583">ORDER BY</span><span style="color:#24292E;--shiki-dark:#E1E4E8"> p, ord) </span><span style="color:#D73A49;--shiki-dark:#F97583">-</span><span style="color:#005CC5;--shiki-dark:#79B8FF"> 1</span><span style="color:#D73A49;--shiki-dark:#F97583"> AS</span><span style="color:#24292E;--shiki-dark:#E1E4E8"> range_no, </span><span style="color:#005CC5;--shiki-dark:#79B8FF">r</span><span style="color:#24292E;--shiki-dark:#E1E4E8">.</span><span style="color:#005CC5;--shiki-dark:#79B8FF">pages</span><span style="color:#D73A49;--shiki-dark:#F97583"> AS</span><span style="color:#24292E;--shiki-dark:#E1E4E8"> tid</span></span>
+<span class="line"><span style="color:#D73A49;--shiki-dark:#F97583">    FROM</span><span style="color:#24292E;--shiki-dark:#E1E4E8"> meta, </span><span style="color:#005CC5;--shiki-dark:#79B8FF">generate_series</span><span style="color:#24292E;--shiki-dark:#E1E4E8">(</span><span style="color:#005CC5;--shiki-dark:#79B8FF">1</span><span style="color:#24292E;--shiki-dark:#E1E4E8">, </span><span style="color:#005CC5;--shiki-dark:#79B8FF">meta</span><span style="color:#24292E;--shiki-dark:#E1E4E8">.</span><span style="color:#005CC5;--shiki-dark:#79B8FF">lastrevmappage</span><span style="color:#24292E;--shiki-dark:#E1E4E8">) </span><span style="color:#D73A49;--shiki-dark:#F97583">AS</span><span style="color:#24292E;--shiki-dark:#E1E4E8"> p,</span></span>
+<span class="line"><span style="color:#24292E;--shiki-dark:#E1E4E8">         LATERAL brin_revmap_data(get_raw_page(idx::</span><span style="color:#D73A49;--shiki-dark:#F97583">text</span><span style="color:#24292E;--shiki-dark:#E1E4E8">, p)) </span><span style="color:#D73A49;--shiki-dark:#F97583">WITH</span><span style="color:#24292E;--shiki-dark:#E1E4E8"> ORDINALITY </span><span style="color:#D73A49;--shiki-dark:#F97583">AS</span><span style="color:#24292E;--shiki-dark:#E1E4E8"> r(pages, ord)</span></span>
+<span class="line"><span style="color:#24292E;--shiki-dark:#E1E4E8">)</span></span>
+<span class="line"><span style="color:#D73A49;--shiki-dark:#F97583">SELECT</span><span style="color:#005CC5;--shiki-dark:#79B8FF"> meta</span><span style="color:#24292E;--shiki-dark:#E1E4E8">.</span><span style="color:#005CC5;--shiki-dark:#79B8FF">ranges</span><span style="color:#24292E;--shiki-dark:#E1E4E8">,</span></span>
+<span class="line"><span style="color:#005CC5;--shiki-dark:#79B8FF">       count</span><span style="color:#24292E;--shiki-dark:#E1E4E8">(</span><span style="color:#D73A49;--shiki-dark:#F97583">*</span><span style="color:#24292E;--shiki-dark:#E1E4E8">) </span><span style="color:#D73A49;--shiki-dark:#F97583">FILTER</span><span style="color:#24292E;--shiki-dark:#E1E4E8"> (</span><span style="color:#D73A49;--shiki-dark:#F97583">WHERE</span><span style="color:#24292E;--shiki-dark:#E1E4E8"> (tid::</span><span style="color:#D73A49;--shiki-dark:#F97583">text</span><span style="color:#24292E;--shiki-dark:#E1E4E8">::</span><span style="color:#D73A49;--shiki-dark:#F97583">point</span><span style="color:#24292E;--shiki-dark:#E1E4E8">)[0] </span><span style="color:#D73A49;--shiki-dark:#F97583">NOT</span><span style="color:#D73A49;--shiki-dark:#F97583"> IN</span><span style="color:#24292E;--shiki-dark:#E1E4E8"> (</span><span style="color:#005CC5;--shiki-dark:#79B8FF">0</span><span style="color:#24292E;--shiki-dark:#E1E4E8">, </span><span style="color:#005CC5;--shiki-dark:#79B8FF">4294967295</span><span style="color:#24292E;--shiki-dark:#E1E4E8">)),</span></span>
+<span class="line"><span style="color:#005CC5;--shiki-dark:#79B8FF">       meta</span><span style="color:#24292E;--shiki-dark:#E1E4E8">.</span><span style="color:#005CC5;--shiki-dark:#79B8FF">ranges</span><span style="color:#D73A49;--shiki-dark:#F97583"> -</span><span style="color:#005CC5;--shiki-dark:#79B8FF"> count</span><span style="color:#24292E;--shiki-dark:#E1E4E8">(</span><span style="color:#D73A49;--shiki-dark:#F97583">*</span><span style="color:#24292E;--shiki-dark:#E1E4E8">) </span><span style="color:#D73A49;--shiki-dark:#F97583">FILTER</span><span style="color:#24292E;--shiki-dark:#E1E4E8"> (</span><span style="color:#D73A49;--shiki-dark:#F97583">WHERE</span><span style="color:#24292E;--shiki-dark:#E1E4E8"> (tid::</span><span style="color:#D73A49;--shiki-dark:#F97583">text</span><span style="color:#24292E;--shiki-dark:#E1E4E8">::</span><span style="color:#D73A49;--shiki-dark:#F97583">point</span><span style="color:#24292E;--shiki-dark:#E1E4E8">)[0] </span><span style="color:#D73A49;--shiki-dark:#F97583">NOT</span><span style="color:#D73A49;--shiki-dark:#F97583"> IN</span><span style="color:#24292E;--shiki-dark:#E1E4E8"> (</span><span style="color:#005CC5;--shiki-dark:#79B8FF">0</span><span style="color:#24292E;--shiki-dark:#E1E4E8">, </span><span style="color:#005CC5;--shiki-dark:#79B8FF">4294967295</span><span style="color:#24292E;--shiki-dark:#E1E4E8">))</span></span>
+<span class="line"><span style="color:#D73A49;--shiki-dark:#F97583">FROM</span><span style="color:#24292E;--shiki-dark:#E1E4E8"> meta </span><span style="color:#D73A49;--shiki-dark:#F97583">LEFT JOIN</span><span style="color:#24292E;--shiki-dark:#E1E4E8"> slots </span><span style="color:#D73A49;--shiki-dark:#F97583">ON</span><span style="color:#005CC5;--shiki-dark:#79B8FF"> slots</span><span style="color:#24292E;--shiki-dark:#E1E4E8">.</span><span style="color:#005CC5;--shiki-dark:#79B8FF">range_no</span><span style="color:#D73A49;--shiki-dark:#F97583"> &lt;</span><span style="color:#005CC5;--shiki-dark:#79B8FF"> meta</span><span style="color:#24292E;--shiki-dark:#E1E4E8">.</span><span style="color:#005CC5;--shiki-dark:#79B8FF">ranges</span></span>
+<span class="line"><span style="color:#D73A49;--shiki-dark:#F97583">GROUP BY</span><span style="color:#005CC5;--shiki-dark:#79B8FF"> meta</span><span style="color:#24292E;--shiki-dark:#E1E4E8">.</span><span style="color:#005CC5;--shiki-dark:#79B8FF">ranges</span><span style="color:#24292E;--shiki-dark:#E1E4E8">;</span></span>
+<span class="line"><span style="color:#24292E;--shiki-dark:#E1E4E8">$$;</span></span></code></pre>
+<h3 id="10_av_setupsql建表决定历史数据冻不冻结">10_av_setup.sql：建表，决定历史数据冻不冻结</h3>
+<pre class="astro-code astro-code-themes github-light github-dark" style="background-color:#fff;--shiki-dark-bg:#24292e;color:#24292e;--shiki-dark:#e1e4e8; overflow-x: auto;" tabindex="0" data-language="sql"><code><span class="line"><span style="color:#6A737D;--shiki-dark:#6A737D">-- 和前一篇同样的演示表：5 辆车，每辆每秒 1 个点，先灌 14 天历史</span></span>
+<span class="line"><span style="color:#6A737D;--shiki-dark:#6A737D">-- 由 run_av.sh 调用：psql -v freeze=on|off -f 10_av_setup.sql</span></span>
+<span class="line"><span style="color:#D73A49;--shiki-dark:#F97583">CREATE</span><span style="color:#D73A49;--shiki-dark:#F97583"> TABLE</span><span style="color:#6F42C1;--shiki-dark:#B392F0"> positions_av</span><span style="color:#24292E;--shiki-dark:#E1E4E8"> (</span></span>
+<span class="line"><span style="color:#24292E;--shiki-dark:#E1E4E8">    id           </span><span style="color:#D73A49;--shiki-dark:#F97583">bigint</span><span style="color:#D73A49;--shiki-dark:#F97583"> GENERATED</span><span style="color:#D73A49;--shiki-dark:#F97583"> ALWAYS</span><span style="color:#D73A49;--shiki-dark:#F97583"> AS</span><span style="color:#D73A49;--shiki-dark:#F97583"> IDENTITY</span><span style="color:#24292E;--shiki-dark:#E1E4E8">,</span></span>
+<span class="line"><span style="color:#24292E;--shiki-dark:#E1E4E8">    vehicle_id   </span><span style="color:#D73A49;--shiki-dark:#F97583">int</span><span style="color:#D73A49;--shiki-dark:#F97583">         NOT NULL</span><span style="color:#24292E;--shiki-dark:#E1E4E8">,</span></span>
+<span class="line"><span style="color:#24292E;--shiki-dark:#E1E4E8">    collected_at </span><span style="color:#D73A49;--shiki-dark:#F97583">timestamptz</span><span style="color:#D73A49;--shiki-dark:#F97583"> NOT NULL</span><span style="color:#24292E;--shiki-dark:#E1E4E8">,</span></span>
+<span class="line"><span style="color:#24292E;--shiki-dark:#E1E4E8">    latitude     </span><span style="color:#D73A49;--shiki-dark:#F97583">double precision</span><span style="color:#24292E;--shiki-dark:#E1E4E8">,</span></span>
+<span class="line"><span style="color:#24292E;--shiki-dark:#E1E4E8">    longitude    </span><span style="color:#D73A49;--shiki-dark:#F97583">double precision</span><span style="color:#24292E;--shiki-dark:#E1E4E8">,</span></span>
+<span class="line"><span style="color:#24292E;--shiki-dark:#E1E4E8">    speed        </span><span style="color:#D73A49;--shiki-dark:#F97583">int</span></span>
+<span class="line"><span style="color:#24292E;--shiki-dark:#E1E4E8">) </span><span style="color:#D73A49;--shiki-dark:#F97583">WITH</span><span style="color:#24292E;--shiki-dark:#E1E4E8"> (autovacuum_enabled </span><span style="color:#D73A49;--shiki-dark:#F97583">=</span><span style="color:#D73A49;--shiki-dark:#F97583"> off</span><span style="color:#24292E;--shiki-dark:#E1E4E8">);  </span><span style="color:#6A737D;--shiki-dark:#6A737D">-- 灌数据时先关着，准备好了再打开</span></span>
+<span class="line"></span>
+<span class="line"><span style="color:#D73A49;--shiki-dark:#F97583">INSERT INTO</span><span style="color:#24292E;--shiki-dark:#E1E4E8"> positions_av (vehicle_id, collected_at, latitude, longitude, speed)</span></span>
+<span class="line"><span style="color:#D73A49;--shiki-dark:#F97583">SELECT</span><span style="color:#24292E;--shiki-dark:#E1E4E8"> n % </span><span style="color:#005CC5;--shiki-dark:#79B8FF">5</span><span style="color:#D73A49;--shiki-dark:#F97583"> +</span><span style="color:#005CC5;--shiki-dark:#79B8FF"> 1</span><span style="color:#24292E;--shiki-dark:#E1E4E8">,</span></span>
+<span class="line"><span style="color:#D73A49;--shiki-dark:#F97583">       timestamptz</span><span style="color:#032F62;--shiki-dark:#9ECBFF"> '2026-11-01 00:00:00+00'</span><span style="color:#D73A49;--shiki-dark:#F97583"> +</span><span style="color:#24292E;--shiki-dark:#E1E4E8"> (n </span><span style="color:#D73A49;--shiki-dark:#F97583">/</span><span style="color:#005CC5;--shiki-dark:#79B8FF"> 5</span><span style="color:#24292E;--shiki-dark:#E1E4E8">) </span><span style="color:#D73A49;--shiki-dark:#F97583">*</span><span style="color:#24292E;--shiki-dark:#E1E4E8"> interval </span><span style="color:#032F62;--shiki-dark:#9ECBFF">'1 second'</span><span style="color:#24292E;--shiki-dark:#E1E4E8">,</span></span>
+<span class="line"><span style="color:#005CC5;--shiki-dark:#79B8FF">       31</span><span style="color:#24292E;--shiki-dark:#E1E4E8">.</span><span style="color:#005CC5;--shiki-dark:#79B8FF">2</span><span style="color:#D73A49;--shiki-dark:#F97583"> +</span><span style="color:#24292E;--shiki-dark:#E1E4E8"> random() </span><span style="color:#D73A49;--shiki-dark:#F97583">/</span><span style="color:#005CC5;--shiki-dark:#79B8FF"> 100</span><span style="color:#24292E;--shiki-dark:#E1E4E8">, </span><span style="color:#005CC5;--shiki-dark:#79B8FF">121</span><span style="color:#24292E;--shiki-dark:#E1E4E8">.</span><span style="color:#005CC5;--shiki-dark:#79B8FF">4</span><span style="color:#D73A49;--shiki-dark:#F97583"> +</span><span style="color:#24292E;--shiki-dark:#E1E4E8"> random() </span><span style="color:#D73A49;--shiki-dark:#F97583">/</span><span style="color:#005CC5;--shiki-dark:#79B8FF"> 100</span><span style="color:#24292E;--shiki-dark:#E1E4E8">, (random() </span><span style="color:#D73A49;--shiki-dark:#F97583">*</span><span style="color:#005CC5;--shiki-dark:#79B8FF"> 120</span><span style="color:#24292E;--shiki-dark:#E1E4E8">)::</span><span style="color:#D73A49;--shiki-dark:#F97583">int</span></span>
+<span class="line"><span style="color:#D73A49;--shiki-dark:#F97583">FROM</span><span style="color:#005CC5;--shiki-dark:#79B8FF"> generate_series</span><span style="color:#24292E;--shiki-dark:#E1E4E8">(</span><span style="color:#005CC5;--shiki-dark:#79B8FF">0</span><span style="color:#24292E;--shiki-dark:#E1E4E8">, </span><span style="color:#005CC5;--shiki-dark:#79B8FF">14</span><span style="color:#D73A49;--shiki-dark:#F97583"> *</span><span style="color:#005CC5;--shiki-dark:#79B8FF"> 86400</span><span style="color:#D73A49;--shiki-dark:#F97583"> *</span><span style="color:#005CC5;--shiki-dark:#79B8FF"> 5</span><span style="color:#D73A49;--shiki-dark:#F97583"> -</span><span style="color:#005CC5;--shiki-dark:#79B8FF"> 1</span><span style="color:#24292E;--shiki-dark:#E1E4E8">) </span><span style="color:#D73A49;--shiki-dark:#F97583">AS</span><span style="color:#24292E;--shiki-dark:#E1E4E8"> n;</span></span>
+<span class="line"></span>
+<span class="line"><span style="color:#D73A49;--shiki-dark:#F97583">CREATE</span><span style="color:#D73A49;--shiki-dark:#F97583"> INDEX</span><span style="color:#6F42C1;--shiki-dark:#B392F0"> positions_av_brin</span><span style="color:#D73A49;--shiki-dark:#F97583"> ON</span><span style="color:#24292E;--shiki-dark:#E1E4E8"> positions_av </span><span style="color:#D73A49;--shiki-dark:#F97583">USING</span><span style="color:#24292E;--shiki-dark:#E1E4E8"> brin (collected_at);</span></span>
+<span class="line"></span>
+<span class="line"><span style="color:#24292E;--shiki-dark:#E1E4E8">\</span><span style="color:#D73A49;--shiki-dark:#F97583">if</span><span style="color:#24292E;--shiki-dark:#E1E4E8"> :freeze</span></span>
+<span class="line"><span style="color:#6A737D;--shiki-dark:#6A737D">-- 模拟一张跑了很久的表：历史数据都已冻结</span></span>
+<span class="line"><span style="color:#24292E;--shiki-dark:#E1E4E8">VACUUM (FREEZE, ANALYZE) positions_av;</span></span>
+<span class="line"><span style="color:#24292E;--shiki-dark:#E1E4E8">\</span><span style="color:#D73A49;--shiki-dark:#F97583">else</span></span>
+<span class="line"><span style="color:#24292E;--shiki-dark:#E1E4E8">VACUUM ANALYZE positions_av;</span></span>
+<span class="line"><span style="color:#24292E;--shiki-dark:#E1E4E8">\endif</span></span>
+<span class="line"></span>
+<span class="line"><span style="color:#D73A49;--shiki-dark:#F97583">CREATE</span><span style="color:#24292E;--shiki-dark:#E1E4E8"> EXTENSION </span><span style="color:#D73A49;--shiki-dark:#F97583">IF</span><span style="color:#D73A49;--shiki-dark:#F97583"> NOT</span><span style="color:#D73A49;--shiki-dark:#F97583"> EXISTS</span><span style="color:#24292E;--shiki-dark:#E1E4E8"> pg_visibility;</span></span>
+<span class="line"><span style="color:#D73A49;--shiki-dark:#F97583">SELECT</span><span style="color:#24292E;--shiki-dark:#E1E4E8"> relpages, reltuples::</span><span style="color:#D73A49;--shiki-dark:#F97583">bigint</span><span style="color:#24292E;--shiki-dark:#E1E4E8">,</span></span>
+<span class="line"><span style="color:#24292E;--shiki-dark:#E1E4E8">       (</span><span style="color:#D73A49;--shiki-dark:#F97583">SELECT</span><span style="color:#24292E;--shiki-dark:#E1E4E8"> all_frozen </span><span style="color:#D73A49;--shiki-dark:#F97583">FROM</span><span style="color:#24292E;--shiki-dark:#E1E4E8"> pg_visibility_map_summary(</span><span style="color:#032F62;--shiki-dark:#9ECBFF">'positions_av'</span><span style="color:#24292E;--shiki-dark:#E1E4E8">)) </span><span style="color:#D73A49;--shiki-dark:#F97583">AS</span><span style="color:#24292E;--shiki-dark:#E1E4E8"> frozen_pages</span></span>
+<span class="line"><span style="color:#D73A49;--shiki-dark:#F97583">FROM</span><span style="color:#24292E;--shiki-dark:#E1E4E8"> pg_class </span><span style="color:#D73A49;--shiki-dark:#F97583">WHERE</span><span style="color:#24292E;--shiki-dark:#E1E4E8"> relname </span><span style="color:#D73A49;--shiki-dark:#F97583">=</span><span style="color:#032F62;--shiki-dark:#9ECBFF"> 'positions_av'</span><span style="color:#24292E;--shiki-dark:#E1E4E8">;</span></span></code></pre>
+<h3 id="gen_appendpy生成追加一天的-sql每条-insert-后取样">gen_append.py：生成追加一天的 SQL，每条 INSERT 后取样</h3>
+<pre class="astro-code astro-code-themes github-light github-dark" style="background-color:#fff;--shiki-dark-bg:#24292e;color:#24292e;--shiki-dark:#e1e4e8; overflow-x: auto;" tabindex="0" data-language="python"><code><span class="line"><span style="color:#6A737D;--shiki-dark:#6A737D"># 生成 "追加一天数据" 的 SQL：每条 INSERT 是一分钟的数据（5 辆车 × 60 秒），</span></span>
+<span class="line"><span style="color:#6A737D;--shiki-dark:#6A737D"># 每条之后 sleep 0.1 秒，一天 1440 条约两分半跑完。</span></span>
+<span class="line"><span style="color:#6A737D;--shiki-dark:#6A737D"># 每条 INSERT 必须是单独的语句：后端在两条语句之间才把插入计数报给统计系统，</span></span>
+<span class="line"><span style="color:#6A737D;--shiki-dark:#6A737D"># autovacuum 看的就是这个计数。</span></span>
+<span class="line"><span style="color:#6A737D;--shiki-dark:#6A737D"># 每条 INSERT 之后取样一次，输出 "第几分钟|没摘要的范围|累计 autovacuum 次数"。</span></span>
+<span class="line"><span style="color:#005CC5;--shiki-dark:#79B8FF">print</span><span style="color:#24292E;--shiki-dark:#E1E4E8">(</span><span style="color:#032F62;--shiki-dark:#9ECBFF">"</span><span style="color:#005CC5;--shiki-dark:#79B8FF">\\</span><span style="color:#032F62;--shiki-dark:#9ECBFF">pset tuples_only on</span><span style="color:#005CC5;--shiki-dark:#79B8FF">\n\\</span><span style="color:#032F62;--shiki-dark:#9ECBFF">pset format unaligned"</span><span style="color:#24292E;--shiki-dark:#E1E4E8">)</span></span>
+<span class="line"><span style="color:#D73A49;--shiki-dark:#F97583">for</span><span style="color:#24292E;--shiki-dark:#E1E4E8"> m </span><span style="color:#D73A49;--shiki-dark:#F97583">in</span><span style="color:#005CC5;--shiki-dark:#79B8FF"> range</span><span style="color:#24292E;--shiki-dark:#E1E4E8">(</span><span style="color:#005CC5;--shiki-dark:#79B8FF">1440</span><span style="color:#24292E;--shiki-dark:#E1E4E8">):</span></span>
+<span class="line"><span style="color:#005CC5;--shiki-dark:#79B8FF">    print</span><span style="color:#24292E;--shiki-dark:#E1E4E8">(</span><span style="color:#D73A49;--shiki-dark:#F97583">f</span><span style="color:#032F62;--shiki-dark:#9ECBFF">"""INSERT INTO positions_av (vehicle_id, collected_at, latitude, longitude, speed)</span></span>
+<span class="line"><span style="color:#032F62;--shiki-dark:#9ECBFF">SELECT n % 5 + 1, timestamptz '2026-11-15 00:00:00+00' + (</span><span style="color:#005CC5;--shiki-dark:#79B8FF">{</span><span style="color:#24292E;--shiki-dark:#E1E4E8">m</span><span style="color:#005CC5;--shiki-dark:#79B8FF">}</span><span style="color:#032F62;--shiki-dark:#9ECBFF"> * 60 + n / 5) * interval '1 second',</span></span>
+<span class="line"><span style="color:#032F62;--shiki-dark:#9ECBFF">       31.2 + random() / 100, 121.4 + random() / 100, (random() * 120)::int</span></span>
+<span class="line"><span style="color:#032F62;--shiki-dark:#9ECBFF">FROM generate_series(0, 299) AS n;</span></span>
+<span class="line"><span style="color:#032F62;--shiki-dark:#9ECBFF">SELECT </span><span style="color:#005CC5;--shiki-dark:#79B8FF">{</span><span style="color:#24292E;--shiki-dark:#E1E4E8">m </span><span style="color:#D73A49;--shiki-dark:#F97583">+</span><span style="color:#005CC5;--shiki-dark:#79B8FF"> 1}</span><span style="color:#032F62;--shiki-dark:#9ECBFF">, c.unsummarized, s.autovacuum_count</span></span>
+<span class="line"><span style="color:#032F62;--shiki-dark:#9ECBFF">FROM brin_coverage('positions_av_brin') AS c, pg_stat_user_tables AS s</span></span>
+<span class="line"><span style="color:#032F62;--shiki-dark:#9ECBFF">WHERE s.relname = 'positions_av';</span></span>
+<span class="line"><span style="color:#032F62;--shiki-dark:#9ECBFF">SELECT pg_sleep(0.1) </span><span style="color:#005CC5;--shiki-dark:#79B8FF">\\</span><span style="color:#032F62;--shiki-dark:#9ECBFF">g /dev/null"""</span><span style="color:#24292E;--shiki-dark:#E1E4E8">)</span></span></code></pre>
+<h3 id="run_avsh建一次性实例跑一轮清理">run_av.sh：建一次性实例，跑一轮，清理</h3>
+<pre class="astro-code astro-code-themes github-light github-dark" style="background-color:#fff;--shiki-dark-bg:#24292e;color:#24292e;--shiki-dark:#e1e4e8; overflow-x: auto;" tabindex="0" data-language="bash"><code><span class="line"><span style="color:#6A737D;--shiki-dark:#6A737D">#!/bin/bash</span></span>
+<span class="line"><span style="color:#6A737D;--shiki-dark:#6A737D"># 用法：./run_av.sh &lt;PostgreSQL 安装目录&gt; on|off ['autovacuum_freeze_min_age = 0']</span></span>
+<span class="line"><span style="color:#6A737D;--shiki-dark:#6A737D">#   例：./run_av.sh /opt/pg19 on</span></span>
+<span class="line"><span style="color:#6A737D;--shiki-dark:#6A737D">#   第二个参数决定历史数据是否先冻结，第三个参数是额外的表级存储参数（可省略）。</span></span>
+<span class="line"><span style="color:#6A737D;--shiki-dark:#6A737D">#   环境变量 INITDB_OPTS 可以给 initdb 加参数，例如 INITDB_OPTS=--no-data-checksums。</span></span>
+<span class="line"><span style="color:#6A737D;--shiki-dark:#6A737D">#   每次取样写到 SAMPLES 指定的文件（默认 ./samples.txt），终端只打印汇总。</span></span>
+<span class="line"><span style="color:#6A737D;--shiki-dark:#6A737D">#</span></span>
+<span class="line"><span style="color:#6A737D;--shiki-dark:#6A737D"># 脚本自己建一个一次性实例，跑完（不论成功失败）停掉并删除，不会连接任何已有实例：</span></span>
+<span class="line"><span style="color:#6A737D;--shiki-dark:#6A737D">#   - 数据目录和 socket 都在 mktemp -d 建的私有目录里（0700，只有当前用户能进）；</span></span>
+<span class="line"><span style="color:#6A737D;--shiki-dark:#6A737D">#   - 不监听 TCP，本地只认 peer 认证（连接用户必须就是当前操作系统用户）；</span></span>
+<span class="line"><span style="color:#6A737D;--shiki-dark:#6A737D">#   - 只用给定安装目录里的 initdb / pg_ctl / psql，版本一定匹配；</span></span>
+<span class="line"><span style="color:#6A737D;--shiki-dark:#6A737D">#   - autovacuum_naptime 写在这个实例自己的 postgresql.conf 里，不用 ALTER SYSTEM。</span></span>
+<span class="line"><span style="color:#6A737D;--shiki-dark:#6A737D"># 要以普通用户运行（initdb 不允许 root），当前目录里要有另外三个文件。</span></span>
+<span class="line"><span style="color:#005CC5;--shiki-dark:#79B8FF">set</span><span style="color:#005CC5;--shiki-dark:#79B8FF"> -euo</span><span style="color:#032F62;--shiki-dark:#9ECBFF"> pipefail</span></span>
+<span class="line"><span style="color:#24292E;--shiki-dark:#E1E4E8">[ </span><span style="color:#005CC5;--shiki-dark:#79B8FF">$#</span><span style="color:#D73A49;--shiki-dark:#F97583"> -ge</span><span style="color:#005CC5;--shiki-dark:#79B8FF"> 2</span><span style="color:#24292E;--shiki-dark:#E1E4E8"> ] </span><span style="color:#D73A49;--shiki-dark:#F97583">||</span><span style="color:#24292E;--shiki-dark:#E1E4E8"> { </span><span style="color:#6F42C1;--shiki-dark:#B392F0">sed</span><span style="color:#005CC5;--shiki-dark:#79B8FF"> -n</span><span style="color:#032F62;--shiki-dark:#9ECBFF"> '2,5p'</span><span style="color:#032F62;--shiki-dark:#9ECBFF"> "</span><span style="color:#005CC5;--shiki-dark:#79B8FF">$0</span><span style="color:#032F62;--shiki-dark:#9ECBFF">"</span><span style="color:#24292E;--shiki-dark:#E1E4E8">; </span><span style="color:#005CC5;--shiki-dark:#79B8FF">exit</span><span style="color:#005CC5;--shiki-dark:#79B8FF"> 2</span><span style="color:#24292E;--shiki-dark:#E1E4E8">; }</span></span>
+<span class="line"><span style="color:#24292E;--shiki-dark:#E1E4E8">bin</span><span style="color:#D73A49;--shiki-dark:#F97583">=</span><span style="color:#E36209;--shiki-dark:#FFAB70">$1</span><span style="color:#032F62;--shiki-dark:#9ECBFF">/bin</span><span style="color:#24292E;--shiki-dark:#E1E4E8">; freeze</span><span style="color:#D73A49;--shiki-dark:#F97583">=</span><span style="color:#E36209;--shiki-dark:#FFAB70">$2</span><span style="color:#24292E;--shiki-dark:#E1E4E8">; extra</span><span style="color:#D73A49;--shiki-dark:#F97583">=</span><span style="color:#E36209;--shiki-dark:#FFAB70">${3</span><span style="color:#D73A49;--shiki-dark:#F97583">:-</span><span style="color:#E36209;--shiki-dark:#FFAB70">}</span></span>
+<span class="line"><span style="color:#24292E;--shiki-dark:#E1E4E8">samples</span><span style="color:#D73A49;--shiki-dark:#F97583">=</span><span style="color:#24292E;--shiki-dark:#E1E4E8">${SAMPLES</span><span style="color:#D73A49;--shiki-dark:#F97583">:-</span><span style="color:#24292E;--shiki-dark:#E1E4E8">samples.txt}   </span><span style="color:#6A737D;--shiki-dark:#6A737D"># 相对路径按当前目录算，脚本不切换目录</span></span>
+<span class="line"></span>
+<span class="line"><span style="color:#6A737D;--shiki-dark:#6A737D"># 清掉调用者环境里所有能把 psql 指到别处的变量</span></span>
+<span class="line"><span style="color:#005CC5;--shiki-dark:#79B8FF">unset</span><span style="color:#032F62;--shiki-dark:#9ECBFF"> PGHOST</span><span style="color:#032F62;--shiki-dark:#9ECBFF"> PGHOSTADDR</span><span style="color:#032F62;--shiki-dark:#9ECBFF"> PGPORT</span><span style="color:#032F62;--shiki-dark:#9ECBFF"> PGDATABASE</span><span style="color:#032F62;--shiki-dark:#9ECBFF"> PGUSER</span><span style="color:#032F62;--shiki-dark:#9ECBFF"> PGPASSWORD</span><span style="color:#032F62;--shiki-dark:#9ECBFF"> PGPASSFILE</span><span style="color:#005CC5;--shiki-dark:#79B8FF"> \</span></span>
+<span class="line"><span style="color:#032F62;--shiki-dark:#9ECBFF">      PGSERVICE</span><span style="color:#032F62;--shiki-dark:#9ECBFF"> PGSERVICEFILE</span><span style="color:#032F62;--shiki-dark:#9ECBFF"> PGOPTIONS</span><span style="color:#032F62;--shiki-dark:#9ECBFF"> PGSSLMODE</span><span style="color:#032F62;--shiki-dark:#9ECBFF"> PGTARGETSESSIONATTRS</span></span>
+<span class="line"></span>
+<span class="line"><span style="color:#24292E;--shiki-dark:#E1E4E8">work</span><span style="color:#D73A49;--shiki-dark:#F97583">=</span><span style="color:#24292E;--shiki-dark:#E1E4E8">$(</span><span style="color:#6F42C1;--shiki-dark:#B392F0">mktemp</span><span style="color:#005CC5;--shiki-dark:#79B8FF"> -d</span><span style="color:#24292E;--shiki-dark:#E1E4E8">)</span></span>
+<span class="line"><span style="color:#6F42C1;--shiki-dark:#B392F0">cleanup</span><span style="color:#24292E;--shiki-dark:#E1E4E8">() {</span></span>
+<span class="line"><span style="color:#6F42C1;--shiki-dark:#B392F0">    "</span><span style="color:#24292E;--shiki-dark:#E1E4E8">$bin</span><span style="color:#6F42C1;--shiki-dark:#B392F0">/pg_ctl"</span><span style="color:#005CC5;--shiki-dark:#79B8FF"> -D</span><span style="color:#032F62;--shiki-dark:#9ECBFF"> "</span><span style="color:#24292E;--shiki-dark:#E1E4E8">$work</span><span style="color:#032F62;--shiki-dark:#9ECBFF">/data"</span><span style="color:#005CC5;--shiki-dark:#79B8FF"> -m</span><span style="color:#032F62;--shiki-dark:#9ECBFF"> immediate</span><span style="color:#032F62;--shiki-dark:#9ECBFF"> stop</span><span style="color:#D73A49;--shiki-dark:#F97583"> &gt;</span><span style="color:#032F62;--shiki-dark:#9ECBFF">/dev/null</span><span style="color:#D73A49;--shiki-dark:#F97583"> 2&gt;&amp;1</span><span style="color:#D73A49;--shiki-dark:#F97583"> ||</span><span style="color:#005CC5;--shiki-dark:#79B8FF"> true</span></span>
+<span class="line"><span style="color:#6F42C1;--shiki-dark:#B392F0">    rm</span><span style="color:#005CC5;--shiki-dark:#79B8FF"> -rf</span><span style="color:#032F62;--shiki-dark:#9ECBFF"> "</span><span style="color:#24292E;--shiki-dark:#E1E4E8">$work</span><span style="color:#032F62;--shiki-dark:#9ECBFF">"</span></span>
+<span class="line"><span style="color:#24292E;--shiki-dark:#E1E4E8">}</span></span>
+<span class="line"><span style="color:#005CC5;--shiki-dark:#79B8FF">trap</span><span style="color:#032F62;--shiki-dark:#9ECBFF"> cleanup</span><span style="color:#032F62;--shiki-dark:#9ECBFF"> EXIT</span><span style="color:#032F62;--shiki-dark:#9ECBFF"> INT</span><span style="color:#032F62;--shiki-dark:#9ECBFF"> TERM</span></span>
+<span class="line"></span>
+<span class="line"><span style="color:#6F42C1;--shiki-dark:#B392F0">"</span><span style="color:#24292E;--shiki-dark:#E1E4E8">$bin</span><span style="color:#6F42C1;--shiki-dark:#B392F0">/initdb"</span><span style="color:#005CC5;--shiki-dark:#79B8FF"> -D</span><span style="color:#032F62;--shiki-dark:#9ECBFF"> "</span><span style="color:#24292E;--shiki-dark:#E1E4E8">$work</span><span style="color:#032F62;--shiki-dark:#9ECBFF">/data"</span><span style="color:#005CC5;--shiki-dark:#79B8FF"> --auth-local=peer</span><span style="color:#005CC5;--shiki-dark:#79B8FF"> --auth-host=reject</span><span style="color:#24292E;--shiki-dark:#E1E4E8"> ${INITDB_OPTS</span><span style="color:#D73A49;--shiki-dark:#F97583">:-</span><span style="color:#24292E;--shiki-dark:#E1E4E8">} </span><span style="color:#D73A49;--shiki-dark:#F97583">&gt;</span><span style="color:#032F62;--shiki-dark:#9ECBFF">/dev/null</span></span>
+<span class="line"><span style="color:#6F42C1;--shiki-dark:#B392F0">cat</span><span style="color:#D73A49;--shiki-dark:#F97583"> &gt;&gt;</span><span style="color:#032F62;--shiki-dark:#9ECBFF"> "</span><span style="color:#24292E;--shiki-dark:#E1E4E8">$work</span><span style="color:#032F62;--shiki-dark:#9ECBFF">/data/postgresql.conf"</span><span style="color:#D73A49;--shiki-dark:#F97583"> &lt;&lt;</span><span style="color:#032F62;--shiki-dark:#9ECBFF">CONF</span></span>
+<span class="line"><span style="color:#032F62;--shiki-dark:#9ECBFF">listen_addresses = ''</span></span>
+<span class="line"><span style="color:#032F62;--shiki-dark:#9ECBFF">unix_socket_directories = '</span><span style="color:#24292E;--shiki-dark:#E1E4E8">$work</span><span style="color:#032F62;--shiki-dark:#9ECBFF">'</span></span>
+<span class="line"><span style="color:#032F62;--shiki-dark:#9ECBFF">unix_socket_permissions = 0700</span></span>
+<span class="line"><span style="color:#032F62;--shiki-dark:#9ECBFF">shared_buffers = 1GB</span></span>
+<span class="line"><span style="color:#032F62;--shiki-dark:#9ECBFF"># 1 秒看一次：数据按 600 倍速写入，1 秒相当于 10 分钟的数据</span></span>
+<span class="line"><span style="color:#032F62;--shiki-dark:#9ECBFF">autovacuum_naptime = 1s</span></span>
+<span class="line"><span style="color:#032F62;--shiki-dark:#9ECBFF">CONF</span></span>
+<span class="line"><span style="color:#6F42C1;--shiki-dark:#B392F0">"</span><span style="color:#24292E;--shiki-dark:#E1E4E8">$bin</span><span style="color:#6F42C1;--shiki-dark:#B392F0">/pg_ctl"</span><span style="color:#005CC5;--shiki-dark:#79B8FF"> -D</span><span style="color:#032F62;--shiki-dark:#9ECBFF"> "</span><span style="color:#24292E;--shiki-dark:#E1E4E8">$work</span><span style="color:#032F62;--shiki-dark:#9ECBFF">/data"</span><span style="color:#005CC5;--shiki-dark:#79B8FF"> -l</span><span style="color:#032F62;--shiki-dark:#9ECBFF"> "</span><span style="color:#24292E;--shiki-dark:#E1E4E8">$work</span><span style="color:#032F62;--shiki-dark:#9ECBFF">/server.log"</span><span style="color:#005CC5;--shiki-dark:#79B8FF"> -w</span><span style="color:#032F62;--shiki-dark:#9ECBFF"> start</span><span style="color:#D73A49;--shiki-dark:#F97583"> &gt;</span><span style="color:#032F62;--shiki-dark:#9ECBFF">/dev/null</span></span>
+<span class="line"></span>
+<span class="line"><span style="color:#24292E;--shiki-dark:#E1E4E8">P</span><span style="color:#D73A49;--shiki-dark:#F97583">=</span><span style="color:#24292E;--shiki-dark:#E1E4E8">(</span><span style="color:#032F62;--shiki-dark:#9ECBFF">"</span><span style="color:#24292E;--shiki-dark:#E1E4E8">$bin</span><span style="color:#032F62;--shiki-dark:#9ECBFF">/psql"</span><span style="color:#032F62;--shiki-dark:#9ECBFF"> -X</span><span style="color:#032F62;--shiki-dark:#9ECBFF"> -q</span><span style="color:#032F62;--shiki-dark:#9ECBFF"> -v</span><span style="color:#6F42C1;--shiki-dark:#B392F0"> ON_ERROR_STOP</span><span style="color:#D73A49;--shiki-dark:#F97583">=</span><span style="color:#005CC5;--shiki-dark:#79B8FF">1</span><span style="color:#032F62;--shiki-dark:#9ECBFF"> -h</span><span style="color:#032F62;--shiki-dark:#9ECBFF"> "</span><span style="color:#24292E;--shiki-dark:#E1E4E8">$work</span><span style="color:#032F62;--shiki-dark:#9ECBFF">"</span><span style="color:#24292E;--shiki-dark:#E1E4E8">)</span></span>
+<span class="line"><span style="color:#6F42C1;--shiki-dark:#B392F0">"${</span><span style="color:#24292E;--shiki-dark:#E1E4E8">P</span><span style="color:#6F42C1;--shiki-dark:#B392F0">[</span><span style="color:#D73A49;--shiki-dark:#F97583">@</span><span style="color:#6F42C1;--shiki-dark:#B392F0">]}"</span><span style="color:#005CC5;--shiki-dark:#79B8FF"> -d</span><span style="color:#032F62;--shiki-dark:#9ECBFF"> postgres</span><span style="color:#005CC5;--shiki-dark:#79B8FF"> -c</span><span style="color:#032F62;--shiki-dark:#9ECBFF"> 'CREATE DATABASE demo'</span></span>
+<span class="line"><span style="color:#24292E;--shiki-dark:#E1E4E8">P</span><span style="color:#D73A49;--shiki-dark:#F97583">+=</span><span style="color:#24292E;--shiki-dark:#E1E4E8">(</span><span style="color:#032F62;--shiki-dark:#9ECBFF">-d</span><span style="color:#032F62;--shiki-dark:#9ECBFF"> demo</span><span style="color:#24292E;--shiki-dark:#E1E4E8">)</span></span>
+<span class="line"><span style="color:#6F42C1;--shiki-dark:#B392F0">"${</span><span style="color:#24292E;--shiki-dark:#E1E4E8">P</span><span style="color:#6F42C1;--shiki-dark:#B392F0">[</span><span style="color:#D73A49;--shiki-dark:#F97583">@</span><span style="color:#6F42C1;--shiki-dark:#B392F0">]}"</span><span style="color:#005CC5;--shiki-dark:#79B8FF"> -Atc</span><span style="color:#032F62;--shiki-dark:#9ECBFF"> "SELECT version()"</span></span>
+<span class="line"><span style="color:#6F42C1;--shiki-dark:#B392F0">"${</span><span style="color:#24292E;--shiki-dark:#E1E4E8">P</span><span style="color:#6F42C1;--shiki-dark:#B392F0">[</span><span style="color:#D73A49;--shiki-dark:#F97583">@</span><span style="color:#6F42C1;--shiki-dark:#B392F0">]}"</span><span style="color:#005CC5;--shiki-dark:#79B8FF"> -f</span><span style="color:#032F62;--shiki-dark:#9ECBFF"> 00_coverage.sql</span></span>
+<span class="line"><span style="color:#6F42C1;--shiki-dark:#B392F0">"${</span><span style="color:#24292E;--shiki-dark:#E1E4E8">P</span><span style="color:#6F42C1;--shiki-dark:#B392F0">[</span><span style="color:#D73A49;--shiki-dark:#F97583">@</span><span style="color:#6F42C1;--shiki-dark:#B392F0">]}"</span><span style="color:#005CC5;--shiki-dark:#79B8FF"> -v</span><span style="color:#032F62;--shiki-dark:#9ECBFF"> freeze="</span><span style="color:#24292E;--shiki-dark:#E1E4E8">$freeze</span><span style="color:#032F62;--shiki-dark:#9ECBFF">"</span><span style="color:#005CC5;--shiki-dark:#79B8FF"> -f</span><span style="color:#032F62;--shiki-dark:#9ECBFF"> 10_av_setup.sql</span></span>
+<span class="line"><span style="color:#6F42C1;--shiki-dark:#B392F0">"${</span><span style="color:#24292E;--shiki-dark:#E1E4E8">P</span><span style="color:#6F42C1;--shiki-dark:#B392F0">[</span><span style="color:#D73A49;--shiki-dark:#F97583">@</span><span style="color:#6F42C1;--shiki-dark:#B392F0">]}"</span><span style="color:#005CC5;--shiki-dark:#79B8FF"> -c</span><span style="color:#032F62;--shiki-dark:#9ECBFF"> "ALTER TABLE positions_av SET (autovacuum_enabled = on${</span><span style="color:#24292E;--shiki-dark:#E1E4E8">extra</span><span style="color:#D73A49;--shiki-dark:#F97583">:</span><span style="color:#032F62;--shiki-dark:#9ECBFF">+, </span><span style="color:#24292E;--shiki-dark:#E1E4E8">$extra</span><span style="color:#032F62;--shiki-dark:#9ECBFF">})"</span></span>
+<span class="line"></span>
+<span class="line"><span style="color:#24292E;--shiki-dark:#E1E4E8">lsn0</span><span style="color:#D73A49;--shiki-dark:#F97583">=</span><span style="color:#24292E;--shiki-dark:#E1E4E8">$(</span><span style="color:#6F42C1;--shiki-dark:#B392F0">"${</span><span style="color:#24292E;--shiki-dark:#E1E4E8">P</span><span style="color:#6F42C1;--shiki-dark:#B392F0">[</span><span style="color:#D73A49;--shiki-dark:#F97583">@</span><span style="color:#6F42C1;--shiki-dark:#B392F0">]}"</span><span style="color:#005CC5;--shiki-dark:#79B8FF"> -Atc</span><span style="color:#032F62;--shiki-dark:#9ECBFF"> "SELECT pg_current_wal_lsn()"</span><span style="color:#24292E;--shiki-dark:#E1E4E8">)</span></span>
+<span class="line"><span style="color:#6F42C1;--shiki-dark:#B392F0">python3</span><span style="color:#032F62;--shiki-dark:#9ECBFF"> gen_append.py</span><span style="color:#D73A49;--shiki-dark:#F97583"> |</span><span style="color:#6F42C1;--shiki-dark:#B392F0"> "${</span><span style="color:#24292E;--shiki-dark:#E1E4E8">P</span><span style="color:#6F42C1;--shiki-dark:#B392F0">[</span><span style="color:#D73A49;--shiki-dark:#F97583">@</span><span style="color:#6F42C1;--shiki-dark:#B392F0">]}"</span><span style="color:#005CC5;--shiki-dark:#79B8FF"> -f</span><span style="color:#032F62;--shiki-dark:#9ECBFF"> -</span><span style="color:#D73A49;--shiki-dark:#F97583"> &gt;</span><span style="color:#032F62;--shiki-dark:#9ECBFF"> "</span><span style="color:#24292E;--shiki-dark:#E1E4E8">$samples</span><span style="color:#032F62;--shiki-dark:#9ECBFF">"</span></span>
+<span class="line"><span style="color:#6F42C1;--shiki-dark:#B392F0">sleep</span><span style="color:#005CC5;--shiki-dark:#79B8FF"> 3</span></span>
+<span class="line"><span style="color:#6F42C1;--shiki-dark:#B392F0">"${</span><span style="color:#24292E;--shiki-dark:#E1E4E8">P</span><span style="color:#6F42C1;--shiki-dark:#B392F0">[</span><span style="color:#D73A49;--shiki-dark:#F97583">@</span><span style="color:#6F42C1;--shiki-dark:#B392F0">]}"</span><span style="color:#005CC5;--shiki-dark:#79B8FF"> -Atc</span><span style="color:#032F62;--shiki-dark:#9ECBFF"> "SELECT 'WAL', pg_size_pretty(pg_wal_lsn_diff(pg_current_wal_lsn(), '</span><span style="color:#24292E;--shiki-dark:#E1E4E8">$lsn0</span><span style="color:#032F62;--shiki-dark:#9ECBFF">'))"</span></span>
+<span class="line"><span style="color:#6F42C1;--shiki-dark:#B392F0">"${</span><span style="color:#24292E;--shiki-dark:#E1E4E8">P</span><span style="color:#6F42C1;--shiki-dark:#B392F0">[</span><span style="color:#D73A49;--shiki-dark:#F97583">@</span><span style="color:#6F42C1;--shiki-dark:#B392F0">]}"</span><span style="color:#005CC5;--shiki-dark:#79B8FF"> -Atc</span><span style="color:#032F62;--shiki-dark:#9ECBFF"> "SELECT 'end', c.*, s.autovacuum_count</span></span>
+<span class="line"><span style="color:#032F62;--shiki-dark:#9ECBFF">                FROM brin_coverage('positions_av_brin') AS c, pg_stat_user_tables AS s</span></span>
+<span class="line"><span style="color:#032F62;--shiki-dark:#9ECBFF">                WHERE s.relname = 'positions_av'"</span></span>
+<span class="line"></span>
+<span class="line"><span style="color:#6A737D;--shiki-dark:#6A737D"># 汇总：每小时内取样到的最大值、整点时的值，以及全天最大值</span></span>
+<span class="line"><span style="color:#6F42C1;--shiki-dark:#B392F0">awk</span><span style="color:#005CC5;--shiki-dark:#79B8FF"> -F</span><span style="color:#032F62;--shiki-dark:#9ECBFF">'|'</span><span style="color:#032F62;--shiki-dark:#9ECBFF"> '</span></span>
+<span class="line"><span style="color:#032F62;--shiki-dark:#9ECBFF">    { h = int(($1 - 1) / 60) + 1</span></span>
+<span class="line"><span style="color:#032F62;--shiki-dark:#9ECBFF">      if ($2 &gt; hmax[h]) hmax[h] = $2</span></span>
+<span class="line"><span style="color:#032F62;--shiki-dark:#9ECBFF">      if ($2 &gt; max) max = $2</span></span>
+<span class="line"><span style="color:#032F62;--shiki-dark:#9ECBFF">      if ($1 % 60 == 0) printf "hour %2d  unsummarized max %d / at end %d  autovacuum %d\n", h, hmax[h], $2, $3 }</span></span>
+<span class="line"><span style="color:#032F62;--shiki-dark:#9ECBFF">    END { printf "samples %d  max unsummarized %d\n", NR, max }'</span><span style="color:#032F62;--shiki-dark:#9ECBFF"> "</span><span style="color:#24292E;--shiki-dark:#E1E4E8">$samples</span><span style="color:#032F62;--shiki-dark:#9ECBFF">"</span></span></code></pre>
+<p>文中表格的各行分别是（以普通用户运行，例如 <code>sudo -u postgres</code>；不同的行可以给 <code>SAMPLES</code> 指定不同的文件）：</p>
+<pre class="astro-code astro-code-themes github-light github-dark" style="background-color:#fff;--shiki-dark-bg:#24292e;color:#24292e;--shiki-dark:#e1e4e8; overflow-x: auto;" tabindex="0" data-language="bash"><code><span class="line"><span style="color:#6F42C1;--shiki-dark:#B392F0">./run_av.sh</span><span style="color:#032F62;--shiki-dark:#9ECBFF"> /opt/pg16</span><span style="color:#032F62;--shiki-dark:#9ECBFF"> off</span></span>
+<span class="line"><span style="color:#6F42C1;--shiki-dark:#B392F0">./run_av.sh</span><span style="color:#032F62;--shiki-dark:#9ECBFF"> /opt/pg16</span><span style="color:#032F62;--shiki-dark:#9ECBFF"> on</span></span>
+<span class="line"><span style="color:#6F42C1;--shiki-dark:#B392F0">./run_av.sh</span><span style="color:#032F62;--shiki-dark:#9ECBFF"> /opt/pg19</span><span style="color:#032F62;--shiki-dark:#9ECBFF"> off</span></span>
+<span class="line"><span style="color:#6F42C1;--shiki-dark:#B392F0">./run_av.sh</span><span style="color:#032F62;--shiki-dark:#9ECBFF"> /opt/pg19</span><span style="color:#032F62;--shiki-dark:#9ECBFF"> on</span></span>
+<span class="line"><span style="color:#6F42C1;--shiki-dark:#B392F0">./run_av.sh</span><span style="color:#032F62;--shiki-dark:#9ECBFF"> /opt/pg19</span><span style="color:#032F62;--shiki-dark:#9ECBFF"> on</span><span style="color:#032F62;--shiki-dark:#9ECBFF"> 'autovacuum_freeze_min_age = 0'</span></span>
+<span class="line"><span style="color:#24292E;--shiki-dark:#E1E4E8">INITDB_OPTS</span><span style="color:#D73A49;--shiki-dark:#F97583">=</span><span style="color:#032F62;--shiki-dark:#9ECBFF">--no-data-checksums</span><span style="color:#6F42C1;--shiki-dark:#B392F0"> ./run_av.sh</span><span style="color:#032F62;--shiki-dark:#9ECBFF"> /opt/pg19</span><span style="color:#032F62;--shiki-dark:#9ECBFF"> off</span><span style="color:#6A737D;--shiki-dark:#6A737D">   # 关掉校验和的对照</span></span></code></pre>
+<h3 id="11_insert_thresholdsql18-及以上算当前的插入阈值">11_insert_threshold.sql：18 及以上算当前的插入阈值</h3>
+<pre class="astro-code astro-code-themes github-light github-dark" style="background-color:#fff;--shiki-dark-bg:#24292e;color:#24292e;--shiki-dark:#e1e4e8; overflow-x: auto;" tabindex="0" data-language="sql"><code><span class="line"><span style="color:#6A737D;--shiki-dark:#6A737D">-- 18 及以上：按 autovacuum 的公式算出 "再插多少行会触发 VACUUM"。</span></span>
+<span class="line"><span style="color:#6A737D;--shiki-dark:#6A737D">-- 只看全局参数；表上单独设过 autovacuum_vacuum_insert_* 的，要换成表上的值。</span></span>
+<span class="line"><span style="color:#D73A49;--shiki-dark:#F97583">SELECT</span><span style="color:#005CC5;--shiki-dark:#79B8FF"> c</span><span style="color:#24292E;--shiki-dark:#E1E4E8">.</span><span style="color:#005CC5;--shiki-dark:#79B8FF">relname</span><span style="color:#24292E;--shiki-dark:#E1E4E8">,</span></span>
+<span class="line"><span style="color:#005CC5;--shiki-dark:#79B8FF">       c</span><span style="color:#24292E;--shiki-dark:#E1E4E8">.</span><span style="color:#005CC5;--shiki-dark:#79B8FF">reltuples</span><span style="color:#24292E;--shiki-dark:#E1E4E8">::</span><span style="color:#D73A49;--shiki-dark:#F97583">bigint</span><span style="color:#D73A49;--shiki-dark:#F97583">                       AS</span><span style="color:#24292E;--shiki-dark:#E1E4E8"> reltuples,</span></span>
+<span class="line"><span style="color:#005CC5;--shiki-dark:#79B8FF">       c</span><span style="color:#24292E;--shiki-dark:#E1E4E8">.</span><span style="color:#005CC5;--shiki-dark:#79B8FF">relpages</span><span style="color:#24292E;--shiki-dark:#E1E4E8">,</span></span>
+<span class="line"><span style="color:#005CC5;--shiki-dark:#79B8FF">       c</span><span style="color:#24292E;--shiki-dark:#E1E4E8">.</span><span style="color:#005CC5;--shiki-dark:#79B8FF">relallfrozen</span><span style="color:#24292E;--shiki-dark:#E1E4E8">,</span></span>
+<span class="line"><span style="color:#005CC5;--shiki-dark:#79B8FF">       s</span><span style="color:#24292E;--shiki-dark:#E1E4E8">.</span><span style="color:#005CC5;--shiki-dark:#79B8FF">n_ins_since_vacuum</span><span style="color:#24292E;--shiki-dark:#E1E4E8">,</span></span>
+<span class="line"><span style="color:#005CC5;--shiki-dark:#79B8FF">       round</span><span style="color:#24292E;--shiki-dark:#E1E4E8">(current_setting(</span><span style="color:#032F62;--shiki-dark:#9ECBFF">'autovacuum_vacuum_insert_threshold'</span><span style="color:#24292E;--shiki-dark:#E1E4E8">)::</span><span style="color:#D73A49;--shiki-dark:#F97583">numeric</span></span>
+<span class="line"><span style="color:#D73A49;--shiki-dark:#F97583">             +</span><span style="color:#24292E;--shiki-dark:#E1E4E8"> current_setting(</span><span style="color:#032F62;--shiki-dark:#9ECBFF">'autovacuum_vacuum_insert_scale_factor'</span><span style="color:#24292E;--shiki-dark:#E1E4E8">)::</span><span style="color:#D73A49;--shiki-dark:#F97583">numeric</span></span>
+<span class="line"><span style="color:#D73A49;--shiki-dark:#F97583">               *</span><span style="color:#005CC5;--shiki-dark:#79B8FF"> greatest</span><span style="color:#24292E;--shiki-dark:#E1E4E8">(</span><span style="color:#005CC5;--shiki-dark:#79B8FF">c</span><span style="color:#24292E;--shiki-dark:#E1E4E8">.</span><span style="color:#005CC5;--shiki-dark:#79B8FF">reltuples</span><span style="color:#24292E;--shiki-dark:#E1E4E8">, </span><span style="color:#005CC5;--shiki-dark:#79B8FF">0</span><span style="color:#24292E;--shiki-dark:#E1E4E8">)::</span><span style="color:#D73A49;--shiki-dark:#F97583">numeric</span></span>
+<span class="line"><span style="color:#D73A49;--shiki-dark:#F97583">               *</span><span style="color:#D73A49;--shiki-dark:#F97583"> CASE</span><span style="color:#D73A49;--shiki-dark:#F97583"> WHEN</span><span style="color:#005CC5;--shiki-dark:#79B8FF"> c</span><span style="color:#24292E;--shiki-dark:#E1E4E8">.</span><span style="color:#005CC5;--shiki-dark:#79B8FF">relpages</span><span style="color:#D73A49;--shiki-dark:#F97583"> &gt;</span><span style="color:#005CC5;--shiki-dark:#79B8FF"> 0</span><span style="color:#D73A49;--shiki-dark:#F97583"> AND</span><span style="color:#005CC5;--shiki-dark:#79B8FF"> c</span><span style="color:#24292E;--shiki-dark:#E1E4E8">.</span><span style="color:#005CC5;--shiki-dark:#79B8FF">relallfrozen</span><span style="color:#D73A49;--shiki-dark:#F97583"> &gt;</span><span style="color:#005CC5;--shiki-dark:#79B8FF"> 0</span></span>
+<span class="line"><span style="color:#D73A49;--shiki-dark:#F97583">                      THEN</span><span style="color:#005CC5;--shiki-dark:#79B8FF"> 1</span><span style="color:#D73A49;--shiki-dark:#F97583"> -</span><span style="color:#005CC5;--shiki-dark:#79B8FF"> least</span><span style="color:#24292E;--shiki-dark:#E1E4E8">(</span><span style="color:#005CC5;--shiki-dark:#79B8FF">c</span><span style="color:#24292E;--shiki-dark:#E1E4E8">.</span><span style="color:#005CC5;--shiki-dark:#79B8FF">relallfrozen</span><span style="color:#24292E;--shiki-dark:#E1E4E8">, </span><span style="color:#005CC5;--shiki-dark:#79B8FF">c</span><span style="color:#24292E;--shiki-dark:#E1E4E8">.</span><span style="color:#005CC5;--shiki-dark:#79B8FF">relpages</span><span style="color:#24292E;--shiki-dark:#E1E4E8">)::</span><span style="color:#D73A49;--shiki-dark:#F97583">numeric</span><span style="color:#D73A49;--shiki-dark:#F97583"> /</span><span style="color:#005CC5;--shiki-dark:#79B8FF"> c</span><span style="color:#24292E;--shiki-dark:#E1E4E8">.</span><span style="color:#005CC5;--shiki-dark:#79B8FF">relpages</span></span>
+<span class="line"><span style="color:#D73A49;--shiki-dark:#F97583">                      ELSE</span><span style="color:#005CC5;--shiki-dark:#79B8FF"> 1</span><span style="color:#D73A49;--shiki-dark:#F97583"> END</span><span style="color:#24292E;--shiki-dark:#E1E4E8">)                </span><span style="color:#D73A49;--shiki-dark:#F97583">AS</span><span style="color:#24292E;--shiki-dark:#E1E4E8"> insert_threshold</span></span>
+<span class="line"><span style="color:#D73A49;--shiki-dark:#F97583">FROM</span><span style="color:#24292E;--shiki-dark:#E1E4E8"> pg_class </span><span style="color:#D73A49;--shiki-dark:#F97583">AS</span><span style="color:#24292E;--shiki-dark:#E1E4E8"> c</span></span>
+<span class="line"><span style="color:#D73A49;--shiki-dark:#F97583">JOIN</span><span style="color:#24292E;--shiki-dark:#E1E4E8"> pg_stat_user_tables </span><span style="color:#D73A49;--shiki-dark:#F97583">AS</span><span style="color:#24292E;--shiki-dark:#E1E4E8"> s </span><span style="color:#D73A49;--shiki-dark:#F97583">ON</span><span style="color:#005CC5;--shiki-dark:#79B8FF"> s</span><span style="color:#24292E;--shiki-dark:#E1E4E8">.</span><span style="color:#005CC5;--shiki-dark:#79B8FF">relid</span><span style="color:#D73A49;--shiki-dark:#F97583"> =</span><span style="color:#005CC5;--shiki-dark:#79B8FF"> c</span><span style="color:#24292E;--shiki-dark:#E1E4E8">.</span><span style="color:#005CC5;--shiki-dark:#79B8FF">oid</span></span>
+<span class="line"><span style="color:#D73A49;--shiki-dark:#F97583">WHERE</span><span style="color:#005CC5;--shiki-dark:#79B8FF"> c</span><span style="color:#24292E;--shiki-dark:#E1E4E8">.</span><span style="color:#005CC5;--shiki-dark:#79B8FF">relname</span><span style="color:#D73A49;--shiki-dark:#F97583"> =</span><span style="color:#032F62;--shiki-dark:#9ECBFF"> 'positions_av'</span><span style="color:#24292E;--shiki-dark:#E1E4E8">;</span></span></code></pre>
+<p>19 上也可以直接查视图：</p>
+<pre class="astro-code astro-code-themes github-light github-dark" style="background-color:#fff;--shiki-dark-bg:#24292e;color:#24292e;--shiki-dark:#e1e4e8; overflow-x: auto;" tabindex="0" data-language="sql"><code><span class="line"><span style="color:#D73A49;--shiki-dark:#F97583">SELECT</span><span style="color:#24292E;--shiki-dark:#E1E4E8"> relname, vacuum_insert_score, do_vacuum</span></span>
+<span class="line"><span style="color:#D73A49;--shiki-dark:#F97583">FROM</span><span style="color:#24292E;--shiki-dark:#E1E4E8"> pg_stat_autovacuum_scores</span></span>
+<span class="line"><span style="color:#D73A49;--shiki-dark:#F97583">WHERE</span><span style="color:#24292E;--shiki-dark:#E1E4E8"> relname </span><span style="color:#D73A49;--shiki-dark:#F97583">=</span><span style="color:#032F62;--shiki-dark:#9ECBFF"> 'positions_av'</span><span style="color:#24292E;--shiki-dark:#E1E4E8">;</span></span></code></pre>
+<h2 id="小结">小结</h2>
+<ul>
+<li>在 19.0 上重跑前一篇的全部实验，测到的 BRIN 汇总行为和 16.15 逐项一致：没摘要的范围对任何查询都算命中，VACUUM 不汇总尾巴，<code>autosummarize</code> 的请求放在 256 格的内存数组里、重启就丢，连尾巴汇总有写放大。决定这些行为的源码在两版之间没有改，18、19 的 release notes 里也没有 BRIN 条目。</li>
+<li>变化在 autovacuum：18 起插入阈值乘以表里未冻结的比例，相当于 “1000 + 20% × 还没冻结的行数”。只追加的时序表，旧数据冻结后，autovacuum 会频繁地来，顺手汇总 BRIN。</li>
+<li>实测追加一天：16 上 autovacuum 0 次、尾巴积 32 个范围；19 上历史数据冻结后 19 次，每条 <code>INSERT</code> 后取样看到的最大值是 6 个；作为实验对照再把表级 <code>autovacuum_freeze_min_age</code> 设成 0，135 次、最多 2 个。时间是压缩模拟的，这些数字看差别和量级，不当线上预测。</li>
+<li>冻结比例取决于整个实例的事务量，你不能直接控制。所以 <code>autosummarize</code> 加兜底任务的做法在 19 上照样推荐；18 及以上可以评估调低这类表的 <code>autovacuum_freeze_min_age</code>，但额外的 I/O 和 vacuum 频率要按自己的负载验证。</li>
+<li>18 起 <code>initdb</code> 默认开校验和，19 上 VACUUM 会顺手冻结一部分本来就要写整页镜像的页；19 新增的 <code>pg_stat_autovacuum_scores</code> 可以直接看到一张表离触发插入 VACUUM 还有多远。</li>
+</ul>
+</div><div class="article-end" data-pagefind-ignore><span>— 文章结束 —</span><a href="/archive/">返回文章归档 ↑</a></div><section class="comment-state" data-comments data-pagefind-ignore data-article-id="c22fb70b" data-repo="kitdine/kitdine.github.io" data-repo-id="MDEwOlJlcG9zaXRvcnk4MTcxMDAzNQ==" data-category="Blog comments" data-category-id="DIC_kwDOBN7L084DJUxV" data-read-only="false" aria-labelledby="comments-heading-c22fb70b"><h2 id="comments-heading-c22fb70b">讨论</h2><p data-comment-status role="status" aria-live="polite">点击后加载 giscus 讨论。登录与发表由你自行操作。</p><button class="load-comments" data-load-comments type="button" aria-controls="comments-frame-c22fb70b">加载讨论</button><div class="giscus" id="comments-frame-c22fb70b" data-comment-frame aria-busy="false"></div><div class="comment-links"><a href="https://github.com/kitdine/kitdine.github.io/discussions/categories/blog-comments">在 GitHub 阅读讨论 ↗</a><a href="https://github.com/kitdine/blog_git_talk/issues">保留的历史评论 ↗</a></div></section><script type="module">var e=`https://giscus.app`,t=`https://blog.jobshen.com`,n=new WeakMap;function r(e,t){return new URL(`/giscus-${e===`dark`?`dark`:`light`}.css`,t).href}function i(i){if(n.has(i))return n.get(i);let a=i.ownerDocument,o=a.defaultView,s=i.querySelector(`[data-load-comments]`),c=i.querySelector(`[data-comment-frame]`),l=i.querySelector(`[data-comment-status]`);if(!s||!c||!l)return;let u=i.dataset,d=u.readOnly===`true`||o.location.origin!==t,f=d?`加载讨论（只读）`:`加载讨论`,p,m,h,g=0,_=!1,v=`idle`,y=()=>r(a.documentElement.dataset.theme,o.location.origin),b=()=>{o.clearTimeout(h),h=void 0};function x(e,t=``){v=e,i.dataset.commentState=e,c.setAttribute(`aria-busy`,String(e===`loading`)),s.hidden=e===`loaded`||e===`empty`,s.disabled=e===`loading`,s.textContent=e===`loading`?`正在加载…`:e===`error`||e===`slow`?`重新加载讨论`:f,l.textContent=t,l.hidden=!t}function S(){m&&(m.dataset.theme=y()),p?.contentWindow?.postMessage({giscus:{setConfig:{theme:y()}}},e)}function C(){!_&&p&&c.contains(p)&&(b(),(!d||v!==`empty`&&v!==`error`)&&x(`loaded`,d?`匿名只读预览。此区域不提供登录或发表操作；也可通过下方链接阅读讨论。`:``))}function w(e=`讨论暂不可用，可以重试或前往 GitHub 阅读。`){b(),x(`error`,e)}function T(){let e=c.querySelector(`iframe`);if(!e||e===p)return;p=e;let t=g,n=()=>!_&&t===g&&p===e&&c.contains(e);e.addEventListener(`load`,()=>{n()&&S()}),e.addEventListener(`error`,()=>{n()&&w()}),S()}function E(){if(_||v===`loading`||v===`loaded`||v===`empty`)return;g+=1;let n=g;if(b(),x(`loading`,`正在加载讨论…`),p&&c.contains(p)){let e=p;p=void 0,T(),e.src=e.src}else if(p=void 0,c.replaceChildren(),!d)m=a.createElement(`script`),m.src=`${e}/client.js`,m.async=!0,m.crossOrigin=`anonymous`,Object.assign(m.dataset,{repo:u.repo,repoId:u.repoId,category:u.category,categoryId:u.categoryId,mapping:`specific`,term:u.articleId,strict:`1`,reactionsEnabled:`0`,emitMetadata:`0`,inputPosition:`bottom`,lang:`zh-CN`,theme:y()}),m.onerror=()=>{!_&&n===g&&w()},m.onload=()=>{_||n!==g||(T(),p||w())},c.append(m);else{let n=new URLSearchParams({origin:`${o.location.origin}${o.location.pathname}`,repo:u.repo,repoId:u.repoId,category:u.category,categoryId:u.categoryId,term:u.articleId,strict:`1`,session:``,reactionsEnabled:`0`,emitMetadata:`0`,theme:y(),backLink:`${t}/posts/${u.articleId}.html`}),r=a.createElement(`iframe`);r.title=`已有讨论（匿名只读预览）`,r.src=`${e}/zh-CN/widget?${n}`,r.sandbox=`allow-scripts allow-same-origin`,r.referrerPolicy=`no-referrer`,r.credentialless=!0,r.inert=!0,r.tabIndex=-1,r.setAttribute(`aria-hidden`,`true`),r.className=`giscus-readonly`,r.setAttribute(`data-giscus-preview`,``),c.append(r),T()}h=o.setTimeout(()=>{!_&&n===g&&v===`loading`&&x(`slow`,`讨论加载较慢，正文不受影响；可重试或通过下方链接阅读。`)},8e3)}function D(t){if(T(),_||!p||!c.contains(p)||t.origin!==e||t.source!==p.contentWindow)return;let n=t.data?.giscus;n&&typeof n==`object`&&(typeof n.error==`string`?n.error.includes(`Discussion not found`)?(b(),x(d?`empty`:`loaded`,d?`这篇文章还没有讨论；只读预览不会创建测试帖。`:``)):(d||!/Bad credentials|Invalid state value|State has expired/.test(n.error))&&w(`讨论暂不可用，正文不受影响；可重试或前往 GitHub 阅读。`):Number.isFinite(n.resizeHeight)&&n.resizeHeight>0&&(p.style.height=`${Math.max(150,Math.min(12e3,n.resizeHeight))}px`,C()))}let O=new o.MutationObserver(T);O.observe(c,{childList:!0,subtree:!0});let k=new o.MutationObserver(S);k.observe(a.documentElement,{attributes:!0,attributeFilter:[`data-theme`]});function A(e){e.persisted||j()}function j(){_||(_=!0,b(),O.disconnect(),k.disconnect(),s.removeEventListener(`click`,E),o.removeEventListener(`message`,D),o.removeEventListener(`pagehide`,A),n.delete(i))}return i.dataset.commentState=`idle`,s.addEventListener(`click`,E),o.addEventListener(`message`,D),o.addEventListener(`pagehide`,A),n.set(i,j),j}document.querySelectorAll(`[data-comments]`).forEach(i);</script><a class="next-post" href="/posts/ba262449.html" data-pagefind-ignore><span>继续阅读 →</span><h3>PostgreSQL BRIN 索引没汇总的尾巴：时序表里最新的数据反而扫得最多</h3></a></article><aside class="desktop-toc" data-pagefind-ignore><span class="eyebrow">ON THIS PAGE</span><h2>本文目录</h2><ol><li class><a href="#怎么比的">怎么比的</a></li><li class><a href="#没变的部分">没变的部分</a></li><li class="sub"><a href="#实测">实测</a></li><li class="sub"><a href="#源码">源码</a></li><li class><a href="#变了的插入触发-autovacuum-的阈值">变了的：插入触发 autovacuum 的阈值</a></li><li class><a href="#实测同样追加一天16-和-19-差多少">实测：同样追加一天，16 和 19 差多少</a></li><li class><a href="#冻结比例从哪来">冻结比例从哪来</a></li><li class><a href="#怎么看怎么调">怎么看、怎么调</a></li><li class><a href="#完整代码">完整代码</a></li><li class="sub"><a href="#编译和建实例">编译和建实例</a></li><li class="sub"><a href="#00_coveragesql还有多少范围没摘要">00_coverage.sql：还有多少范围没摘要</a></li><li class="sub"><a href="#10_av_setupsql建表决定历史数据冻不冻结">10_av_setup.sql：建表，决定历史数据冻不冻结</a></li><li class="sub"><a href="#gen_appendpy生成追加一天的-sql每条-insert-后取样">gen_append.py：生成追加一天的 SQL，每条 INSERT 后取样</a></li><li class="sub"><a href="#run_avsh建一次性实例跑一轮清理">run_av.sh：建一次性实例，跑一轮，清理</a></li><li class="sub"><a href="#11_insert_thresholdsql18-及以上算当前的插入阈值">11_insert_threshold.sql：18 及以上算当前的插入阈值</a></li><li class><a href="#小结">小结</a></li></ol><a class="back-top" href="#main">回到顶部 ↑</a></aside></div></main><footer class="site-footer wrap" data-pagefind-ignore><div><a class="footer-name" href="/">Job Shen</a><p>记录问题，也记录解决问题的过程。</p></div><div class="footer-links"><a href="https://github.com/kitdine">GitHub ↗</a><a href="/rss.xml">RSS ↗</a></div></footer><script type="module">document.querySelector(`#theme-toggle`)?.addEventListener(`click`,()=>{let e=document.documentElement.dataset.theme===`dark`?`light`:`dark`;document.documentElement.dataset.theme=e;try{localStorage.setItem(`theme`,e)}catch{}}),document.querySelectorAll(`pre`).forEach(e=>{let t=document.createElement(`button`);t.className=`copy-code`,t.textContent=`复制`,t.setAttribute(`aria-label`,`复制代码`),t.addEventListener(`click`,async()=>{try{await navigator.clipboard.writeText(e.querySelector(`code`)?.textContent||``),t.textContent=`已复制`}catch{t.textContent=`请手动复制`}setTimeout(()=>t.textContent=`复制`,1800)}),e.append(t)});</script></body></html>
